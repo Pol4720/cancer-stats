@@ -218,3 +218,42 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ---------------------------------------------------------------------------
+# Específico de cancer-stats
+# ---------------------------------------------------------------------------
+# Entorno virtual gestionado por uv
+.venv/
+
+# Frontend (interfaz web)
+node_modules/
+web/dist/
+web/public/data/
+web/test-results/
+web/playwright-report/
+*.tsbuildinfo
+
+# Sitio estático ensamblado para GitHub Pages
+site/
+
+# LaTeX: intermedios (el PDF final sí se versiona en report/dist/)
+report/build/
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+
+# Presentación: capturas de la inspección visual
+presentation/capturas/
+
+# Caché de corridas en curso (las corridas terminadas sí se versionan en runs/)
+runs/.tmp-*/

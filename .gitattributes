@@ -1,0 +1,5 @@
+# Los datos originales se versionan byte a byte: el fichero viene en Mac Roman con
+# finales de línea CR y cualquier normalización alteraría su huella SHA-256.
+data/raw/** -text -diff
+*.pdf binary
+*.png binary
