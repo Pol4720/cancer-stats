@@ -466,6 +466,12 @@ class PredictiveConfig(_Section):
         ],
         title="Modelos a comparar",
     )
+    selection_rule: Literal["min", "one_se"] = Field(
+        "min",
+        title="Regla de elección del modelo",
+        description="«min»: menor RMSE medio en validación cruzada; «one_se»: el modelo más "
+        "sencillo cuyo RMSE está a menos de un error típico del mejor.",
+    )
     conformal_alpha: float = Field(
         0.1,
         title="α de los intervalos de predicción conformales",
