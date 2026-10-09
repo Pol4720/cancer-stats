@@ -80,6 +80,24 @@ def alias(term: str) -> str:
     return ALIAS.get(term, term.lower().replace("_", ""))
 
 
+def _model_name(text: str) -> str:
+    """Nombre de un modelo en minúscula dentro de una frase, conservando las siglas (MCO)."""
+    return re.sub(r"\bmco\b", "MCO", tex_escape(text).lower())
+
+
+def term_label(term: str) -> str:
+    """Etiqueta de un término del modelo: indicadoras de región e interacciones legibles."""
+    if term == "const":
+        return "Constante"
+    if term.startswith("region["):
+        return "Región: " + term[7:-1]
+    if ":" in term:
+        a, b = term.split(":", 1)
+        right = b[7:-1] if b.startswith("region[") else label(b)
+        return f"{label(a)} × {right}"
+    return label(term)
+
+
 def join_es(items: list[str]) -> str:
     """Lista en castellano: «a, b y c»."""
     items = [i for i in items if i]
@@ -505,6 +523,8 @@ def macros(res: Results) -> dict[str, str]:
         m["n-sin-influyentes"] = integer(specs["no_influential"]["n"])
     if "mi" in specs:
         m["n-imputacion"] = integer(specs["mi"]["n"])
+        if "m" in specs["mi"]:
+            m["m-imputaciones"] = integer(specs["mi"]["m"])
     boot = eff.get("bootstrap")
     if boot:
         m["boot-reps"] = integer(boot["reps"])
@@ -521,11 +541,11 @@ def macros(res: Results) -> dict[str, str]:
     if pred:
         m["n-entrenamiento"] = integer(pred["n_train"])
         m["n-prueba"] = integer(pred["n_test"])
-        m["modelo-elegido"] = tex_escape(pred["chosen_label"]).lower()
-        m["modelo-mejor-cv"] = tex_escape(pred["best_label"]).lower()
-        m["modelo-1ee"] = tex_escape(
+        m["modelo-elegido"] = _model_name(pred["chosen_label"])
+        m["modelo-mejor-cv"] = _model_name(pred["best_label"])
+        m["modelo-1ee"] = _model_name(
             next(r["label"] for r in pred["cv"] if r["model"] == pred["one_se_choice"])
-        ).lower()
+        )
         for row in pred["cv"]:
             a = MODEL_ALIAS[row["model"]]
             m[f"cv-rmse-{a}"] = num(row["rmse_mean"], 2)
@@ -537,7 +557,7 @@ def macros(res: Results) -> dict[str, str]:
             m[f"gcv-r2-{a}"] = num(row["r2_mean"], 3)
         if pred["group_cv"]:
             gbest = min(pred["group_cv"], key=lambda r: r["rmse_mean"])
-            m["modelo-mejor-gcv"] = tex_escape(gbest["label"]).lower()
+            m["modelo-mejor-gcv"] = _model_name(gbest["label"])
         for row in pred["test"]:
             a = MODEL_ALIAS[row["model"]]
             m[f"test-rmse-{a}"] = num(row["rmse"], 2)
@@ -1013,7 +1033,7 @@ def t_comparison(res: Results) -> str:
         )
         rows.append(
             rf"{tex_escape(c['modelo'])} & {c['k']} & {num(c['r2_adj'], 3)} & "
-            rf"{num(c['aic'], 1)} & {num(c['bic'], 1)} & {fpart} \\"
+            rf"{num(c['aic'], 0)} & {num(c['bic'], 0)} & {fpart} \\"
         )
     return _table(
         "comparacion",
@@ -1024,7 +1044,7 @@ def t_comparison(res: Results) -> str:
         r"& & & & & $F$ & $p$ & $F$ & $p$",
         rows,
         env="tabularx",
-        size=r"\footnotesize",
+        size=r"\footnotesize\setlength{\tabcolsep}{4pt}",
         note="Cada fila se compara con la anterior (bloque de términos que se añade o se retira). "
         "El $F$ clásico supone errores independientes y homocedásticos; el Wald robusto usa la "
         "covarianza por conglomerados de estado, la misma que guía la selección.",
@@ -1057,7 +1077,7 @@ def t_anova(res: Results) -> str:
 def t_coefficients(res: Results) -> str:
     rows = []
     for c in res["effects"]["final"]["coef"]:
-        name = "Constante" if c["term"] == "const" else label(c["term"])
+        name = term_label(c["term"])
         beta = num(c["beta"], 3) if c.get("beta") is not None else ""
         rows.append(
             rf"{tex_escape(name)} & {num(c['coef'], 3)} & {num(c['se'], 3)} & "
@@ -1109,7 +1129,7 @@ def t_spss_summary(res: Results) -> str:
 def t_spss_coefficients(res: Results) -> str:
     rows = []
     for c in res["effects"]["final"]["spss"]["coefficients"]:
-        name = "Constante" if c["term"] == "const" else label(c["term"])
+        name = term_label(c["term"])
         beta = num(c["beta"], 3) if c.get("beta") is not None else ""
         tol = num(c["tolerancia"], 3) if c.get("tolerancia") is not None else ""
         fiv = num(c["fiv"], 2) if c.get("fiv") is not None else ""
@@ -1142,7 +1162,7 @@ def t_standard_errors(res: Results) -> str:
         t = c["term"]
         cl, h = classic[t], hc3[t]
         rows.append(
-            rf"{tex_escape(label(t))} & {num(c['coef'], 3)} & {num(cl['se'], 3)} & "
+            rf"{tex_escape(term_label(t))} & {num(c['coef'], 3)} & {num(cl['se'], 3)} & "
             rf"{num(h['se'], 3)} & {num(c['se'], 3)} & {num(c['se'] / cl['se'], 2)} & "
             rf"{pcell(cl['p'])} & {pcell(c['p'])} \\"
         )
@@ -1335,7 +1355,7 @@ def t_incidence(res: Results) -> str:
         return "% El modelo final no incluye la incidencia.\n"
     rows = []
     for c in inc["comparison"]:
-        name = "Región: " + c["term"][7:-1] if c["term"].startswith("region") else label(c["term"])
+        name = term_label(c["term"])
         rows.append(
             rf"{tex_escape(name)} & {num(c['con'], 3)} & {num(c['sin'], 3)} & "
             rf"{num(c['cambio_pct'], 1)} \\"

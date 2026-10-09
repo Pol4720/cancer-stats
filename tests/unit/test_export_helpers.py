@@ -30,7 +30,7 @@ def test_pvalues_never_print_zero() -> None:
 
 
 def test_interval_uses_semicolon() -> None:
-    assert ci(1.0, 2.25, 1) == r"$[\num{1.0};\ \num{2.2}]$"
+    assert ci(1.0, 2.25, 1) == r"$[\num{1.0};$\allowbreak\ $\num{2.2}]$"
     assert num(7, 2) == r"\num{7}"  # los enteros (conteos) no llevan decimales
 
 

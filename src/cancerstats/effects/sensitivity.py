@@ -260,4 +260,5 @@ def with_multiple_imputation(
         "Reglas de Rubin; incluye Kansas, Minnesota y Nevada con incidencia imputada.",
     )
     out["fmi"] = {k: float(v) for k, v in pooled.fmi.items()}
+    out["m"] = m
     return out

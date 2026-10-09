@@ -95,7 +95,7 @@ def pcell(p: float | None, digits: int = 3) -> str:
 
 def ci(lo: float, hi: float, digits: int = 2) -> str:
     """Intervalo de confianza [a; b] con punto y coma (la coma es el separador decimal)."""
-    return rf"$[{num(lo, digits)};\ {num(hi, digits)}]$"
+    return rf"$[{num(lo, digits)};$\allowbreak\ ${num(hi, digits)}]$"
 
 
 def stars(p: float | None) -> str:
