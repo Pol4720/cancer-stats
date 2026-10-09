@@ -107,3 +107,19 @@ def test_failed_job_reports_error(client: TestClient, monkeypatch: pytest.Monkey
         time.sleep(0.02)
     assert state["status"] == "error"
     assert "fallo simulado" in state["error"]
+
+
+def test_presentation_and_report_routes(client: TestClient) -> None:
+    """Las mismas rutas relativas que en GitHub Pages: ./presentacion/ y ./informe.pdf."""
+    from cancerstats.paths import project_root
+
+    for url, path, mime in (
+        ("/presentacion/", "presentation/index.html", "text/html"),
+        ("/informe.pdf", "report/dist/informe.pdf", "application/pdf"),
+    ):
+        r = client.get(url)
+        if (project_root() / path).is_file():
+            assert r.status_code == 200
+            assert r.headers["content-type"].startswith(mime)
+        else:
+            assert r.status_code == 404

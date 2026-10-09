@@ -297,8 +297,26 @@ def create_app(
 
         return StreamingResponse(stream(), media_type="text/event-stream")
 
+    # ------------------------------------------------- presentación e informe en PDF
+    # Mismas rutas relativas que en GitHub Pages: ./presentacion/ y ./informe.pdf.
+    root = project_root()
+
+    @app.get("/presentacion/", include_in_schema=False)
+    def presentation() -> FileResponse:
+        path = root / "presentation" / "index.html"
+        if not path.is_file():
+            raise HTTPException(404, "Presentación no generada: «cancerstats presentation».")
+        return FileResponse(path, media_type="text/html")
+
+    @app.get("/informe.pdf", include_in_schema=False)
+    def report_pdf() -> FileResponse:
+        path = root / "report" / "dist" / "informe.pdf"
+        if not path.is_file():
+            raise HTTPException(404, "Informe no compilado.")
+        return FileResponse(path, media_type="application/pdf")
+
     # --------------------------------------------------------------------- interfaz
-    web = static_dir or project_root() / "web" / "dist"
+    web = static_dir or root / "web" / "dist"
     if web.is_dir():
         app.mount("/", StaticFiles(directory=web, html=True), name="web")
     return app

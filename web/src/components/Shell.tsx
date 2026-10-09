@@ -97,6 +97,10 @@ export function Shell() {
           ];
         })}
         <div className="sidebar-foot">
+          <div className="foot-links">
+            <a className="btn btn-sm" href="presentacion/" target="_blank" rel="noopener"><Icon name="monitor" size={16} /> Presentación</a>
+            <a className="btn btn-sm" href="informe.pdf" target="_blank" rel="noopener"><Icon name="download" size={16} /> Informe (PDF)</a>
+          </div>
           <span className={`badge ${source.mode}`}>
             <span className="dot" /> {source.mode === "live" ? "Modo en vivo" : "Versión publicada"}
           </span>
