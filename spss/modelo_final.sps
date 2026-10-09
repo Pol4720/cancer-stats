@@ -1,6 +1,6 @@
 * ==========================================================================.
 * Reproducción en SPSS del modelo final MCO (proyecto cancer-stats).
-* Generado automáticamente a partir de la corrida 20261009-034617-f8341612.
+* Generado automáticamente a partir de la corrida 20261009-095405-f8341612.
 * Los coeficientes y errores típicos clásicos deben coincidir con la tabla
 * «salida tipo SPSS» del informe. Ejecutar con el fichero oficial en la
 * misma carpeta que esta sintaxis.
@@ -19,7 +19,7 @@ EXECUTE.
 * D02: Notificadomuerte = avgAnnCount - avgDeathsPerYear (fuga): no entra en el modelo.
 
 * D03: valor centinela de incidenceRate.
-IF (ABS(incidenceRate - 453.5494000) < 0.000001) incidenceRate = $SYSMIS.
+IF (ABS(incidenceRate - 453.5494221) < 0.0001) incidenceRate = $SYSMIS.
 
 * D04: edad mediana registrada en meses.
 IF (MedianAge > 100) MedianAge = RND(MedianAge / 12 * 10) / 10.
