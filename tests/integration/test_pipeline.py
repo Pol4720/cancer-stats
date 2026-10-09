@@ -7,6 +7,7 @@ exactamente lo que produce un ajuste MCO estándar.
 
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 from typing import Any
@@ -156,3 +157,18 @@ def test_export(outcome, registry: RunRegistry, tmp_path: Path) -> None:  # type
     assert "/RESIDUALS DURBIN" in sps
     for c in res["effects"]["final"]["centers"]:
         assert f"c_{c}" in sps
+
+
+def test_web_export(outcome, registry: RunRegistry, tmp_path: Path) -> None:  # type: ignore[no-untyped-def]
+    from cancerstats.export.web import export_web
+
+    rid, _ = outcome
+    assert export_web(rid, registry, tmp_path) == rid
+    run_dir = tmp_path / "runs" / rid
+    for name in ("results.json", "dataset.json", "config.json", "modelo_final.sps", "log.txt"):
+        assert (run_dir / name).is_file(), name
+    index = json.loads((tmp_path / "runs.json").read_text(encoding="utf-8"))
+    assert index["latest"] == rid
+    assert index["mode"] == "static"
+    schema = json.loads((tmp_path / "config-schema.json").read_text(encoding="utf-8"))
+    assert "effects" in schema["properties"]

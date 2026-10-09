@@ -120,6 +120,8 @@ def run(
     """
     registry = registry or RunRegistry()
     run_id = new_run_id(config)
+    # El estado del código se registra al empezar: es el que realmente se ejecuta.
+    code_state = git_state(project_root())
     log_lines: list[str] = []
     timings: dict[str, float] = {}
     started = time.perf_counter()
@@ -260,7 +262,7 @@ def run(
         "seed": config.meta.seed,
         "data_path": config.data.path,
         "data_sha256": ingest.sha256,
-        "git": git_state(root),
+        "git": code_state,
         "environment": environment(),
     }
     results["manifest"] = manifest
