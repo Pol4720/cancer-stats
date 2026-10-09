@@ -170,16 +170,17 @@ def state_fixed_effects(
     )
     shown = list(cols)
     ci = res.conf_int().loc[shown]
+    weighted = not np.allclose(weights, weights[0])
     return _table(
         "state_fe",
-        "Efectos fijos de estado (MCPF + cluster)",
+        f"Efectos fijos de estado ({'MCPF' if weighted else 'MCO'} + cluster)",
         res.params[shown],
         res.bse[shown],
         ci.iloc[:, 0],
         ci.iloc[:, 1],
         res.pvalues[shown],
         int(res.nobs),
-        "La región desaparece: queda absorbida por los 50 efectos de estado.",
+        f"La región desaparece: queda absorbida por los {states.shape[1] + 1} efectos de estado.",
     )
 
 

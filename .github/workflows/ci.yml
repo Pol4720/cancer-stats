@@ -52,3 +52,33 @@ jobs:
           enable-cache: true
       - run: uv sync --extra dev --frozen
       - run: uv run pytest -m slow
+
+  web:
+    name: Interfaz web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --frozen
+      - name: Datos de la última corrida
+        run: uv run cancerstats web-data
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Dependencias
+        working-directory: web
+        run: npm ci
+      - name: ESLint, tipos y pruebas unitarias
+        working-directory: web
+        run: npm run lint && npm run typecheck && npm test
+      - name: Compilación
+        working-directory: web
+        run: npm run build
+      - name: Pruebas de extremo a extremo (escritorio y móvil)
+        working-directory: web
+        run: npx playwright install --with-deps chromium && npm run e2e
