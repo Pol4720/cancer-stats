@@ -187,3 +187,21 @@ def test_web_export(outcome, registry: RunRegistry, tmp_path: Path) -> None:  # 
     assert index["mode"] == "static"
     schema = json.loads((tmp_path / "config-schema.json").read_text(encoding="utf-8"))
     assert "effects" in schema["properties"]
+
+
+def test_spss_syntax_flags_the_sentinel_exactly(outcome, registry: RunRegistry) -> None:  # type: ignore[no-untyped-def]
+    """La sintaxis de SPSS debe reconocer el centinela tal como está en el fichero oficial."""
+    from cancerstats.export.spss import syntax
+    from cancerstats.io import read_raw
+    from tests.conftest import SAV
+
+    _, res = outcome
+    sps = syntax(res, "practica.sav")
+    raw, _ = read_raw(SAV)
+    for col in res["cleaning"]["sentinels"]:
+        line = next(ln for ln in sps.splitlines() if ln.startswith(f"IF (ABS({col} - "))
+        value = float(line.split(" - ")[1].split(")")[0])
+        tol = float(line.split("< ")[1].split(")")[0])
+        n_flagged = int(((raw[col] - value).abs() < tol).sum())
+        expected = next(d["n_affected"] for d in res["cleaning"]["decisions"] if d["id"] == "D03")
+        assert n_flagged == expected

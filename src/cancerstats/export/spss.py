@@ -46,7 +46,10 @@ def syntax(res: Results, data_file: str = "practica.sav") -> str:
     fin = eff["final"]
     terms: list[str] = list(fin["terms"])
     centers: dict[str, float] = fin["centers"]
-    sentinels = res["cleaning"]["sentinels"]
+    exact = res["cleaning"].get("sentinels_exact") or {}
+    sentinels = {
+        col: float(exact.get(col, value)) for col, value in res["cleaning"]["sentinels"].items()
+    }
     reference = next(
         lev for lev in REGIONS if not any(c["term"] == f"region[{lev}]" for c in fin["coef"])
     )
@@ -77,7 +80,8 @@ def syntax(res: Results, data_file: str = "practica.sav") -> str:
     for col, value in sentinels.items():
         out += [
             f"* D03: valor centinela de {col}.",
-            f"IF (ABS({col} - {value:.7f}) < 0.000001) {col} = $SYSMIS.",
+            # Tolerancia holgada: las mediciones reales tienen uno o dos decimales.
+            f"IF (ABS({col} - {value!r}) < 0.0001) {col} = $SYSMIS.",
         ]
     out += [
         "",

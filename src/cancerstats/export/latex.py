@@ -144,7 +144,8 @@ def macros(res: Results) -> dict[str, str]:
     if "avgAnnCount" in sent:
         m["centinela-casos"] = num(sent["avgAnnCount"], 6)
     if "incidenceRate" in sent:
-        m["centinela-incidencia"] = num(sent["incidenceRate"], 7)
+        exact = res["cleaning"].get("sentinels_exact", {}).get("incidenceRate")
+        m["centinela-incidencia"] = rf"\num{{{exact}}}" if exact else num(sent["incidenceRate"], 7)
     m["estados-centinela"] = join_es(list(dec["D03"]["evidence"].get("estados", {})))
     m["n-edad-meses"] = integer(dec["D04"]["n_affected"])
     m["razon-edad"] = num(dec["D04"]["evidence"].get("razon_media", float("nan")), 3)

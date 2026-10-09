@@ -240,6 +240,9 @@ def run(
         "cleaning": {
             "decisions": [d.to_dict() for d in cleaned.decisions],
             "sentinels": cleaned.sentinels,
+            # El JSON redondea los reales a 7 cifras: el valor exacto viaja como texto para que
+            # la sintaxis de SPSS lo reconozca sin ambigüedad.
+            "sentinels_exact": {k: repr(v) for k, v in cleaned.sentinels.items()},
             "n_rows": len(df),
         },
         "missing": miss.to_dict(),
