@@ -180,7 +180,7 @@ def missing_patterns(
     keys = df[cols].isna().apply(lambda r: tuple(c for c in cols if r[c]), axis=1)
     counts = keys.value_counts().head(top)
     return [
-        {"faltan": list(k) if k else [], "n": int(n), "pct": round(100 * n / len(df), 2)}
+        {"faltan": list(k) if k else [], "n": int(n), "pct": round(100 * n / len(df), 2)}  # type: ignore[call-overload]
         for k, n in counts.items()
     ]
 
@@ -228,7 +228,7 @@ def compare_missing(
 
 def missing_by_state(df: pd.DataFrame, target_cols: list[str]) -> list[dict[str, object]]:
     """Contraste χ² de independencia entre la ausencia y el estado (y la región)."""
-    out = []
+    out: list[dict[str, object]] = []
     for tcol in target_cols:
         miss = df[tcol].isna()
         if miss.sum() == 0:
@@ -297,10 +297,10 @@ def analyze_missing(
         significant = [r for r in rows if float(r["p_welch_ajustado"]) < alpha]  # type: ignore[arg-type]
         state_p = next(
             (
-                float(r["p"])
+                float(r["p"])  # type: ignore[arg-type]
                 for r in by_state
                 if r["variable"] == col and r["agrupacion"] == "state"
-            ),  # type: ignore[arg-type]
+            ),
             float("nan"),
         )
         verdict = "compatible con MCAR" if not significant and state_p >= alpha else "no MCAR"
@@ -388,4 +388,4 @@ def rubin_pool(
     nu = 1 / (1 / nu_old + 1 / nu_obs)
     r = (1 + 1 / m) * b / ubar
     fmi = (r + 2 / (nu + 3)) / (r + 1)
-    return RubinPooled(params=qbar, se=np.sqrt(t), df=nu, fmi=fmi, within=ubar, between=b)
+    return RubinPooled(params=qbar, se=t.pow(0.5), df=nu, fmi=fmi, within=ubar, between=b)

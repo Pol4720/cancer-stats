@@ -92,7 +92,7 @@ def correlations(
     """Correlación de cada explicativa con la respuesta, con p-valores corregidos."""
     rows = []
     for col in columns:
-        res = inf.correlation_test(df[col], df[response], alpha)
+        res = inf.correlation_test(df[col].to_numpy(), df[response].to_numpy(), alpha)
         res.update({"variable": col, "etiqueta": label(col)})
         rows.append(res)
     adj_p = inf.adjust([float(r["p_pearson"]) for r in rows], correction)  # type: ignore[arg-type]
@@ -105,7 +105,7 @@ def correlations(
 
 def correlation_matrix(df: pd.DataFrame, columns: list[str], method: str = "pearson") -> Record:
     """Matriz de correlaciones (casos disponibles por pares)."""
-    mat = df[columns].astype(float).corr(method=method)
+    mat = df[columns].astype(float).corr(method=method)  # type: ignore[arg-type]
     return {
         "variables": columns,
         "labels": [label(c) for c in columns],
@@ -149,11 +149,15 @@ def explore(
     region = inf.k_sample(df, response, "region", alpha, correction)
     poverty = df["povertyPercent"] >= 20
     high_pov = inf.two_sample(
-        df.loc[poverty, response], df.loc[~poverty, response], ("Pobreza ≥ 20 %", "Pobreza < 20 %")
+        df.loc[poverty, response].to_numpy(),
+        df.loc[~poverty, response].to_numpy(),
+        ("Pobreza ≥ 20 %", "Pobreza < 20 %"),
     )
     trials = df["studyPerCap"] > 0
     study = inf.two_sample(
-        df.loc[trials, response], df.loc[~trials, response], ("Con ensayos", "Sin ensayos")
+        df.loc[trials, response].to_numpy(),
+        df.loc[~trials, response].to_numpy(),
+        ("Con ensayos", "Sin ensayos"),
     )
     state_means = (
         df.groupby("state")[response]

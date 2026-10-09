@@ -38,7 +38,7 @@ def high_correlations(x: pd.DataFrame, threshold: float) -> list[Record]:
     out = []
     for i, a in enumerate(cols):
         for b in cols[i + 1 :]:
-            r = float(corr.loc[a, b])
+            r = float(corr.to_numpy()[corr.index.get_loc(a), corr.columns.get_loc(b)])
             if abs(r) >= threshold:
                 out.append({"a": a, "b": b, "etiqueta_a": label(a), "etiqueta_b": label(b), "r": r})
     return sorted(out, key=lambda d: -abs(float(d["r"])))  # type: ignore[arg-type]
@@ -97,7 +97,7 @@ def prune(
                 "paso": len(trace) + 1,
                 "eliminada": worst,
                 "etiqueta": label(worst),
-                "fiv": float(free.loc[worst, "fiv"]),
+                "fiv": float(free["fiv"].to_numpy()[free.index.get_loc(worst)]),
                 "mas_correlada_con": partner,
                 "r": float(corr[partner]),
             }
