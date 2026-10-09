@@ -10,6 +10,8 @@ export default defineConfig({
   server: {
     proxy: { "/api": "http://127.0.0.1:8000" },
   },
+  // La vista previa reproduce GitHub Pages: sin API, modo estático.
+  preview: { proxy: {} },
   build: {
     target: "es2022",
     chunkSizeWarningLimit: 5000,
