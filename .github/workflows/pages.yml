@@ -34,7 +34,7 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - name: Compilación de la interfaz (sólo modo estático: en Pages no hay API)
+      - name: Compilación de la interfaz en modo estático (en Pages no hay API)
         working-directory: web
         env:
           VITE_CS_MODE: static
