@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  calidad:
+    name: Estilo y tipos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --extra dev --frozen
+      - name: Ruff (reglas)
+        run: uv run ruff check src tests
+      - name: Ruff (formato)
+        run: uv run ruff format --check src tests
+      - name: mypy
+        run: uv run mypy
+
+  pruebas:
+    name: Pruebas unitarias y de la API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --extra dev --frozen
+      - run: uv run pytest -m "not slow" --cov --cov-report=term
+
+  pipeline:
+    name: Pipeline completo (integración)
+    runs-on: ubuntu-latest
+    needs: pruebas
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --extra dev --frozen
+      - run: uv run pytest -m slow
