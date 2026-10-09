@@ -336,6 +336,26 @@ def macros(res: Results) -> dict[str, str]:
     for c in eff["confounding"]:
         m[f"confusion-{alias(c['reincorporada'])}"] = num(100 * c["cambio_relativo"], 1)
         m[f"confusion-{alias(c['reincorporada'])}-en"] = tex_escape(label(c["en"])).lower()
+    cmp_alias = {
+        "Nulo (región)": "nulo",
+        "Máximo (tras la poda)": "maximo",
+        "Seleccionado (efectos principales)": "seleccionado",
+        "Final (con interacciones)": "final",
+    }
+    for c in eff["model_comparison"]:
+        ca = cmp_alias.get(c["modelo"])
+        if ca is None:
+            continue
+        m[f"cmp-{ca}-k"] = integer(c["k"])
+        m[f"cmp-{ca}-r2aj"] = num(c["r2_adj"], 3)
+        m[f"cmp-{ca}-aic"] = num(c["aic"], 1)
+        m[f"cmp-{ca}-bic"] = num(c["bic"], 1)
+        if "F_parcial" in c:
+            m[f"cmp-{ca}-f"] = num(c["F_parcial"], 2)
+            m[f"cmp-{ca}-p"] = pvalue(c["p_parcial"])
+            m[f"cmp-{ca}-f-rob"] = num(c.get("F_robusto"), 2)
+            m[f"cmp-{ca}-p-rob"] = pvalue(c.get("p_robusto"))
+            m[f"cmp-{ca}-gl"] = integer(c["gl"][0])
     entered = [t for t in eff["interactions"] if t["entra"]]
     m["n-interacciones"] = integer(len(entered))
     m["interacciones"] = (
@@ -986,9 +1006,10 @@ def t_comparison(res: Results) -> str:
     rows = []
     for c in res["effects"]["model_comparison"]:
         fpart = (
-            rf"{num(c['F_parcial'], 2)} & {pcell(c['p_parcial'])}"
+            rf"{num(c['F_parcial'], 2)} & {pcell(c['p_parcial'])} & "
+            rf"{num(c.get('F_robusto'), 2)} & {pcell(c.get('p_robusto'))}"
             if "F_parcial" in c
-            else r"--- & ---"
+            else r"--- & --- & --- & ---"
         )
         rows.append(
             rf"{tex_escape(c['modelo'])} & {c['k']} & {num(c['r2_adj'], 3)} & "
@@ -997,12 +1018,16 @@ def t_comparison(res: Results) -> str:
     return _table(
         "comparacion",
         "Comparación de modelos anidados (misma muestra y mismos pesos)",
-        r"X r r r r r r",
-        r"Modelo & $k$ & $\bar R^2$ & AIC & BIC & $F$ parcial & $p$",
+        r"X r r r r r r r r",
+        r"Modelo & $k$ & $\bar R^2$ & AIC & BIC & \multicolumn{2}{c}{$F$ clásico} & "
+        r"\multicolumn{2}{c}{Wald robusto} \\ \cmidrule(lr){6-7}\cmidrule(lr){8-9} "
+        r"& & & & & $F$ & $p$ & $F$ & $p$",
         rows,
         env="tabularx",
         size=r"\footnotesize",
-        note="El $F$ parcial compara cada modelo con el de la fila anterior.",
+        note="Cada fila se compara con la anterior (bloque de términos que se añade o se retira). "
+        "El $F$ clásico supone errores independientes y homocedásticos; el Wald robusto usa la "
+        "covarianza por conglomerados de estado, la misma que guía la selección.",
     )
 
 

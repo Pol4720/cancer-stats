@@ -230,8 +230,8 @@ export default function Explore() {
           />
           <Explain>
             <p>
-              Las varianzas difieren entre regiones (Levene p {pval(x.region.levene.p)}), por eso se usa el ANOVA de Welch y las comparaciones de
-              Games-Howell. El Sur tiene la mortalidad más alta; buena parte de esa brecha se explica luego por la composición socioeconómica.
+              Las varianzas difieren entre regiones (Levene p {pval(x.region.levene.p)}), por eso se usa el ANOVA de Welch; las comparaciones por pares (Tukey) se confirman con
+              Mann-Whitney y corrección de Holm. El Sur tiene la mortalidad más alta; buena parte de esa brecha se explica luego por la composición socioeconómica.
             </p>
           </Explain>
         </Card>

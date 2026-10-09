@@ -73,12 +73,17 @@ def _construct_blocks(res, design: Design, terms: list[str]) -> list[Record]:  #
 
 
 def _nested_comparison(
-    design: Design, models: dict[str, list[str]], weights: np.ndarray | None
+    design: Design, models: dict[str, list[str]], weights: np.ndarray | None, cov: str = "cluster"
 ) -> list[Record]:
-    """Comparación de modelos anidados sobre la misma muestra (AIC, BIC, R² ajustado, F parcial)."""
+    """Comparación de modelos anidados sobre la misma muestra (AIC, BIC, R² ajustado, F parcial).
+
+    Además del $F$ parcial clásico se contrasta el mismo bloque de términos con un Wald que usa
+    la covarianza elegida (por conglomerados), coherente con el resto de la inferencia.
+    """
     rows: list[Record] = []
     prev_name: str | None = None
     prev_res = None
+    prev_terms: list[str] = []
     for name, terms in models.items():
         res = fit(design, terms, weights, "nonrobust")
         row: Record = {
@@ -98,8 +103,15 @@ def _nested_comparison(
             row["F_parcial"] = float(f_stat)
             row["gl"] = [int(dq), int(big.df_resid)]
             row["p_parcial"] = float(stats.f.sf(f_stat, dq, big.df_resid))
+            big_terms, small_terms = (terms, prev_terms) if res is big else (prev_terms, terms)
+            extra = [
+                c for c in design.columns_for(big_terms) if c not in design.columns_for(small_terms)
+            ]
+            f_rob, p_rob, _ = wald(fit(design, big_terms, weights, cov), extra)
+            row["F_robusto"] = f_rob
+            row["p_robusto"] = p_rob
         rows.append(row)
-        prev_name, prev_res = name, res
+        prev_name, prev_res, prev_terms = name, res, list(terms)
     return rows
 
 
@@ -252,6 +264,7 @@ def run_effects(
             "Final (con interacciones)": final_terms,
         },
         w0,
+        eff.covariance,
     )
 
     # 7. Modelo final sobre su propia muestra de casos completos -------------------------
@@ -374,6 +387,13 @@ def run_effects(
         ),
         sensitivity._from_res("main", principal, res),
         alternative,
+        sensitivity._from_res(
+            "maximo",
+            "Modelo máximo: todas las candidatas tras la poda",
+            fit(design, [*main_terms, *(t for t in final_terms if ":" in t)], w0, eff.covariance),
+            "Sin selección de variables: si los coeficientes de interés apenas cambian, las "
+            "conclusiones no dependen de qué covariables descartó la selección.",
+        ),
         sensitivity.state_fixed_effects(df, fdesign, final_terms, w_or_one),
         sensitivity.mixed_model(fdesign, final_terms),
         sensitivity.huber(fdesign, final_terms, w_or_one),

@@ -107,6 +107,15 @@ def test_final_model_is_reproduced_independently(outcome, dataset: pd.DataFrame)
         assert ref.bse[name] == pytest.approx(classic[t]["se"], rel=1e-4)
 
 
+def test_nested_comparison_has_robust_tests(outcome) -> None:  # type: ignore[no-untyped-def]
+    rows = outcome[1]["effects"]["model_comparison"]
+    for r in rows[1:]:
+        assert 0 <= r["p_robusto"] <= 1
+        assert r["F_robusto"] > 0
+    ids = [s["id"] for s in outcome[1]["effects"]["sensitivity"]]
+    assert "maximo" in ids
+
+
 def test_robust_and_classic_share_estimates(outcome) -> None:  # type: ignore[no-untyped-def]
     final = outcome[1]["effects"]["final"]
     for table in ("coef_classic", "coef_hc3"):

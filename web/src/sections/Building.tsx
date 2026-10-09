@@ -192,7 +192,7 @@ export default function Building() {
         />
       </Card>
 
-      <Card title="Paso 6 · Comparación de modelos anidados" sub="Misma muestra; F parcial frente al modelo anterior.">
+      <Card title="Paso 6 · Comparación de modelos anidados" sub="Misma muestra; cada fila frente a la anterior, con el F clásico y el Wald robusto por conglomerados.">
         <DataTable
           name="comparacion-modelos"
           csv={false}
@@ -204,8 +204,10 @@ export default function Building() {
             { key: "r2_adj", header: "R² aj.", num: true, render: (r: any) => num(r.r2_adj, 3) },
             { key: "aic", header: "AIC", num: true, render: (r: any) => num(r.aic, 1) },
             { key: "bic", header: "BIC", num: true, render: (r: any) => num(r.bic, 1) },
-            { key: "F_parcial", header: "F parcial", num: true, render: (r: any) => num(r.F_parcial, 2) },
+            { key: "F_parcial", header: "F clásico", num: true, render: (r: any) => num(r.F_parcial, 2) },
             { key: "p_parcial", header: "p", num: true, render: (r: any) => pval(r.p_parcial) },
+            { key: "F_robusto", header: "Wald robusto", num: true, render: (r: any) => num(r.F_robusto, 2) },
+            { key: "p_robusto", header: "p robusto", num: true, render: (r: any) => pval(r.p_robusto) },
           ]}
         />
       </Card>

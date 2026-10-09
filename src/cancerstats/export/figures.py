@@ -602,6 +602,8 @@ def fig_sensitivity(res: Results, clean: pd.DataFrame, raw: pd.DataFrame, path: 
         "ols": "MCO",
         "ols_hc3": "MCO + HC3",
         "wls": "MCPF",
+        "maximo": "Máximo",
+        "ols_cluster": "MCO + cluster",
         "main": "Principal",
         "state_fe": "EF de estado",
         "mixed": "Mixto",
