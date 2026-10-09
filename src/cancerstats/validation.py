@@ -83,7 +83,7 @@ def _examples(
     for rec in rows.to_dict(orient="records"):
         out.append(
             {
-                key: (
+                str(key): (
                     None
                     if isinstance(val, float) and np.isnan(val)
                     else (round(val, 4) if isinstance(val, float) else val)
@@ -111,8 +111,9 @@ def find_sentinels(df: pd.DataFrame, min_repeats: int, min_decimals: int) -> dic
     for col in df.select_dtypes(include="number").columns:
         counts = df[col].value_counts()
         for value, n in counts.items():
-            if n >= min_repeats and _decimals(float(value)) >= min_decimals:
-                found[col] = float(value)
+            v = float(value)  # type: ignore[arg-type]
+            if n >= min_repeats and _decimals(v) >= min_decimals:
+                found[str(col)] = v
                 break
     return found
 
@@ -186,7 +187,7 @@ def r03_positive(df: pd.DataFrame, cfg: CleaningConfig, s: dict[str, float]) -> 
 def r04_sentinels(df: pd.DataFrame, cfg: CleaningConfig, s: dict[str, float]) -> RuleResult:
     found = find_sentinels(df, cfg.sentinel_min_repeats, cfg.sentinel_min_decimals)
     mask = sentinel_mask(df, found)
-    desc = ", ".join(f"{c} = {v:g}" for c, v in found.items()) or "ninguno"
+    desc = ", ".join(f"{c} = {v:.10g}".replace(".", ",") for c, v in found.items()) or "ninguno"
     return RuleResult(
         "R04",
         "Valores centinela",
@@ -226,7 +227,7 @@ def r06_age_coherence(df: pd.DataFrame, cfg: CleaningConfig, s: dict[str, float]
         "R06",
         "Coherencia de las edades medianas",
         "La mediana conjunta debe estar entre las medianas de hombres y mujeres (con una "
-        f"tolerancia de {cfg.median_age_tolerance:g} años).",
+        f"tolerancia de {cfg.median_age_tolerance:g} años).".replace(".", ",", 1),
         "consistencia",
         "error",
         ["MedianAge", "MedianAgeMale", "MedianAgeFemale"],
@@ -471,6 +472,45 @@ def r18_zero_inflation(df: pd.DataFrame, cfg: CleaningConfig, s: dict[str, float
     )
 
 
+def r19_cases_minus_deaths(
+    df: pd.DataFrame, cfg: CleaningConfig, s: dict[str, float]
+) -> RuleResult:
+    if "Notificadomuerte" not in df.columns:
+        return RuleResult(
+            "R19",
+            "Identidad de Notificadomuerte",
+            "La fuente no contiene la variable Notificadomuerte.",
+            "identidad",
+            "información",
+            [],
+            0,
+            0,
+            "No aplica.",
+        )
+    valid = df[["Notificadomuerte", "avgAnnCount", "avgDeathsPerYear"]].notna().all(axis=1)
+    diff = df["Notificadomuerte"] - (df["avgAnnCount"] - df["avgDeathsPerYear"])
+    bad = valid & (diff.abs() > 1e-6)
+    same_missing = bool((df["Notificadomuerte"].isna() == df["avgAnnCount"].isna()).all())
+    return RuleResult(
+        "R19",
+        "Identidad de Notificadomuerte",
+        "La variable que añade el fichero oficial debe ser avgAnnCount − avgDeathsPerYear "
+        f"(se comprueba en {int(valid.sum())} condados); "
+        + (
+            "falta exactamente donde falta avgAnnCount."
+            if same_missing
+            else "su patrón de ausencia difiere del de avgAnnCount."
+        ),
+        "identidad",
+        "error",
+        ["Notificadomuerte", "avgAnnCount", "avgDeathsPerYear"],
+        int(valid.sum()),
+        int(bad.sum()),
+        "D02: al contener las muertes (numerador de la respuesta) se excluye de los modelos.",
+        _examples(df, bad, ["Notificadomuerte", "avgAnnCount", "avgDeathsPerYear"]),
+    )
+
+
 RULES: tuple[Rule, ...] = (
     r01_unique_id,
     r02_percent_domain,
@@ -490,6 +530,7 @@ RULES: tuple[Rule, ...] = (
     r16_region,
     r17_declared_missing,
     r18_zero_inflation,
+    r19_cases_minus_deaths,
 )
 
 

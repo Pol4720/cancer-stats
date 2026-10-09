@@ -67,42 +67,93 @@ EXCLUDED_REASONS: dict[str, str] = {
 }
 
 
-def clean(raw: pd.DataFrame, config: AnalysisConfig) -> CleaningResult:
-    """Aplica las decisiones de depuración según la configuración."""
+def clean(raw: pd.DataFrame, config: AnalysisConfig, source_format: str = "spss") -> CleaningResult:
+    """Aplica las decisiones de depuración según la configuración.
+
+    Args:
+        raw: datos tal como se leyeron.
+        config: configuración de la corrida.
+        source_format: ``"spss"`` (fuente oficial) o ``"csv"`` (CSV de Kaggle); determina
+            qué incidencias de formato hubo que resolver en la ingesta.
+    """
     cfg = config.cleaning
     df = raw.copy()
     decisions: list[Decision] = []
 
-    # D01 y D02 se aplican en la ingesta (codificación y columna vacía); se registran aquí
-    # para que el registro de decisiones sea completo.
-    decisions.append(
-        Decision(
-            "D01",
-            "Codificación y finales de línea",
-            "El fichero está en Mac Roman con finales de línea CR; una lectura en UTF-8 falla y "
-            "en Windows-1252 convierte «Doña Ana» en «Do–a Ana».",
-            "Se decodifica en Mac Roman y se normalizan los finales de línea.",
-            "La huella del Mac clásico (CR) y el byte 0x96 ⇒ «ñ» identifican la codificación "
-            "sin ambigüedad.",
-            "data.encoding",
-            1,
-            evidence={"condado": "Doña Ana County, New Mexico"},
-            affected=["Doña Ana County, New Mexico"],
+    # D01 y D02 dependen del formato de la fuente: se resolvieron en la ingesta o se refieren
+    # a columnas que no son variables del estudio, y se registran aquí para que el registro
+    # de decisiones sea completo.
+    if source_format == "csv":
+        decisions.append(
+            Decision(
+                "D01",
+                "Codificación y finales de línea",
+                "El fichero está en Mac Roman con finales de línea CR; una lectura en UTF-8 "
+                "falla y en Windows-1252 convierte «Doña Ana» en «Do–a Ana».",
+                "Se decodifica en Mac Roman y se normalizan los finales de línea.",
+                "La huella del Mac clásico (CR) y el byte 0x96 ⇒ «ñ» identifican la "
+                "codificación sin ambigüedad.",
+                "data.encoding",
+                1,
+                evidence={"condado": "Doña Ana County, New Mexico"},
+                affected=["Doña Ana County, New Mexico"],
+            )
         )
-    )
-    decisions.append(
-        Decision(
-            "D02",
-            "Columna vacía sin nombre",
-            "Hay una columna sin cabecera y sin ningún valor entre MedianAgeFemale y "
-            "AvgHouseholdSize, justo donde la documentación sitúa Geography.",
-            "Se elimina.",
-            "Geography se movió al final y su coma interna la dividió en «Geography» y "
-            "«state»; la columna vacía es el hueco que dejó.",
-            "—",
-            len(df),
+        decisions.append(
+            Decision(
+                "D02",
+                "Columna vacía sin nombre",
+                "Hay una columna sin cabecera y sin ningún valor entre MedianAgeFemale y "
+                "AvgHouseholdSize, justo donde la documentación sitúa Geography.",
+                "Se elimina.",
+                "Geography se movió al final y su coma interna la dividió en «Geography» y "
+                "«state»; la columna vacía es el hueco que dejó.",
+                "—",
+                len(df),
+            )
         )
-    )
+    else:
+        decisions.append(
+            Decision(
+                "D01",
+                "Geography separada en condado y estado",
+                "La fuente oficial guarda en una sola columna «Condado, Estado» (por ejemplo, "
+                "«Doña Ana County, New Mexico»), de modo que el estado no es utilizable como "
+                "variable.",
+                "Se separa por la última coma en Geography (condado) y state (estado).",
+                "El estado es imprescindible: define la región censal y es la unidad de "
+                "conglomerado de los errores típicos. Ningún nombre de estado contiene comas, "
+                "así que la separación es exacta (51 estados reconocidos).",
+                "—",
+                len(df),
+                evidence={"n_estados": int(df["state"].nunique())},
+            )
+        )
+        if "Notificadomuerte" in df.columns:
+            valid = df[["Notificadomuerte", "avgAnnCount", "avgDeathsPerYear"]].notna().all(axis=1)
+            exact = bool(
+                np.allclose(
+                    df.loc[valid, "Notificadomuerte"],
+                    df.loc[valid, "avgAnnCount"] - df.loc[valid, "avgDeathsPerYear"],
+                )
+            )
+            decisions.append(
+                Decision(
+                    "D02",
+                    "Notificadomuerte excluida por fuga de información",
+                    "El fichero oficial añade una variable sin documentar, Notificadomuerte, "
+                    f"presente en {_fmt_int(valid.sum())} condados.",
+                    "Se conserva en los datos pero se excluye de todos los modelos.",
+                    "La regla R19 demuestra que es "
+                    + ("exactamente" if exact else "aproximadamente")
+                    + " avgAnnCount − avgDeathsPerYear (casos menos muertes anuales). Contiene "
+                    "las muertes, que son el numerador de la mortalidad que se quiere explicar: "
+                    "usarla como explicativa sería explicar la respuesta con ella misma.",
+                    "variables.candidates",
+                    int(valid.sum()),
+                    evidence={"identidad_exacta": exact},
+                )
+            )
 
     # D03: centinelas -------------------------------------------------------------------
     sentinels = find_sentinels(df, cfg.sentinel_min_repeats, cfg.sentinel_min_decimals)
@@ -110,30 +161,40 @@ def clean(raw: pd.DataFrame, config: AnalysisConfig) -> CleaningResult:
     states = df.loc[smask, "state"].value_counts()
     state_totals = df["state"].value_counts()
     coverage = {s: f"{int(n)}/{int(state_totals[s])}" for s, n in states.items()}
+    count_missing = df["avgAnnCount"].isna()
+    count_already_missing = bool(
+        smask.any() and "avgAnnCount" not in sentinels and (count_missing == smask).all()
+    )
     if cfg.sentinel_to_missing:
         for col, value in sentinels.items():
             hit = np.isclose(df[col].to_numpy(dtype=float), value, rtol=0, atol=1e-6)
             df.loc[hit, col] = np.nan
-    big = raw.loc[smask].sort_values("popEst2015", ascending=False).head(1)
+    affected = raw.loc[smask].sort_values("popEst2015", ascending=False)
     example = ""
-    if len(big):
-        row = big.iloc[0]
+    if len(affected) >= 2 and "incidenceRate" in sentinels:
+        big, small = affected.iloc[0], affected.iloc[-1]
         example = (
-            f" Además produce incoherencias evidentes ({row['county_id']}: "
-            f"{_fmt_int(row['popEst2015'])} habitantes y {_fmt_int(row['avgDeathsPerYear'])} "
-            f"muertes anuales, pero «{_fmt_int(row['avgAnnCount'])} casos»)."
+            f" La incoherencia es evidente: {big['county_id']} ({_fmt_int(big['popEst2015'])} "
+            f"habitantes) y {small['county_id']} ({_fmt_int(small['popEst2015'])}) tendrían "
+            "exactamente la misma incidencia."
         )
     values = " e ".join(f"{c} = {_fmt_dec(v)}" for c, v in sentinels.items())
     state_list = _join_es(list(states.index))
     whole_states = all(states[s] == state_totals[s] for s in states.index)
+    also = (
+        " El propio fichero oficial ya trae como perdidos del sistema los casos anuales "
+        "(avgAnnCount) de esos mismos condados, pero conserva la incidencia rellena."
+        if count_already_missing
+        else ""
+    )
     decisions.append(
         Decision(
             "D03",
-            "Valores centinela en incidencia y casos anuales",
-            f"{values} se repiten exactamente en los mismos {int(smask.sum())} condados: "
+            "Valor centinela en la incidencia",
+            f"{values} se repite exactamente en {int(smask.sum())} condados: "
             f"{'todos' if whole_states else 'casi todos'} "
-            f"los de {state_list}, cuyos registros no publican la incidencia por condado.",
-            "Se sustituyen por valores ausentes."
+            f"los de {state_list}, cuyos registros no publican la incidencia por condado." + also,
+            "Se sustituye por valor ausente."
             if cfg.sentinel_to_missing
             else "No se aplica (desactivado en la configuración).",
             "Un valor con siete decimales repetido en cientos de condados no es una medición: "
@@ -143,7 +204,11 @@ def clean(raw: pd.DataFrame, config: AnalysisConfig) -> CleaningResult:
             "cleaning.sentinel_to_missing",
             int(smask.sum()),
             cfg.sentinel_to_missing,
-            evidence={"centinelas": sentinels, "estados": coverage},
+            evidence={
+                "centinelas": sentinels,
+                "estados": coverage,
+                "casos_ya_ausentes": count_already_missing,
+            },
             affected=df.loc[smask, "county_id"].tolist(),
         )
     )
@@ -258,7 +323,7 @@ def clean(raw: pd.DataFrame, config: AnalysisConfig) -> CleaningResult:
     if cfg.derive_native_multi:
         df["PctNativeMulti"] = (100 - race_sum).clip(lower=0)
     low = race_sum < 80
-    min_county = str(df.loc[race_sum.idxmin(), "county_id"])
+    min_county = str(df["county_id"].to_numpy()[df.index.get_loc(race_sum.idxmin())])
     decisions.append(
         Decision(
             "D07",
