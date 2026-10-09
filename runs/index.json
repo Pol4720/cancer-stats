@@ -58,5 +58,35 @@
     "predictive_model": "ridge",
     "test_rmse": 17.35803,
     "test_r2": 0.5888514
+  },
+  {
+    "id": "20261009-094024-f8341612",
+    "created_at": "2026-10-09T09:43:24+00:00",
+    "name": "Metodología por defecto",
+    "description": "Configuración con la que se elaboró el informe final.",
+    "fingerprint": "f8341612ab08",
+    "data_sha256": "1924e0da423a7408347eefb5373e4592bf7e3d4fcdedc52a05fb05df45e00a9f",
+    "git_commit": "1c1bf1d765b54ed9e1f0c215124a63d298c66547",
+    "duration_s": 180.59,
+    "n_effects": 2840,
+    "terms": [
+      "incidenceRate",
+      "MedianAge",
+      "AvgHouseholdSize",
+      "PctHS18_24",
+      "PctBachDeg25_Over",
+      "PctUnemployed16_Over",
+      "PctPublicCoverageAlone",
+      "PctOtherRace",
+      "BirthRate",
+      "region",
+      "PctHS25_Over",
+      "PctBachDeg25_Over:region",
+      "PctUnemployed16_Over:region"
+    ],
+    "r2_adj": 0.5549764,
+    "predictive_model": "ridge",
+    "test_rmse": 17.35803,
+    "test_r2": 0.5888514
   }
 ]
