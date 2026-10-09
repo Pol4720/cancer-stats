@@ -131,6 +131,12 @@ def test_predictive_split_is_honest(outcome) -> None:  # type: ignore[no-untyped
     assert chosen["rmse"] < base["rmse"]
 
 
+def test_partial_dependence_is_informative(outcome) -> None:  # type: ignore[no-untyped-def]
+    for row in outcome[1]["predictive"]["partial_dependence"]:
+        assert all(g is not None for g in row["grid"]), row["variable"]
+        assert max(row["average"]) > min(row["average"]), row["variable"]
+
+
 def test_registry_roundtrip(outcome, registry: RunRegistry) -> None:  # type: ignore[no-untyped-def]
     rid, _ = outcome
     assert registry.latest() == rid

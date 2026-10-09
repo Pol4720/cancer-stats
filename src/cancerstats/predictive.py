@@ -27,7 +27,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.dummy import DummyRegressor
 from sklearn.ensemble import HistGradientBoostingRegressor, RandomForestRegressor
 from sklearn.impute import SimpleImputer
-from sklearn.inspection import partial_dependence, permutation_importance
+from sklearn.inspection import permutation_importance
 from sklearn.linear_model import ElasticNetCV, LassoCV, LinearRegression, RidgeCV
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV, GroupKFold, KFold, train_test_split
@@ -322,6 +322,25 @@ def _feature_names(model: Any) -> list[str] | None:
     return None
 
 
+def partial_dependence_curve(
+    model: Any, X: pd.DataFrame, var: str, points: int = 30
+) -> tuple[np.ndarray, np.ndarray]:
+    """Dependencia parcial media de ``var``: predicción media al fijar ``var`` en cada valor.
+
+    La rejilla va del percentil 5 al 95 de los valores observados (los ausentes se ignoran
+    al calcularla; el modelo los imputa como en el ajuste).
+    """
+    values = X[var].to_numpy(dtype=float)
+    lo, hi = np.nanquantile(values, [0.05, 0.95])
+    grid = np.linspace(lo, hi, points)
+    average = np.empty(points)
+    work = X.copy()
+    for i, g in enumerate(grid):
+        work[var] = g
+        average[i] = float(np.mean(model.predict(work)))
+    return grid, average
+
+
 def run_predictive(
     df: pd.DataFrame,
     config: AnalysisConfig,
@@ -448,13 +467,13 @@ def run_predictive(
     pd_rows = []
     top_numeric = [r["variable"] for r in importance if r["variable"] in numeric][:4]
     for var in top_numeric:
-        res = partial_dependence(fitted[chosen], Xtr, [var], grid_resolution=30, kind="average")
+        grid, average = partial_dependence_curve(fitted[chosen], Xtr, str(var))
         pd_rows.append(
             {
                 "variable": var,
                 "etiqueta": label(str(var)),
-                "grid": np.asarray(res["grid_values"][0]).round(4).tolist(),
-                "average": np.asarray(res["average"][0]).round(4).tolist(),
+                "grid": grid.round(4).tolist(),
+                "average": average.round(4).tolist(),
             }
         )
 
