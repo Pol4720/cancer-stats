@@ -1,0 +1,15 @@
+\begin{table}[htbp]
+\centering
+\small
+\caption{Datos ausentes tras la depuración y diagnóstico de su mecanismo}\label{tab:ausentes}
+\begin{tabularx}{\linewidth}{X r r r l}
+\toprule
+Variable & $n$ & \% & $p$ ($\chi^2$ estado) & Mecanismo \\
+\midrule
+Solo seguro privado & \num{609} & \num{20.0} & \num{0.052} & compatible con MCAR \\
+Incidencia de cáncer & \num{207} & \num{6.8} & $<\num{0.001}$ & Ausencia estructural \\
+Empleo (16+) & \num{152} & \num{5.0} & \num{0.591} & compatible con MCAR \\
+\bottomrule
+\end{tabularx}
+\par\smallskip{\footnotesize\raggedright Contraste MCAR de Little sin la incidencia: $d^2 = \num{62.8}$, \num{74} g.\,l., $p = \num{0.820}$. Con la incidencia: $d^2 = \num{522.3}$, \num{177} g.\,l., $p < \num{0.001}$.\par}
+\end{table}

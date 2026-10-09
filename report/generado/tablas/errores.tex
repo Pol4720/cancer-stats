@@ -1,0 +1,39 @@
+{\footnotesize
+\begin{xltabular}{\linewidth}{X r r r r r r r}
+\caption{Errores típicos del modelo final: clásicos, HC3 y por conglomerados de estado}\label{tab:errores} \\
+\toprule
+Término & $\hat\beta$ & Clásico & HC3 & Cluster & Razón & $p$ clásico & $p$ cluster \\
+\midrule
+\endfirsthead
+\multicolumn{8}{l}{\emph{(continuación)}} \\
+\toprule
+Término & $\hat\beta$ & Clásico & HC3 & Cluster & Razón & $p$ clásico & $p$ cluster \\
+\midrule
+\endhead
+\midrule
+\multicolumn{8}{r}{\emph{(continúa)}} \\
+\endfoot
+\bottomrule
+\multicolumn{8}{p{0.97\linewidth}}{\footnotesize Razón: E.\,T. por conglomerados entre E.\,T. clásico. Una razón mayor que 1 indica que la inferencia clásica es optimista, por la dependencia dentro de cada estado y la heterocedasticidad.} \\
+\endlastfoot
+Incidencia de cáncer & \num{0.187} & \num{0.007} & \num{0.012} & \num{0.019} & \num{2.88} & $<\num{0.001}$ & $<\num{0.001}$ \\
+Edad mediana & \num{-0.788} & \num{0.095} & \num{0.114} & \num{0.187} & \num{1.97} & $<\num{0.001}$ & $<\num{0.001}$ \\
+Tamaño medio del hogar & \num{-12.875} & \num{2.004} & \num{2.758} & \num{3.292} & \num{1.64} & $<\num{0.001}$ & $<\num{0.001}$ \\
+Bachillerato (18–24) & \num{0.241} & \num{0.047} & \num{0.061} & \num{0.064} & \num{1.38} & $<\num{0.001}$ & $<\num{0.001}$ \\
+Grado universitario (25+) & \num{-1.054} & \num{0.160} & \num{0.183} & \num{0.255} & \num{1.60} & $<\num{0.001}$ & $<\num{0.001}$ \\
+Desempleo (16+) & \num{0.366} & \num{0.178} & \num{0.218} & \num{0.284} & \num{1.60} & \num{0.040} & \num{0.204} \\
+Solo seguro público & \num{0.892} & \num{0.093} & \num{0.108} & \num{0.214} & \num{2.31} & $<\num{0.001}$ & $<\num{0.001}$ \\
+Otra raza & \num{-0.660} & \num{0.118} & \num{0.140} & \num{0.210} & \num{1.78} & $<\num{0.001}$ & \num{0.003} \\
+Natalidad & \num{-0.381} & \num{0.187} & \num{0.255} & \num{0.249} & \num{1.33} & \num{0.042} & \num{0.132} \\
+region[Noreste] & \num{-15.683} & \num{1.685} & \num{1.294} & \num{2.316} & \num{1.37} & $<\num{0.001}$ & $<\num{0.001}$ \\
+region[Medio Oeste] & \num{-4.327} & \num{0.957} & \num{0.950} & \num{2.419} & \num{2.53} & $<\num{0.001}$ & \num{0.080} \\
+region[Oeste] & \num{-14.131} & \num{1.221} & \num{1.437} & \num{2.756} & \num{2.26} & $<\num{0.001}$ & $<\num{0.001}$ \\
+Bachillerato (25+) & \num{0.354} & \num{0.096} & \num{0.122} & \num{0.192} & \num{1.99} & $<\num{0.001}$ & \num{0.071} \\
+Grado universitario (25+) $\times$ region[Noreste] & \num{0.844} & \num{0.265} & \num{0.198} & \num{0.219} & \num{0.83} & \num{0.001} & $<\num{0.001}$ \\
+Grado universitario (25+) $\times$ region[Medio Oeste] & \num{0.229} & \num{0.187} & \num{0.188} & \num{0.308} & \num{1.65} & \num{0.220} & \num{0.461} \\
+Grado universitario (25+) $\times$ region[Oeste] & \num{-0.031} & \num{0.192} & \num{0.217} & \num{0.257} & \num{1.33} & \num{0.873} & \num{0.905} \\
+Desempleo (16+) $\times$ region[Noreste] & \num{0.903} & \num{0.774} & \num{0.546} & \num{0.555} & \num{0.72} & \num{0.243} & \num{0.110} \\
+Desempleo (16+) $\times$ region[Medio Oeste] & \num{1.478} & \num{0.273} & \num{0.317} & \num{0.446} & \num{1.64} & $<\num{0.001}$ & \num{0.002} \\
+Desempleo (16+) $\times$ region[Oeste] & \num{-0.429} & \num{0.325} & \num{0.462} & \num{0.688} & \num{2.12} & \num{0.187} & \num{0.536} \\
+\end{xltabular}
+}

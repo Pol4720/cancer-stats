@@ -1,0 +1,58 @@
+{\footnotesize
+\begin{xltabular}{\linewidth}{l X l l c l}
+\caption{Diccionario de variables y papel de cada una en el análisis}\label{tab:variables} \\
+\toprule
+Variable & Descripción & Unidad & Tipo & Fuente & Papel \\
+\midrule
+\endfirsthead
+\multicolumn{6}{l}{\emph{(continuación)}} \\
+\toprule
+Variable & Descripción & Unidad & Tipo & Fuente & Papel \\
+\midrule
+\endhead
+\midrule
+\multicolumn{6}{r}{\emph{(continúa)}} \\
+\endfoot
+\bottomrule
+\multicolumn{6}{p{0.97\linewidth}}{\footnotesize Fuente (a): registros de cáncer 2010--2016; (b): estimaciones censales de 2013; derivada: calculada en la depuración. Las variables excluidas y su motivo se detallan en la tabla~\ref{tab:excluidas}.} \\
+\endlastfoot
+\texttt{TARGET\_deathRate} & Mortalidad por cáncer & muertes/100 000 hab. & cont. & (a) & respuesta \\
+\texttt{avgAnnCount} & Casos anuales & casos/año & conteo & (a) & excluida \\
+\texttt{avgDeathsPerYear} & Muertes anuales & muertes/año & conteo & (a) & excluida \\
+\texttt{incidenceRate} & Incidencia de cáncer & casos/100 000 hab. & cont. & (a) & candidata \\
+\texttt{medIncome} & Renta mediana & USD & cont. & (b) & candidata \\
+\texttt{popEst2015} & Población & habitantes & conteo & (b) & candidata \\
+\texttt{povertyPercent} & Pobreza & \% & \% & (b) & candidata \\
+\texttt{studyPerCap} & Ensayos clínicos per cápita & ensayos/100 000 hab. & cont. & (a) & candidata \\
+\texttt{binnedInc} & Decil de renta & intervalo de USD & ord. & (b) & excluida \\
+\texttt{MedianAge} & Edad mediana & años & cont. & (b) & candidata \\
+\texttt{MedianAgeMale} & Edad mediana (hombres) & años & cont. & (b) & excluida \\
+\texttt{MedianAgeFemale} & Edad mediana (mujeres) & años & cont. & (b) & excluida \\
+\texttt{AvgHouseholdSize} & Tamaño medio del hogar & personas & cont. & (b) & candidata \\
+\texttt{PercentMarried} & Población casada & \% & \% & (b) & candidata \\
+\texttt{PctNoHS18\_24} & Sin bachillerato (18–24) & \% & \% & (b) & candidata \\
+\texttt{PctHS18\_24} & Bachillerato (18–24) & \% & \% & (b) & candidata \\
+\texttt{PctSomeCol18\_24} & Estudios superiores incompletos (18–24) & \% & \% & (b) & excluida \\
+\texttt{PctBachDeg18\_24} & Grado universitario (18–24) & \% & \% & (b) & candidata \\
+\texttt{PctHS25\_Over} & Bachillerato (25+) & \% & \% & (b) & candidata \\
+\texttt{PctBachDeg25\_Over} & Grado universitario (25+) & \% & \% & (b) & candidata \\
+\texttt{PctEmployed16\_Over} & Empleo (16+) & \% & \% & (b) & candidata \\
+\texttt{PctUnemployed16\_Over} & Desempleo (16+) & \% & \% & (b) & candidata \\
+\texttt{PctPrivateCoverage} & Seguro privado & \% & \% & (b) & candidata \\
+\texttt{PctPrivateCoverageAlone} & Solo seguro privado & \% & \% & (b) & excluida \\
+\texttt{PctEmpPrivCoverage} & Seguro privado vía empleador & \% & \% & (b) & candidata \\
+\texttt{PctPublicCoverage} & Seguro público & \% & \% & (b) & candidata \\
+\texttt{PctPublicCoverageAlone} & Solo seguro público & \% & \% & (b) & candidata \\
+\texttt{PctWhite} & Población blanca & \% & \% & (b) & excluida \\
+\texttt{PctBlack} & Población negra & \% & \% & (b) & candidata \\
+\texttt{PctAsian} & Población asiática & \% & \% & (b) & candidata \\
+\texttt{PctOtherRace} & Otra raza & \% & \% & (b) & candidata \\
+\texttt{PctMarriedHouseholds} & Hogares de matrimonios & \% & \% & (b) & candidata \\
+\texttt{BirthRate} & Natalidad & \% & cont. & (b) & candidata \\
+\texttt{Geography} & Condado & — & id. & (b) & excluida \\
+\texttt{state} & Estado & — & cat. & (b) & excluida \\
+\texttt{Notificadomuerte} & Casos menos muertes & casos/año & conteo & (derivada) & excluida \\
+\texttt{PctNativeMulti} & Población nativa o multirracial & \% & \% & (derivada) & candidata \\
+\texttt{region} & Región censal & — & cat. & (derivada) & factor \\
+\end{xltabular}
+}

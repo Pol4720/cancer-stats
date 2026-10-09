@@ -1,0 +1,21 @@
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{Efecto de las variables que interaccionan con la región: pendiente específica de cada región}\label{tab:pendientes}
+\begin{tabular}{l l r l r r}
+\toprule
+Variable & Región & Pendiente & IC 95\,\% & $p$ & Efecto Q1$\to$Q3 \\
+\midrule
+Grado universitario (25+) & Sur & \num{-1.054} & $[\num{-1.566};\ \num{-0.542}]$ & $<\num{0.001}$ & \num{-7.1} \\
+ & Noreste & \num{-0.209} & $[\num{-0.723};\ \num{0.304}]$ & \num{0.416} & \num{-1.4} \\
+ & Medio Oeste & \num{-0.825} & $[\num{-1.542};\ \num{-0.108}]$ & \num{0.025} & \num{-5.5} \\
+ & Oeste & \num{-1.085} & $[\num{-1.600};\ \num{-0.569}]$ & $<\num{0.001}$ & \num{-7.3} \\
+\addlinespace
+Desempleo (16+) & Sur & \num{0.366} & $[\num{-0.205};\ \num{0.937}]$ & \num{0.204} & \num{1.5} \\
+ & Noreste & \num{1.269} & $[\num{0.221};\ \num{2.317}]$ & \num{0.019} & \num{5.3} \\
+ & Medio Oeste & \num{1.844} & $[\num{0.940};\ \num{2.749}]$ & $<\num{0.001}$ & \num{7.7} \\
+ & Oeste & \num{-0.063} & $[\num{-1.417};\ \num{1.291}]$ & \num{0.926} & \num{-0.3} \\
+\bottomrule
+\end{tabular}
+\par\smallskip{\footnotesize\raggedright Pendiente en la región $R$: $\hat\beta_{x} + \hat\beta_{x\times R}$, con $\widehat{\mathrm{Var}} = \widehat{\mathrm{Var}}(\hat\beta_x) + \widehat{\mathrm{Var}}(\hat\beta_{x\times R}) + 2\,\widehat{\mathrm{Cov}}$.\par}
+\end{table}

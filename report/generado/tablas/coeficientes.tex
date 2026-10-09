@@ -1,0 +1,40 @@
+{\footnotesize
+\begin{xltabular}{\linewidth}{X r r r r l r}
+\caption{Coeficientes del modelo final de efectos (MCO con errores típicos robustos por conglomerados de estado)}\label{tab:coeficientes} \\
+\toprule
+Término & $\hat\beta$ & E.\,T. & $t$ & $p$ & IC 95\,\% & Beta \\
+\midrule
+\endfirsthead
+\multicolumn{7}{l}{\emph{(continuación)}} \\
+\toprule
+Término & $\hat\beta$ & E.\,T. & $t$ & $p$ & IC 95\,\% & Beta \\
+\midrule
+\endhead
+\midrule
+\multicolumn{7}{r}{\emph{(continúa)}} \\
+\endfoot
+\bottomrule
+\multicolumn{7}{p{0.97\linewidth}}{\footnotesize $n = \num{2840}$ condados de \num{48} estados. Explicativas continuas centradas en su media: la constante es la mortalidad esperada de un condado medio del Sur. Inferencia con $t$ de \num{47} g.\,l. Beta: coeficiente tipificado.} \\
+\endlastfoot
+Constante & \num{184.526} & \num{1.319} & \num{139.95} & $<\num{0.001}$ & $[\num{181.873};\ \num{187.178}]$ &  \\
+Incidencia de cáncer & \num{0.187} & \num{0.019} & \num{9.61} & $<\num{0.001}$ & $[\num{0.148};\ \num{0.226}]$ & \num{0.379} \\
+Edad mediana & \num{-0.788} & \num{0.187} & \num{-4.22} & $<\num{0.001}$ & $[\num{-1.164};\ \num{-0.413}]$ & \num{-0.147} \\
+Tamaño medio del hogar & \num{-12.875} & \num{3.292} & \num{-3.91} & $<\num{0.001}$ & $[\num{-19.499};\ \num{-6.252}]$ & \num{-0.115} \\
+Bachillerato (18–24) & \num{0.241} & \num{0.064} & \num{3.76} & $<\num{0.001}$ & $[\num{0.112};\ \num{0.370}]$ & \num{0.078} \\
+Grado universitario (25+) & \num{-1.054} & \num{0.255} & \num{-4.14} & $<\num{0.001}$ & $[\num{-1.566};\ \num{-0.542}]$ & \num{-0.207} \\
+Desempleo (16+) & \num{0.366} & \num{0.284} & \num{1.29} & \num{0.204} & $[\num{-0.205};\ \num{0.937}]$ & \num{0.045} \\
+Solo seguro público & \num{0.892} & \num{0.214} & \num{4.18} & $<\num{0.001}$ & $[\num{0.463};\ \num{1.322}]$ & \num{0.197} \\
+Otra raza & \num{-0.660} & \num{0.210} & \num{-3.14} & \num{0.003} & $[\num{-1.082};\ \num{-0.238}]$ & \num{-0.084} \\
+Natalidad & \num{-0.381} & \num{0.249} & \num{-1.53} & \num{0.132} & $[\num{-0.883};\ \num{0.120}]$ & \num{-0.027} \\
+region[Noreste] & \num{-15.683} & \num{2.316} & \num{-6.77} & $<\num{0.001}$ & $[\num{-20.343};\ \num{-11.023}]$ &  \\
+region[Medio Oeste] & \num{-4.327} & \num{2.419} & \num{-1.79} & \num{0.080} & $[\num{-9.194};\ \num{0.541}]$ &  \\
+region[Oeste] & \num{-14.131} & \num{2.756} & \num{-5.13} & $<\num{0.001}$ & $[\num{-19.675};\ \num{-8.586}]$ &  \\
+Bachillerato (25+) & \num{0.354} & \num{0.192} & \num{1.85} & \num{0.071} & $[\num{-0.031};\ \num{0.739}]$ & \num{0.091} \\
+Grado universitario (25+) $\times$ region[Noreste] & \num{0.844} & \num{0.219} & \num{3.86} & $<\num{0.001}$ & $[\num{0.404};\ \num{1.285}]$ &  \\
+Grado universitario (25+) $\times$ region[Medio Oeste] & \num{0.229} & \num{0.308} & \num{0.74} & \num{0.461} & $[\num{-0.391};\ \num{0.849}]$ &  \\
+Grado universitario (25+) $\times$ region[Oeste] & \num{-0.031} & \num{0.257} & \num{-0.12} & \num{0.905} & $[\num{-0.547};\ \num{0.485}]$ &  \\
+Desempleo (16+) $\times$ region[Noreste] & \num{0.903} & \num{0.555} & \num{1.63} & \num{0.110} & $[\num{-0.214};\ \num{2.020}]$ &  \\
+Desempleo (16+) $\times$ region[Medio Oeste] & \num{1.478} & \num{0.446} & \num{3.31} & \num{0.002} & $[\num{0.581};\ \num{2.375}]$ &  \\
+Desempleo (16+) $\times$ region[Oeste] & \num{-0.429} & \num{0.688} & \num{-0.62} & \num{0.536} & $[\num{-1.813};\ \num{0.955}]$ &  \\
+\end{xltabular}
+}

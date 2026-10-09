@@ -1,0 +1,16 @@
+\begin{table}[htbp]
+\centering
+\small
+\caption{Poda iterativa por factor de inflación de la varianza (umbral 10)}\label{tab:poda}
+\begin{tabularx}{\linewidth}{r X r X r}
+\toprule
+Paso & Eliminada & FIV & Más correlada con & $r$ \\
+\midrule
+1 & Seguro público & \num{25.9} & Solo seguro público & \num{0.867} \\
+2 & Población casada & \num{14.6} & Hogares de matrimonios & \num{0.873} \\
+3 & Seguro privado & \num{13.9} & Solo seguro público & \num{-0.887} \\
+4 & log(Renta mediana) & \num{11.0} & Pobreza & \num{-0.855} \\
+\bottomrule
+\end{tabularx}
+\par\smallskip{\footnotesize\raggedright Número de condición: \num{972.2} antes y \num{187.1} después de la poda.\par}
+\end{table}

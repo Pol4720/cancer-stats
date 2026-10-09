@@ -1,0 +1,16 @@
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{Comparación de modelos anidados (misma muestra y mismos pesos)}\label{tab:comparacion}
+\begin{tabularx}{\linewidth}{X r r r r r r}
+\toprule
+Modelo & $k$ & $\bar R^2$ & AIC & BIC & $F$ parcial & $p$ \\
+\midrule
+Nulo (región) & 3 & \num{0.154} & \num{25083.0} & \num{25106.6} & --- & --- \\
+Máximo (tras la poda) & 24 & \num{0.544} & \num{23436.5} & \num{23584.0} & \num{110.70} & $<\num{0.001}$ \\
+Seleccionado (efectos principales) & 13 & \num{0.537} & \num{23462.4} & \num{23545.0} & \num{4.35} & $<\num{0.001}$ \\
+Final (con interacciones) & 19 & \num{0.543} & \num{23433.3} & \num{23551.3} & \num{6.85} & $<\num{0.001}$ \\
+\bottomrule
+\end{tabularx}
+\par\smallskip{\footnotesize\raggedright El $F$ parcial compara cada modelo con el de la fila anterior.\par}
+\end{table}

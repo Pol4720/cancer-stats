@@ -1,0 +1,31 @@
+{\footnotesize
+\begin{xltabular}{\linewidth}{l p{0.28\linewidth} r X}
+\caption{Registro de decisiones de depuración}\label{tab:decisiones} \\
+\toprule
+Id. & Decisión & Casos & Acción \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\emph{(continuación)}} \\
+\toprule
+Id. & Decisión & Casos & Acción \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\emph{(continúa)}} \\
+\endfoot
+\bottomrule
+
+\endlastfoot
+D01 & Geography separada en condado y estado & \num{3047} & Se separa por la última coma en Geography (condado) y state (estado). \\
+D02 & Notificadomuerte excluida por fuga de información & \num{2841} & Se conserva en los datos pero se excluye de todos los modelos. \\
+D03 & Valor centinela en la incidencia & \num{206} & Se sustituye por valor ausente. \\
+D04 & Edad mediana registrada en meses & \num{30} & Se divide entre 12 y se verifica que el resultado quede entre las medianas masculina y femenina. \\
+D05 & Tamaño medio del hogar dividido por 100 & \num{61} & Se multiplica por 100. \\
+D06 & PctSomeCol18\_24 recuperada por identidad contable & \num{2285} & Se calcula como 100 \textminus{} (sin bachillerato + bachillerato + grado). \\
+D07 & Población nativa o multirracial (variable derivada) & \num{86} & Se crea PctNativeMulti = 100 \textminus{} (blanca + negra + asiática + otra). \\
+D08 & Incidencia inverosímil (mortalidad $\geq$ incidencia) & \num{1} & Se marca la incidencia como ausente. \\
+D09 & Región censal & \num{3047} & Se agrupan en las cuatro regiones oficiales de la Oficina del Censo. \\
+D10 & Transformaciones de variables muy asimétricas & \num{3047} & Población: logaritmo; renta: logaritmo; ensayos: log1p. \\
+D11 & Variables excluidas de los modelos & \num{12} & Se excluyen: TARGET\_deathRate, avgDeathsPerYear, avgAnnCount, Notificadomuerte, binnedInc, Geography, state, MedianAgeMale, MedianAgeFemale, PctPrivateCoverageAlone, PctSomeCol18\_24, PctWhite. \\
+\end{xltabular}
+}

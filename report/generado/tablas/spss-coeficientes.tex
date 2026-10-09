@@ -1,0 +1,40 @@
+{\footnotesize
+\begin{xltabular}{\linewidth}{X r r r r r l r r}
+\caption{Coeficientes del modelo final con errores típicos clásicos (salida tipo SPSS)}\label{tab:spss-coeficientes} \\
+\toprule
+Término & $B$ & E.\,T. & Beta & $t$ & Sig. & IC 95\,\% & Tol. & FIV \\
+\midrule
+\endfirsthead
+\multicolumn{9}{l}{\emph{(continuación)}} \\
+\toprule
+Término & $B$ & E.\,T. & Beta & $t$ & Sig. & IC 95\,\% & Tol. & FIV \\
+\midrule
+\endhead
+\midrule
+\multicolumn{9}{r}{\emph{(continúa)}} \\
+\endfoot
+\bottomrule
+\multicolumn{9}{p{0.97\linewidth}}{\footnotesize Errores típicos clásicos $\hat\sigma^2(X^\top X)^{-1}$, como en el procedimiento REGRESSION; la sintaxis \texttt{spss/modelo\_final.sps} los reproduce. La inferencia del informe usa los robustos (tabla~\ref{tab:errores}).} \\
+\endlastfoot
+Constante & \num{184.526} & \num{0.545} &  & \num{338.37} & $<\num{0.001}$ & $[\num{183.457};\ \num{185.595}]$ &  &  \\
+Incidencia de cáncer & \num{0.187} & \num{0.007} & \num{0.379} & \num{27.66} & $<\num{0.001}$ & $[\num{0.173};\ \num{0.200}]$ & \num{0.835} & \num{1.20} \\
+Edad mediana & \num{-0.788} & \num{0.095} & \num{-0.147} & \num{-8.31} & $<\num{0.001}$ & $[\num{-0.974};\ \num{-0.602}]$ & \num{0.501} & \num{1.99} \\
+Tamaño medio del hogar & \num{-12.875} & \num{2.004} & \num{-0.115} & \num{-6.42} & $<\num{0.001}$ & $[\num{-16.805};\ \num{-8.945}]$ & \num{0.486} & \num{2.06} \\
+Bachillerato (18–24) & \num{0.241} & \num{0.047} & \num{0.078} & \num{5.17} & $<\num{0.001}$ & $[\num{0.150};\ \num{0.333}]$ & \num{0.684} & \num{1.46} \\
+Grado universitario (25+) & \num{-1.054} & \num{0.160} & \num{-0.207} & \num{-6.60} & $<\num{0.001}$ & $[\num{-1.367};\ \num{-0.741}]$ & \num{0.160} & \num{6.25} \\
+Desempleo (16+) & \num{0.366} & \num{0.178} & \num{0.045} & \num{2.06} & \num{0.040} & $[\num{0.017};\ \num{0.715}]$ & \num{0.323} & \num{3.09} \\
+Solo seguro público & \num{0.892} & \num{0.093} & \num{0.197} & \num{9.63} & $<\num{0.001}$ & $[\num{0.711};\ \num{1.074}]$ & \num{0.374} & \num{2.67} \\
+Otra raza & \num{-0.660} & \num{0.118} & \num{-0.084} & \num{-5.60} & $<\num{0.001}$ & $[\num{-0.891};\ \num{-0.429}]$ & \num{0.702} & \num{1.42} \\
+Natalidad & \num{-0.381} & \num{0.187} & \num{-0.027} & \num{-2.04} & \num{0.042} & $[\num{-0.749};\ \num{-0.014}]$ & \num{0.888} & \num{1.13} \\
+region[Noreste] & \num{-15.683} & \num{1.685} &  & \num{-9.30} & $<\num{0.001}$ & $[\num{-18.988};\ \num{-12.378}]$ & \num{0.601} & \num{1.66} \\
+region[Medio Oeste] & \num{-4.327} & \num{0.957} &  & \num{-4.52} & $<\num{0.001}$ & $[\num{-6.202};\ \num{-2.451}]$ & \num{0.632} & \num{1.58} \\
+region[Oeste] & \num{-14.131} & \num{1.221} &  & \num{-11.57} & $<\num{0.001}$ & $[\num{-16.525};\ \num{-11.737}]$ & \num{0.668} & \num{1.50} \\
+Bachillerato (25+) & \num{0.354} & \num{0.096} & \num{0.091} & \num{3.68} & $<\num{0.001}$ & $[\num{0.165};\ \num{0.542}]$ & \num{0.257} & \num{3.89} \\
+Grado universitario (25+) $\times$ region[Noreste] & \num{0.844} & \num{0.265} &  & \num{3.19} & \num{0.001} & $[\num{0.326};\ \num{1.363}]$ & \num{0.555} & \num{1.80} \\
+Grado universitario (25+) $\times$ region[Medio Oeste] & \num{0.229} & \num{0.187} &  & \num{1.23} & \num{0.220} & $[\num{-0.137};\ \num{0.595}]$ & \num{0.554} & \num{1.80} \\
+Grado universitario (25+) $\times$ region[Oeste] & \num{-0.031} & \num{0.192} &  & \num{-0.16} & \num{0.873} & $[\num{-0.408};\ \num{0.346}]$ & \num{0.492} & \num{2.03} \\
+Desempleo (16+) $\times$ region[Noreste] & \num{0.903} & \num{0.774} &  & \num{1.17} & \num{0.243} & $[\num{-0.615};\ \num{2.421}]$ & \num{0.791} & \num{1.26} \\
+Desempleo (16+) $\times$ region[Medio Oeste] & \num{1.478} & \num{0.273} &  & \num{5.42} & $<\num{0.001}$ & $[\num{0.944};\ \num{2.012}]$ & \num{0.446} & \num{2.24} \\
+Desempleo (16+) $\times$ region[Oeste] & \num{-0.429} & \num{0.325} &  & \num{-1.32} & \num{0.187} & $[\num{-1.066};\ \num{0.209}]$ & \num{0.618} & \num{1.62} \\
+\end{xltabular}
+}

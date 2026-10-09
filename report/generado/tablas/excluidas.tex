@@ -1,0 +1,23 @@
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{Variables que no entran como explicativas y motivo}\label{tab:excluidas}
+\begin{tabularx}{\linewidth}{l X}
+\toprule
+Variable & Motivo \\
+\midrule
+\texttt{avgDeathsPerYear} & Fuga de información: es el numerador de la tasa de mortalidad que se quiere explicar. \\
+\texttt{avgAnnCount} & Es un conteo que escala con la población (numerador de la incidencia) y falta, o es un valor centinela, en los condados de Kansas, Minnesota y Nevada. \\
+\texttt{Notificadomuerte} & Fuga de información: es exactamente avgAnnCount \textminus{} avgDeathsPerYear, de modo que contiene el numerador de la respuesta. \\
+\texttt{binnedInc} & Es una función determinista de medIncome (su decil), información redundante. \\
+\texttt{Geography} & Es un identificador, no una característica del condado. \\
+\texttt{state} & Se usa como unidad de conglomerado; la región recoge el efecto geográfico. \\
+\texttt{MedianAgeMale} & Redundante con MedianAge (r > 0,9); se usa sólo para validar y reparar. \\
+\texttt{MedianAgeFemale} & Redundante con MedianAge (r > 0,9); se usa sólo para validar y reparar. \\
+\texttt{PctPrivateCoverageAlone} & Combinación casi lineal de las demás coberturas ($R^2$ $\approx$ 0,99) y 20 \% de ausentes. \\
+\texttt{PctSomeCol18\_24} & Categoría de referencia de la composición educativa de 18–24 años: las cuatro suman 100 \% e incluirlas todas haría singular X'X (como las tres indicadoras de una variable con tres categorías). \\
+\texttt{PctWhite} & Categoría de referencia de la composición racial: blanca + negra + asiática + otra + nativa/multirracial = 100 \%. \\
+\bottomrule
+\end{tabularx}
+
+\end{table}

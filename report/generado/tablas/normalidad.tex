@@ -1,0 +1,20 @@
+\begin{table}[htbp]
+\centering
+\small
+\caption{Contrastes de normalidad de la mortalidad}\label{tab:normalidad}
+\begin{tabularx}{\linewidth}{X r r}
+\toprule
+Contraste & Estadístico & $p$ \\
+\midrule
+Shapiro-Wilk & \num{0.9903} & $<\num{0.001}$ \\
+Kolmogorov-Smirnov-Lilliefors & \num{0.0280} & \num{0.001} \\
+D'Agostino-Pearson K² & \num{127.3633} & $<\num{0.001}$ \\
+Jarque-Bera & \num{269.8196} & $<\num{0.001}$ \\
+Anderson-Darling & \num{4.0742} & \num{0.010} \\
+$\chi^2$ de Pearson (clases equiprobables) ($k = 50$, 47 g.\,l.) & \num{94.2701} & $<\num{0.001}$ \\
+Asimetría (contraste de D'Agostino) & \num{0.275} & $<\num{0.001}$ \\
+Curtosis de exceso (contraste de Anscombe-Glynn) & \num{1.350} & $<\num{0.001}$ \\
+\bottomrule
+\end{tabularx}
+\par\smallskip{\footnotesize\raggedright Anderson-Darling informa un $p$ interpolado en tablas (acotado entre 0,01 y 0,15). Con $n$ grande, cualquier desviación mínima resulta significativa: los contrastes se leen junto al gráfico Q-Q.\par}
+\end{table}

@@ -1,0 +1,31 @@
+\begin{table}[htbp]
+\centering
+\small
+\caption{Catálogo de reglas de validación: casos que las incumplen antes y después de la depuración}\label{tab:validacion}
+\begin{tabularx}{\linewidth}{l X l r r}
+\toprule
+Id. & Regla & Severidad & Original & Depurado \\
+\midrule
+R01 & Identificador único & error & \num{0} & \num{0} \\
+R02 & Porcentajes en [0, 100] & error & \num{0} & \num{0} \\
+R03 & Tasas, renta y población positivas & error & \num{0} & \num{0} \\
+R04 & Valores centinela & error & \num{206} & \num{0} \\
+R05 & Edad mediana plausible ($\leq$ 100 años) & error & \num{30} & \num{0} \\
+R06 & Coherencia de las edades medianas & error & \num{30} & \num{0} \\
+R07 & Tamaño del hogar $\geq$ 1 persona & error & \num{61} & \num{0} \\
+R08 & Identidad educativa de 18–24 años & error & \num{0} & \num{0} \\
+R09 & Composición racial $\leq$ 100 \% & error & \num{0} & \num{0} \\
+R10 & Empleo + desempleo $\leq$ 100 \% & error & \num{0} & \num{0} \\
+R11 & Educación de 25+ años $\leq$ 100 \% & error & \num{0} & \num{0} \\
+R12 & Jerarquía de coberturas sanitarias & error & \num{0} & \num{0} \\
+R13 & Renta mediana dentro de su decil & error & \num{0} & \num{0} \\
+R14 & Casos anuales $\geq$ muertes anuales & advert. & \num{0} & \num{0} \\
+R15 & Razón mortalidad/incidencia plausible & advert. & \num{1} & \num{0} \\
+R16 & Estado reconocido & error & \num{0} & \num{0} \\
+R17 & Ausentes declarados & info. & \num{2504} & \num{872} \\
+R18 & Inflación de ceros en ensayos clínicos & info. & \num{1931} & \num{1931} \\
+R19 & Identidad de Notificadomuerte & error & \num{0} & \num{0} \\
+\bottomrule
+\end{tabularx}
+\par\smallskip{\footnotesize\raggedright R17 y R18 son informativas: describen ausencias declaradas e inflación de ceros, que se tratan en etapas posteriores.\par}
+\end{table}

@@ -1,0 +1,47 @@
+[03:46:17] ingesta      inicio Ingesta del fichero original
+[03:46:17] ingesta      fin    Ingesta del fichero original (0.0 s)
+[03:46:17] validacion   inicio Validación de reglas
+[03:46:17] validacion   fin    Validación de reglas (0.1 s)
+[03:46:18] depuracion   inicio Depuración razonada
+[03:46:18] depuracion   fin    Depuración razonada (0.0 s)
+[03:46:18] ausentes     inicio Mecanismo de los datos ausentes
+[03:46:18] ausentes     fin    Mecanismo de los datos ausentes (0.4 s)
+[03:46:18] exploracion  inicio Análisis exploratorio e inferencia
+[03:46:19] exploracion  fin    Análisis exploratorio e inferencia (1.4 s)
+[03:46:19] atipicos     inicio Atípicos univariantes y multivariantes
+[03:46:21] atipicos     fin    Atípicos univariantes y multivariantes (1.3 s)
+[03:46:21] efectos      inicio Modelo de estimación de efectos
+[03:46:21] efectos      info   Colinealidad: FIV, índices de condición y poda
+[03:46:21] efectos      info   Modelo máximo: 21 continuas + región, n = 2699
+[03:46:21] efectos      info   Estimando la función de varianza σ²(n) = a + b/n
+[03:46:21] efectos      info   Selección de variables (backward) con covarianza cluster
+[03:46:22] efectos      info   Contrastando interacciones (principio jerárquico, corrección de Holm)
+[03:46:22] efectos      info   Modelo final: 13 términos, n = 2840
+[03:46:22] efectos      info   Diagnóstico de las hipótesis e influencia
+[03:46:31] efectos      info   Análisis de sensibilidad (especificaciones alternativas)
+[03:46:31] efectos      info   Imputación múltiple (sensibilidad al tratamiento de ausentes)
+[03:46:36] efectos      info   Bootstrap por conglomerados (999 réplicas)
+[03:46:38] efectos      fin    Modelo de estimación de efectos (17.6 s)
+[03:46:38] prediccion   inicio Modelo predictivo
+[03:46:38] prediccion   info   Validación cruzada aleatoria de 10 pliegues
+[03:46:38] prediccion   info     · Referencia (media)
+[03:46:38] prediccion   info     · MCO con la especificación del modelo de efectos
+[03:46:38] prediccion   info     · MCO con todas las variables
+[03:46:39] prediccion   info     · Ridge
+[03:46:39] prediccion   info     · Lasso
+[03:46:41] prediccion   info     · Red elástica
+[03:46:43] prediccion   info     · Bosque aleatorio
+[03:46:55] prediccion   info     · Potenciación del gradiente (histogramas)
+[03:47:33] prediccion   info   Validación cruzada agrupada por estado (10 grupos de estados)
+[03:47:33] prediccion   info     · Referencia (media)
+[03:47:33] prediccion   info     · MCO con la especificación del modelo de efectos
+[03:47:33] prediccion   info     · MCO con todas las variables
+[03:47:33] prediccion   info     · Ridge
+[03:47:34] prediccion   info     · Lasso
+[03:47:35] prediccion   info     · Red elástica
+[03:47:37] prediccion   info     · Bosque aleatorio
+[03:47:48] prediccion   info     · Potenciación del gradiente (histogramas)
+[03:48:21] prediccion   info   Evaluación final en la partición de prueba
+[03:48:26] prediccion   info   Importancia por permutación y dependencia parcial
+[03:48:27] prediccion   fin    Modelo predictivo (109.1 s)
+[03:48:27] persistencia inicio Guardando la corrida

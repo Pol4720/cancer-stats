@@ -1,0 +1,22 @@
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{Análisis de sensibilidad: coeficientes de las seis explicativas con mayor $|t|$ bajo especificaciones alternativas}\label{tab:sensibilidad}
+\begin{tabularx}{\linewidth}{X r r r r r r r }
+\toprule
+Especificación & $n$ & \rotatebox{70}{Incidencia de cáncer} & \rotatebox{70}{Edad mediana} & \rotatebox{70}{Solo seguro público} & \rotatebox{70}{Grado universitario (25+)} & \rotatebox{70}{Tamaño medio del hogar} & \rotatebox{70}{Bachillerato (18–24)} \\
+\midrule
+MCO con errores típicos clásicos (salida tipo SPSS) & \num{2840} & \num{0.187} & \num{-0.788} & \num{0.892} & \num{-1.054} & \num{-12.875} & \num{0.241} \\
+MCO con errores típicos HC3 & \num{2840} & \num{0.187} & \num{-0.788} & \num{0.892} & \num{-1.054} & \num{-12.875} & \num{0.241} \\
+Principal: MCO + errores cluster por estado & \num{2840} & \num{0.187} & \num{-0.788} & \num{0.892} & \num{-1.054} & \num{-12.875} & \num{0.241} \\
+MCPF con $\sigma^2$(n) = a + b/n y errores cluster & \num{2840} & \num{0.178} & \num{-0.929} & \num{0.812} & \num{-1.134} & \num{-16.176} & \num{0.271} \\
+Efectos fijos de estado (MCPF + cluster) & \num{2840} & \num{0.188} & \num{-0.581} & \num{0.915} & \num{-1.015} & \num{-10.647} & \num{0.154} \\
+Modelo mixto (intercepto aleatorio por estado) & \num{2840} & \num{0.188} & \num{-0.595} & \num{0.856} & \num{-1.118} & \num{-10.680} & \num{0.163} \\
+Regresión robusta de Huber (M-estimador) & \num{2840} & \num{0.188} & \num{-0.875} & \num{0.777} & \num{-1.192} & \num{-14.634} & \num{0.252} \\
+Sin los 185 condados influyentes (Cook > 4/n) & \num{2655} & \num{0.175} & \num{-0.927} & \num{0.783} & \num{-1.283} & \num{-14.998} & \num{0.256} \\
+Imputación múltiple (20 conjuntos, todos los condados) & \num{3047} & \num{0.188} & \num{-0.761} & \num{0.814} & \num{-1.090} & \num{-12.870} & \num{0.261} \\
+Bootstrap por conglomerados (\num{999}) & --- & \num{0.187} & \num{-0.784} & \num{0.893} & \num{-1.102} & \num{-12.456} & \num{0.234} \\
+\bottomrule
+\end{tabularx}
+\par\smallskip{\footnotesize\raggedright $^{\dagger}$: no significativo al 5\,\% en esa especificación.\par}
+\end{table}

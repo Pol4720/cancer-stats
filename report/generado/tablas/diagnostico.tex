@@ -1,0 +1,23 @@
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{Diagnóstico de las hipótesis del modelo}\label{tab:diagnostico}
+\begin{tabularx}{\linewidth}{l X r r l}
+\toprule
+Hipótesis & Contraste & Estadístico & $p$ & Decisión al 5\,\% \\
+\midrule
+Linealidad & RESET de Ramsey (potencias 2 y 3) & \num{1.291} & \num{0.275} & no se rechaza $H_0$ \\
+Normalidad & Shapiro-Wilk (residuos tipificados) & \num{0.9750} & $<\num{0.001}$ & se rechaza $H_0$ \\
+ & Jarque-Bera & \num{952.9} & $<\num{0.001}$ & se rechaza $H_0$ \\
+Homocedasticidad & Breusch-Pagan, MCO inicial & \num{262.7} & $<\num{0.001}$ & se rechaza $H_0$ \\
+ & Breusch-Pagan, modelo final & \num{73.0} & $<\num{0.001}$ & se rechaza $H_0$ \\
+ & Frente a 1/población, MCO inicial & \num{201.9} & $<\num{0.001}$ & se rechaza $H_0$ \\
+ & Frente a 1/población, modelo final & \num{209.99} & $<\num{0.001}$ & se rechaza $H_0$ \\
+Independencia & Durbin-Watson (orden del fichero) & \num{1.878} & --- & \\
+ & Rachas de los signos & \num{-3.33} & $<\num{0.001}$ & se rechaza $H_0$ \\
+ & Correlación intraclase por estado & \num{0.079} & $<\num{0.001}$ & se rechaza $H_0$ \\
+Media cero & Media de los residuos & \num{-1.6e-13} & --- & por construcción \\
+\bottomrule
+\end{tabularx}
+\par\smallskip{\footnotesize\raggedright La dependencia dentro de cada estado y la heterocedasticidad se absorben con errores típicos robustos por conglomerados; la falta de normalidad, con el bootstrap por conglomerados, que no la supone.\par}
+\end{table}
