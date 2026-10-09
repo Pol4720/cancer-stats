@@ -82,3 +82,19 @@ jobs:
       - name: Pruebas de extremo a extremo (escritorio y móvil)
         working-directory: web
         run: npx playwright install --with-deps chromium && npm run e2e
+
+  informe:
+    name: Informe LaTeX (sin errores ni advertencias)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compilación con LuaLaTeX y biber
+        uses: xu-cheng/texlive-action@v2
+        with:
+          scheme: full
+          run: |
+            cd report
+            mkdir -p build dist
+            latexmk informe.tex
+      - name: Registro sin advertencias ni cajas mal llenas
+        run: python3 scripts/check_latex_log.py report/build/informe.log

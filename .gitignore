@@ -239,6 +239,7 @@ site/
 
 # LaTeX: intermedios (el PDF final sí se versiona en report/dist/)
 report/build/
+!report/dist/
 *.aux
 *.bbl
 *.bcf
