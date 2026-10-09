@@ -65,3 +65,11 @@ def test_jsonable_handles_numpy_and_nan(tmp_path) -> None:  # type: ignore[no-un
     path = tmp_path / "x.json"
     jsonutil.dump(obj, path)
     assert json.loads(path.read_text(encoding="utf-8")) == out
+
+
+def test_text_columns_are_ragged() -> None:
+    from cancerstats.export.latex import _ragged
+
+    rag = r">{\raggedright\arraybackslash}"
+    assert _ragged(r"l p{2cm} r X") == rf"l {rag}p{{2cm}} r {rag}X"
+    assert _ragged("l r") == "l r"

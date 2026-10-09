@@ -13,6 +13,7 @@ El texto interpretativo de las secciones lo escribe el investigador; las cifras,
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -599,6 +600,13 @@ def _cov_text(res: Results) -> str:
     }[res["effects"].get("covariance", "cluster")]
 
 
+def _ragged(colspec: str) -> str:
+    """Columnas de texto (X y p{…}) en bandera: evita cajas mal llenas en celdas estrechas."""
+    rag = r">{\raggedright\arraybackslash}"
+    out = re.sub(r"(?<![>{])\bX\b", lambda _m: rag + "X", colspec)
+    return re.sub(r"(?<![}])p\{", lambda _m: rag + "p{", out)
+
+
 def _table(
     name: str,
     caption: str,
@@ -611,6 +619,7 @@ def _table(
     env: str = "tabular",
 ) -> str:
     body = "\n".join(rows)
+    colspec = _ragged(colspec)
     note_tex = rf"\par\smallskip{{\footnotesize\raggedright {note}\par}}" if note else ""
     width = r"{\linewidth}" if env == "tabularx" else ""
     return (
@@ -632,6 +641,7 @@ def _long(
 ) -> str:
     """Tabla larga que puede partirse entre páginas (xltabular)."""
     body = "\n".join(rows)
+    colspec = _ragged(colspec)
     ncols = header.split(r"\\")[-1].count("&") + 1
     cont = rf"\multicolumn{{{ncols}}}{{l}}{{\emph{{(continuación)}}}} \\"
     follows = rf"\multicolumn{{{ncols}}}{{r}}{{\emph{{(continúa)}}}} \\"
