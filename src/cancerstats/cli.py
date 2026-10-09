@@ -91,6 +91,18 @@ def web_data(
 
 
 @app.command()
+def presentation(
+    run_id: Annotated[
+        str | None, typer.Option("--run", help="Corrida (por defecto, la última).")
+    ] = None,
+) -> None:
+    """Genera presentation/index.html (presentación autónoma) con las cifras de una corrida."""
+    from cancerstats.export.presentation import build_presentation
+
+    console.print(f"Presentación escrita en {build_presentation(run_id)}")
+
+
+@app.command()
 def serve(
     host: Annotated[str, typer.Option()] = "127.0.0.1",
     port: Annotated[int, typer.Option()] = 8000,

@@ -189,6 +189,20 @@ def test_web_export(outcome, registry: RunRegistry, tmp_path: Path) -> None:  # 
     assert "effects" in schema["properties"]
 
 
+def test_presentation_embeds_run_figures(outcome, registry: RunRegistry, tmp_path: Path) -> None:  # type: ignore[no-untyped-def]
+    from cancerstats.export.presentation import build_presentation
+
+    rid, res = outcome
+    out = build_presentation(rid, registry, tmp_path / "index.html")
+    html = out.read_text(encoding="utf-8")
+    assert "/*__DATOS__*/null" not in html
+    data = json.loads(re.search(r"const D = (\{.*?\});\n", html, re.S).group(1))  # type: ignore[union-attr]
+    assert data["run_id"] == rid
+    assert data["fit"]["n"] == res["effects"]["final"]["spss"]["model_summary"]["n"]
+    assert data["effects"]
+    assert all(r["lo"] <= r["v"] <= r["hi"] for r in data["effects"])
+
+
 def test_spss_syntax_flags_the_sentinel_exactly(outcome, registry: RunRegistry) -> None:  # type: ignore[no-untyped-def]
     """La sintaxis de SPSS debe reconocer el centinela tal como está en el fichero oficial."""
     from cancerstats.export.spss import syntax
