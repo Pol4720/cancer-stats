@@ -1,0 +1,9 @@
+model,label,rmse_mean,rmse_sd,mae_mean,r2_mean,r2_sd
+baseline,Referencia (media),27.8976,1.10849,21.3952,-0.0029429,0.0028182
+ols_effects,MCO con la especificación del modelo de efectos,19.1052,1.43959,13.8871,0.527438,0.0613807
+ols_full,MCO con todas las variables,18.6144,1.37395,13.5409,0.551445,0.0581782
+ridge,Ridge,18.5896,1.37208,13.4826,0.552551,0.0585876
+lasso,Lasso,18.5972,1.35987,13.5138,0.552236,0.0580194
+elasticnet,Red elástica,18.5968,1.3607,13.5019,0.552228,0.0581771
+random_forest,Bosque aleatorio,18.9543,1.00811,13.6813,0.536097,0.0390806
+gradient_boosting,Potenciación del gradiente (histogramas),19.0334,0.897993,13.8436,0.532363,0.033187

@@ -1,0 +1,203 @@
+especificacion,termino,coef,lower,upper,p
+MCO con errores típicos clásicos (salida tipo SPSS),const,184.526,183.457,185.595,0
+MCO con errores típicos clásicos (salida tipo SPSS),incidenceRate,0.186695,0.173459,0.19993,3.40993e-149
+MCO con errores típicos clásicos (salida tipo SPSS),MedianAge,-0.788178,-0.974108,-0.602248,1.44348e-16
+MCO con errores típicos clásicos (salida tipo SPSS),AvgHouseholdSize,-12.8751,-16.8053,-8.94482,1.5589e-10
+MCO con errores típicos clásicos (salida tipo SPSS),PctHS18_24,0.24113,0.149739,0.332521,2.45867e-07
+MCO con errores típicos clásicos (salida tipo SPSS),PctBachDeg25_Over,-1.05378,-1.36661,-0.740944,4.73442e-11
+MCO con errores típicos clásicos (salida tipo SPSS),PctUnemployed16_Over,0.3661,0.0174618,0.714739,0.0395845
+MCO con errores típicos clásicos (salida tipo SPSS),PctPublicCoverageAlone,0.892434,0.710799,1.07407,1.23149e-21
+MCO con errores típicos clásicos (salida tipo SPSS),PctOtherRace,-0.659818,-0.890896,-0.42874,2.36532e-08
+MCO con errores típicos clásicos (salida tipo SPSS),BirthRate,-0.381471,-0.748895,-0.0140474,0.0418666
+MCO con errores típicos clásicos (salida tipo SPSS),region[Noreste],-15.6827,-18.9876,-12.3778,2.61644e-20
+MCO con errores típicos clásicos (salida tipo SPSS),region[Medio Oeste],-4.32673,-6.20239,-2.45106,6.34507e-06
+MCO con errores típicos clásicos (salida tipo SPSS),region[Oeste],-14.1307,-16.5245,-11.7369,2.65383e-30
+MCO con errores típicos clásicos (salida tipo SPSS),PctHS25_Over,0.353927,0.16537,0.542485,0.000237157
+MCO con errores típicos clásicos (salida tipo SPSS),PctBachDeg25_Over:region[Noreste],0.844429,0.325643,1.36321,0.00143038
+MCO con errores típicos clásicos (salida tipo SPSS),PctBachDeg25_Over:region[Medio Oeste],0.228947,-0.137161,0.595055,0.220226
+MCO con errores típicos clásicos (salida tipo SPSS),PctBachDeg25_Over:region[Oeste],-0.0307535,-0.407969,0.346462,0.873003
+MCO con errores típicos clásicos (salida tipo SPSS),PctUnemployed16_Over:region[Noreste],0.902981,-0.614539,2.4205,0.243409
+MCO con errores típicos clásicos (salida tipo SPSS),PctUnemployed16_Over:region[Medio Oeste],1.47796,0.943501,2.01242,6.38239e-08
+MCO con errores típicos clásicos (salida tipo SPSS),PctUnemployed16_Over:region[Oeste],-0.428716,-1.06598,0.208546,0.187234
+MCO con errores típicos HC3,const,184.526,183.421,185.631,0
+MCO con errores típicos HC3,incidenceRate,0.186695,0.163983,0.209406,5.55332e-56
+MCO con errores típicos HC3,MedianAge,-0.788178,-1.01197,-0.564388,6.14115e-12
+MCO con errores típicos HC3,AvgHouseholdSize,-12.8751,-18.2826,-7.46757,3.17424e-06
+MCO con errores típicos HC3,PctHS18_24,0.24113,0.121949,0.360311,7.45482e-05
+MCO con errores típicos HC3,PctBachDeg25_Over,-1.05378,-1.41206,-0.695491,8.94306e-09
+MCO con errores típicos HC3,PctUnemployed16_Over,0.3661,-0.0614646,0.793665,0.0932765
+MCO con errores típicos HC3,PctPublicCoverageAlone,0.892434,0.679924,1.10494,2.72761e-16
+MCO con errores típicos HC3,PctOtherRace,-0.659818,-0.93503,-0.384607,2.7129e-06
+MCO con errores típicos HC3,BirthRate,-0.381471,-0.882397,0.119455,0.135493
+MCO con errores típicos HC3,region[Noreste],-15.6827,-18.2208,-13.1446,5.66319e-33
+MCO con errores típicos HC3,region[Medio Oeste],-4.32673,-6.1886,-2.46485,5.41901e-06
+MCO con errores típicos HC3,region[Oeste],-14.1307,-16.9481,-11.3133,1.8306e-22
+MCO con errores típicos HC3,PctHS25_Over,0.353927,0.114309,0.593546,0.00380619
+MCO con errores típicos HC3,PctBachDeg25_Over:region[Noreste],0.844429,0.455556,1.2333,2.13151e-05
+MCO con errores típicos HC3,PctBachDeg25_Over:region[Medio Oeste],0.228947,-0.139987,0.597882,0.223781
+MCO con errores típicos HC3,PctBachDeg25_Over:region[Oeste],-0.0307535,-0.456495,0.394988,0.887375
+MCO con errores típicos HC3,PctUnemployed16_Over:region[Noreste],0.902981,-0.166875,1.97284,0.0980436
+MCO con errores típicos HC3,PctUnemployed16_Over:region[Medio Oeste],1.47796,0.856807,2.09912,3.22222e-06
+MCO con errores típicos HC3,PctUnemployed16_Over:region[Oeste],-0.428716,-1.33489,0.477459,0.35366
+Principal: MCO + errores cluster por estado,const,184.526,181.873,187.178,2.97414e-63
+Principal: MCO + errores cluster por estado,incidenceRate,0.186695,0.14763,0.22576,1.12227e-12
+Principal: MCO + errores cluster por estado,MedianAge,-0.788178,-1.16355,-0.412805,0.000109243
+Principal: MCO + errores cluster por estado,AvgHouseholdSize,-12.8751,-19.4986,-6.2516,0.000294882
+Principal: MCO + errores cluster por estado,PctHS18_24,0.24113,0.112053,0.370208,0.000472427
+Principal: MCO + errores cluster por estado,PctBachDeg25_Over,-1.05378,-1.56605,-0.541502,0.000143782
+Principal: MCO + errores cluster por estado,PctUnemployed16_Over,0.3661,-0.205107,0.937307,0.203578
+Principal: MCO + errores cluster por estado,PctPublicCoverageAlone,0.892434,0.462685,1.32218,0.00012678
+Principal: MCO + errores cluster por estado,PctOtherRace,-0.659818,-1.0819,-0.237733,0.00287973
+Principal: MCO + errores cluster por estado,BirthRate,-0.381471,-0.882651,0.119709,0.132417
+Principal: MCO + errores cluster por estado,region[Noreste],-15.6827,-20.3425,-11.0229,1.82228e-08
+Principal: MCO + errores cluster por estado,region[Medio Oeste],-4.32673,-9.19408,0.540625,0.0801759
+Principal: MCO + errores cluster por estado,region[Oeste],-14.1307,-19.6751,-8.58623,5.46557e-06
+Principal: MCO + errores cluster por estado,PctHS25_Over,0.353927,-0.0314091,0.739264,0.0709354
+Principal: MCO + errores cluster por estado,PctBachDeg25_Over:region[Noreste],0.844429,0.404069,1.28479,0.000347545
+Principal: MCO + errores cluster por estado,PctBachDeg25_Over:region[Medio Oeste],0.228947,-0.390673,0.848567,0.460982
+Principal: MCO + errores cluster por estado,PctBachDeg25_Over:region[Oeste],-0.0307535,-0.546985,0.485478,0.905116
+Principal: MCO + errores cluster por estado,PctUnemployed16_Over:region[Noreste],0.902981,-0.213752,2.01971,0.110493
+Principal: MCO + errores cluster por estado,PctUnemployed16_Over:region[Medio Oeste],1.47796,0.580665,2.37526,0.00177865
+Principal: MCO + errores cluster por estado,PctUnemployed16_Over:region[Oeste],-0.428716,-1.81278,0.955353,0.536207
+MCPF con σ²(n) = a + b/n y errores cluster,const,184.327,181.792,186.862,3.74987e-64
+MCPF con σ²(n) = a + b/n y errores cluster,incidenceRate,0.177767,0.135073,0.22046,7.02613e-11
+MCPF con σ²(n) = a + b/n y errores cluster,MedianAge,-0.928606,-1.28386,-0.573357,3.49099e-06
+MCPF con σ²(n) = a + b/n y errores cluster,AvgHouseholdSize,-16.1759,-22.44,-9.91176,4.33906e-06
+MCPF con σ²(n) = a + b/n y errores cluster,PctHS18_24,0.271099,0.149779,0.39242,4.52566e-05
+MCPF con σ²(n) = a + b/n y errores cluster,PctBachDeg25_Over,-1.13355,-1.61653,-0.650573,2.14224e-05
+MCPF con σ²(n) = a + b/n y errores cluster,PctUnemployed16_Over,0.386829,-0.188912,0.96257,0.182957
+MCPF con σ²(n) = a + b/n y errores cluster,PctPublicCoverageAlone,0.812403,0.369183,1.25562,0.000586278
+MCPF con σ²(n) = a + b/n y errores cluster,PctOtherRace,-0.768831,-1.18574,-0.351916,0.000547601
+MCPF con σ²(n) = a + b/n y errores cluster,BirthRate,-0.369425,-0.945942,0.207093,0.203673
+MCPF con σ²(n) = a + b/n y errores cluster,region[Noreste],-15.4142,-19.9165,-10.9119,1.21118e-08
+MCPF con σ²(n) = a + b/n y errores cluster,region[Medio Oeste],-4.30212,-8.86568,0.26143,0.0640504
+MCPF con σ²(n) = a + b/n y errores cluster,region[Oeste],-13.8693,-19.3451,-8.39354,6.08755e-06
+MCPF con σ²(n) = a + b/n y errores cluster,PctHS25_Over,0.376058,-0.0318265,0.783943,0.0699085
+MCPF con σ²(n) = a + b/n y errores cluster,PctBachDeg25_Over:region[Noreste],0.989165,0.563709,1.41462,2.48275e-05
+MCPF con σ²(n) = a + b/n y errores cluster,PctBachDeg25_Over:region[Medio Oeste],0.315965,-0.236901,0.868831,0.256077
+MCPF con σ²(n) = a + b/n y errores cluster,PctBachDeg25_Over:region[Oeste],0.135427,-0.35979,0.630645,0.584821
+MCPF con σ²(n) = a + b/n y errores cluster,PctUnemployed16_Over:region[Noreste],0.988363,-0.176561,2.15329,0.0944529
+MCPF con σ²(n) = a + b/n y errores cluster,PctUnemployed16_Over:region[Medio Oeste],1.65163,0.612443,2.69083,0.00248205
+MCPF con σ²(n) = a + b/n y errores cluster,PctUnemployed16_Over:region[Oeste],0.100026,-1.12825,1.3283,0.870568
+Modelo máximo: todas las candidatas tras la poda,const,185.196,182.808,187.584,1.81179e-65
+Modelo máximo: todas las candidatas tras la poda,incidenceRate,0.181598,0.135106,0.228091,4.15562e-10
+Modelo máximo: todas las candidatas tras la poda,povertyPercent,-0.0518354,-0.644947,0.541276,0.861193
+Modelo máximo: todas las candidatas tras la poda,MedianAge,-0.616145,-1.02305,-0.209238,0.00379318
+Modelo máximo: todas las candidatas tras la poda,AvgHouseholdSize,-12.5451,-21.8588,-3.23146,0.009368
+Modelo máximo: todas las candidatas tras la poda,PctNoHS18_24,-0.00107432,-0.126225,0.124077,0.986295
+Modelo máximo: todas las candidatas tras la poda,PctHS18_24,0.225736,0.0942518,0.35722,0.00118073
+Modelo máximo: todas las candidatas tras la poda,PctBachDeg18_24,-0.119487,-0.346267,0.107293,0.294581
+Modelo máximo: todas las candidatas tras la poda,PctHS25_Over,0.247346,-0.128852,0.623544,0.192337
+Modelo máximo: todas las candidatas tras la poda,PctBachDeg25_Over,-1.12054,-1.64069,-0.600387,7.66658e-05
+Modelo máximo: todas las candidatas tras la poda,PctEmployed16_Over,-0.115945,-0.402936,0.171046,0.42046
+Modelo máximo: todas las candidatas tras la poda,PctUnemployed16_Over,0.642913,0.0428889,1.24294,0.0362723
+Modelo máximo: todas las candidatas tras la poda,PctEmpPrivCoverage,0.253747,0.00232536,0.505169,0.0480016
+Modelo máximo: todas las candidatas tras la poda,PctPublicCoverageAlone,0.935263,0.514891,1.35563,4.82568e-05
+Modelo máximo: todas las candidatas tras la poda,PctBlack,-0.107095,-0.305737,0.0915472,0.283631
+Modelo máximo: todas las candidatas tras la poda,PctAsian,0.0361692,-0.48553,0.557868,0.889672
+Modelo máximo: todas las candidatas tras la poda,PctOtherRace,-0.548403,-0.935911,-0.160894,0.00652332
+Modelo máximo: todas las candidatas tras la poda,PctNativeMulti,0.27233,-0.0663645,0.611025,0.112451
+Modelo máximo: todas las candidatas tras la poda,PctMarriedHouseholds,-0.257345,-0.629702,0.115012,0.170968
+Modelo máximo: todas las candidatas tras la poda,BirthRate,-0.444929,-0.882518,-0.00733989,0.0464271
+Modelo máximo: todas las candidatas tras la poda,logStudy,-0.220319,-0.587719,0.147081,0.233707
+Modelo máximo: todas las candidatas tras la poda,logPop,-0.0600463,-1.56232,1.44223,0.936253
+Modelo máximo: todas las candidatas tras la poda,region[Noreste],-17.4492,-22.5875,-12.311,1.47115e-08
+Modelo máximo: todas las candidatas tras la poda,region[Medio Oeste],-5.9101,-11.509,-0.311223,0.0389994
+Modelo máximo: todas las candidatas tras la poda,region[Oeste],-17.0625,-21.5702,-12.5548,9.62232e-10
+Modelo máximo: todas las candidatas tras la poda,PctBachDeg25_Over:region[Noreste],0.789402,0.383671,1.19513,0.000291618
+Modelo máximo: todas las candidatas tras la poda,PctBachDeg25_Over:region[Medio Oeste],0.031746,-0.600067,0.663559,0.919916
+Modelo máximo: todas las candidatas tras la poda,PctBachDeg25_Over:region[Oeste],0.0117157,-0.413723,0.437154,0.956055
+Modelo máximo: todas las candidatas tras la poda,PctUnemployed16_Over:region[Noreste],0.558832,-0.548212,1.66588,0.315057
+Modelo máximo: todas las candidatas tras la poda,PctUnemployed16_Over:region[Medio Oeste],0.759724,-0.245394,1.76484,0.135064
+Modelo máximo: todas las candidatas tras la poda,PctUnemployed16_Over:region[Oeste],-1.11839,-2.34466,0.107882,0.0728755
+Efectos fijos de estado (MCO + cluster),const,172.602,170.128,175.076,2.58489e-63
+Efectos fijos de estado (MCO + cluster),incidenceRate,0.187973,0.145194,0.230751,1.46527e-11
+Efectos fijos de estado (MCO + cluster),MedianAge,-0.581297,-0.929001,-0.233593,0.00153983
+Efectos fijos de estado (MCO + cluster),AvgHouseholdSize,-10.6465,-17.9301,-3.36298,0.00506883
+Efectos fijos de estado (MCO + cluster),PctHS18_24,0.153607,0.0282051,0.279008,0.0174444
+Efectos fijos de estado (MCO + cluster),PctBachDeg25_Over,-1.01536,-1.4907,-0.54002,8.63099e-05
+Efectos fijos de estado (MCO + cluster),PctUnemployed16_Over,0.743826,0.220786,1.26687,0.00628489
+Efectos fijos de estado (MCO + cluster),PctPublicCoverageAlone,0.914924,0.471399,1.35845,0.000138537
+Efectos fijos de estado (MCO + cluster),PctOtherRace,-0.550272,-0.873398,-0.227146,0.00128182
+Efectos fijos de estado (MCO + cluster),BirthRate,-0.414639,-0.862112,0.0328349,0.0685573
+Efectos fijos de estado (MCO + cluster),PctHS25_Over,0.150909,-0.262977,0.564795,0.46689
+Modelo mixto (intercepto aleatorio por estado),const,184.204,180.782,187.625,0
+Modelo mixto (intercepto aleatorio por estado),incidenceRate,0.187731,0.173955,0.201508,3.8047e-157
+Modelo mixto (intercepto aleatorio por estado),MedianAge,-0.594998,-0.782823,-0.407174,5.33718e-10
+Modelo mixto (intercepto aleatorio por estado),AvgHouseholdSize,-10.6799,-14.6,-6.75987,9.30657e-08
+Modelo mixto (intercepto aleatorio por estado),PctHS18_24,0.162875,0.0722176,0.253533,0.000429498
+Modelo mixto (intercepto aleatorio por estado),PctBachDeg25_Over,-1.11829,-1.44538,-0.791209,2.06886e-11
+Modelo mixto (intercepto aleatorio por estado),PctUnemployed16_Over,0.76717,0.396277,1.13806,5.0334e-05
+Modelo mixto (intercepto aleatorio por estado),PctPublicCoverageAlone,0.855824,0.66361,1.04804,2.62283e-18
+Modelo mixto (intercepto aleatorio por estado),PctOtherRace,-0.58424,-0.820001,-0.34848,1.19171e-06
+Modelo mixto (intercepto aleatorio por estado),BirthRate,-0.355832,-0.717183,0.00551902,0.0536033
+Modelo mixto (intercepto aleatorio por estado),region[Noreste],-13.9451,-20.7582,-7.132,6.02914e-05
+Modelo mixto (intercepto aleatorio por estado),region[Medio Oeste],-4.31536,-9.81847,1.18775,0.124308
+Modelo mixto (intercepto aleatorio por estado),region[Oeste],-13.4223,-18.9756,-7.86909,2.16604e-06
+Modelo mixto (intercepto aleatorio por estado),PctHS25_Over,0.226508,0.0130869,0.439929,0.037512
+Modelo mixto (intercepto aleatorio por estado),PctBachDeg25_Over:region[Noreste],0.599472,0.0139378,1.18501,0.0447903
+Modelo mixto (intercepto aleatorio por estado),PctBachDeg25_Over:region[Medio Oeste],0.399083,0.0335462,0.764621,0.0323681
+Modelo mixto (intercepto aleatorio por estado),PctBachDeg25_Over:region[Oeste],-0.0935698,-0.475702,0.288563,0.631283
+Modelo mixto (intercepto aleatorio por estado),PctUnemployed16_Over:region[Noreste],0.479494,-1.11869,2.07767,0.556507
+Modelo mixto (intercepto aleatorio por estado),PctUnemployed16_Over:region[Medio Oeste],0.951324,0.35065,1.552,0.0019085
+Modelo mixto (intercepto aleatorio por estado),PctUnemployed16_Over:region[Oeste],-1.38019,-2.07885,-0.681533,0.000107996
+Regresión robusta de Huber (M-estimador),const,184.497,183.541,185.453,0
+Regresión robusta de Huber (M-estimador),incidenceRate,0.187833,0.175999,0.199667,1.83034e-212
+Regresión robusta de Huber (M-estimador),MedianAge,-0.874877,-1.04112,-0.708631,6.06598e-25
+Regresión robusta de Huber (M-estimador),AvgHouseholdSize,-14.6338,-18.1479,-11.1196,3.30314e-16
+Regresión robusta de Huber (M-estimador),PctHS18_24,0.252232,0.170517,0.333947,1.44979e-09
+Regresión robusta de Huber (M-estimador),PctBachDeg25_Over,-1.19203,-1.47174,-0.912313,6.67867e-17
+Regresión robusta de Huber (M-estimador),PctUnemployed16_Over,0.415713,0.103984,0.727442,0.0089553
+Regresión robusta de Huber (M-estimador),PctPublicCoverageAlone,0.77682,0.614414,0.939225,6.923e-21
+Regresión robusta de Huber (M-estimador),PctOtherRace,-0.62383,-0.830444,-0.417216,3.26442e-09
+Regresión robusta de Huber (M-estimador),BirthRate,-0.587188,-0.915713,-0.258663,0.000459822
+Regresión robusta de Huber (M-estimador),region[Noreste],-16.0499,-19.0049,-13.0949,1.83037e-26
+Regresión robusta de Huber (M-estimador),region[Medio Oeste],-5.03731,-6.7144,-3.36022,3.93394e-09
+Regresión robusta de Huber (M-estimador),region[Oeste],-14.7099,-16.8503,-12.5695,2.35414e-41
+Regresión robusta de Huber (M-estimador),PctHS25_Over,0.409153,0.240558,0.577749,1.96969e-06
+Regresión robusta de Huber (M-estimador),PctBachDeg25_Over:region[Noreste],1.00587,0.542008,1.46973,2.13659e-05
+Regresión robusta de Huber (M-estimador),PctBachDeg25_Over:region[Medio Oeste],0.370753,0.0434049,0.698102,0.0264292
+Regresión robusta de Huber (M-estimador),PctBachDeg25_Over:region[Oeste],0.216487,-0.120793,0.553768,0.208382
+Regresión robusta de Huber (M-estimador),PctUnemployed16_Over:region[Noreste],0.827117,-0.529746,2.18398,0.232183
+Regresión robusta de Huber (M-estimador),PctUnemployed16_Over:region[Medio Oeste],1.59392,1.11604,2.0718,6.2643e-11
+Regresión robusta de Huber (M-estimador),PctUnemployed16_Over:region[Oeste],-0.104786,-0.674581,0.46501,0.718519
+Sin los 185 condados influyentes (Cook > 4/n),const,184.732,182.513,186.951,6.53106e-67
+Sin los 185 condados influyentes (Cook > 4/n),incidenceRate,0.175381,0.153827,0.196934,4.81206e-21
+Sin los 185 condados influyentes (Cook > 4/n),MedianAge,-0.926909,-1.20398,-0.64984,2.09927e-08
+Sin los 185 condados influyentes (Cook > 4/n),AvgHouseholdSize,-14.9984,-19.4828,-10.5139,2.11269e-08
+Sin los 185 condados influyentes (Cook > 4/n),PctHS18_24,0.255815,0.160962,0.350668,1.96916e-06
+Sin los 185 condados influyentes (Cook > 4/n),PctBachDeg25_Over,-1.28333,-1.61753,-0.949134,6.56865e-10
+Sin los 185 condados influyentes (Cook > 4/n),PctUnemployed16_Over,0.28347,-0.187807,0.754747,0.232312
+Sin los 185 condados influyentes (Cook > 4/n),PctPublicCoverageAlone,0.782947,0.494808,1.07109,1.71102e-06
+Sin los 185 condados influyentes (Cook > 4/n),PctOtherRace,-0.762074,-1.03037,-0.493773,7.271e-07
+Sin los 185 condados influyentes (Cook > 4/n),BirthRate,-0.583889,-0.979247,-0.188531,0.00466491
+Sin los 185 condados influyentes (Cook > 4/n),region[Noreste],-16.0711,-19.5802,-12.5619,4.20883e-12
+Sin los 185 condados influyentes (Cook > 4/n),region[Medio Oeste],-5.29401,-9.05666,-1.53136,0.00681728
+Sin los 185 condados influyentes (Cook > 4/n),region[Oeste],-14.627,-18.9283,-10.3258,1.42352e-08
+Sin los 185 condados influyentes (Cook > 4/n),PctHS25_Over,0.415622,0.140108,0.691136,0.00391516
+Sin los 185 condados influyentes (Cook > 4/n),PctBachDeg25_Over:region[Noreste],1.16019,0.79753,1.52286,5.87762e-08
+Sin los 185 condados influyentes (Cook > 4/n),PctBachDeg25_Over:region[Medio Oeste],0.40266,-0.129091,0.934411,0.13437
+Sin los 185 condados influyentes (Cook > 4/n),PctBachDeg25_Over:region[Oeste],0.349531,-0.0668923,0.765955,0.0979244
+Sin los 185 condados influyentes (Cook > 4/n),PctUnemployed16_Over:region[Noreste],0.732497,-0.262781,1.72777,0.14539
+Sin los 185 condados influyentes (Cook > 4/n),PctUnemployed16_Over:region[Medio Oeste],1.93006,1.1025,2.75762,2.36484e-05
+Sin los 185 condados influyentes (Cook > 4/n),PctUnemployed16_Over:region[Oeste],0.185949,-0.479325,0.851223,0.576587
+"Imputación múltiple (20 conjuntos, todos los condados)",const,183.855,181.237,186.474,1.32497e-64
+"Imputación múltiple (20 conjuntos, todos los condados)",incidenceRate,0.188495,0.150865,0.226124,2.20287e-13
+"Imputación múltiple (20 conjuntos, todos los condados)",MedianAge,-0.760563,-1.11081,-0.410318,6.72134e-05
+"Imputación múltiple (20 conjuntos, todos los condados)",AvgHouseholdSize,-12.8697,-19.6374,-6.10195,0.000379173
+"Imputación múltiple (20 conjuntos, todos los condados)",PctHS18_24,0.260531,0.138313,0.382749,8.77273e-05
+"Imputación múltiple (20 conjuntos, todos los condados)",PctBachDeg25_Over,-1.08985,-1.59159,-0.588114,6.69098e-05
+"Imputación múltiple (20 conjuntos, todos los condados)",PctUnemployed16_Over,0.445974,-0.122526,1.01447,0.1213
+"Imputación múltiple (20 conjuntos, todos los condados)",PctPublicCoverageAlone,0.813562,0.410362,1.21676,0.000181917
+"Imputación múltiple (20 conjuntos, todos los condados)",PctOtherRace,-0.554314,-0.937043,-0.171586,0.0054343
+"Imputación múltiple (20 conjuntos, todos los condados)",BirthRate,-0.465237,-0.934983,0.00450933,0.0521504
+"Imputación múltiple (20 conjuntos, todos los condados)",region[Noreste],-15.8733,-20.2936,-11.4529,3.37609e-09
+"Imputación múltiple (20 conjuntos, todos los condados)",region[Medio Oeste],-4.69003,-9.2929,-0.0871707,0.0459791
+"Imputación múltiple (20 conjuntos, todos los condados)",region[Oeste],-13.3412,-18.8219,-7.86044,1.15485e-05
+"Imputación múltiple (20 conjuntos, todos los condados)",PctHS25_Over,0.348943,-0.0130569,0.710944,0.0585022
+"Imputación múltiple (20 conjuntos, todos los condados)",PctBachDeg25_Over:region[Noreste],0.848433,0.408645,1.28822,0.000318739
+"Imputación múltiple (20 conjuntos, todos los condados)",PctBachDeg25_Over:region[Medio Oeste],0.250406,-0.318848,0.81966,0.380793
+"Imputación múltiple (20 conjuntos, todos los condados)",PctBachDeg25_Over:region[Oeste],-0.0795821,-0.584209,0.425045,0.752548
+"Imputación múltiple (20 conjuntos, todos los condados)",PctUnemployed16_Over:region[Noreste],0.806341,-0.34382,1.9565,0.165114
+"Imputación múltiple (20 conjuntos, todos los condados)",PctUnemployed16_Over:region[Medio Oeste],1.47898,0.621001,2.33696,0.00112454
+"Imputación múltiple (20 conjuntos, todos los condados)",PctUnemployed16_Over:region[Oeste],-0.366025,-1.64512,0.913066,0.567733
