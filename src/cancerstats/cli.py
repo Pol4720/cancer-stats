@@ -77,10 +77,26 @@ def export_cmd(
     console.print(f"Exportada la corrida {rid}")
 
 
+@app.command("web-data")
+def web_data(
+    run_id: Annotated[
+        str | None, typer.Option("--run", help="Corrida (por defecto, la última).")
+    ] = None,
+) -> None:
+    """Prepara web/public/data para compilar la interfaz en modo estático."""
+    from cancerstats.export.web import export_web
+
+    rid = export_web(run_id)
+    console.print(f"Datos de la interfaz preparados con la corrida {rid}")
+
+
 @app.command()
 def serve(
     host: Annotated[str, typer.Option()] = "127.0.0.1",
     port: Annotated[int, typer.Option()] = 8000,
+    export: Annotated[
+        bool, typer.Option(help="Regenerar report/generado al terminar cada corrida.")
+    ] = True,
 ) -> None:
     """Arranca la interfaz interactiva en modo en vivo (configurar y ejecutar corridas)."""
     import uvicorn
@@ -88,7 +104,7 @@ def serve(
     from cancerstats.api.server import create_app
 
     console.print(f"Interfaz en http://{host}:{port}")
-    uvicorn.run(create_app(), host=host, port=port, log_level="info")
+    uvicorn.run(create_app(export=export), host=host, port=port, log_level="info")
 
 
 @runs_app.command("list")
