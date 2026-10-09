@@ -457,10 +457,11 @@ def r17_declared_missing(df: pd.DataFrame, cfg: CleaningConfig, s: dict[str, flo
 def r18_zero_inflation(df: pd.DataFrame, cfg: CleaningConfig, s: dict[str, float]) -> RuleResult:
     zeros = df["studyPerCap"] == 0
     share = float(zeros.mean())
+    share_text = f"{100 * share:.1f}".replace(".", ",")
     return RuleResult(
         "R18",
         "Inflación de ceros en ensayos clínicos",
-        f"El {100 * share:.1f} % de los condados no tiene ningún ensayo clínico: la variable es "
+        f"El {share_text} % de los condados no tiene ningún ensayo clínico: la variable es "
         "una mezcla de ceros estructurales y una cola muy asimétrica.",
         "distribución",
         "información",

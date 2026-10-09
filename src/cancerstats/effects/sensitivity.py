@@ -129,8 +129,10 @@ def mixed_model(design: Design, terms: list[str]) -> Record:
         fe + z * bse,
         res.pvalues[fe.index],
         int(res.nobs),
-        f"σ²_estado = {s2u:.2f}; σ²_residual = {res.scale:.2f}; "
-        f"ICC = {s2u / (s2u + res.scale):.3f}",
+        (
+            f"σ²_estado = {s2u:.2f}; σ²_residual = {res.scale:.2f}; "
+            f"ICC = {s2u / (s2u + res.scale):.3f}"
+        ).replace(".", ","),
     )
     out["icc"] = s2u / (s2u + float(res.scale))
     return out

@@ -221,7 +221,9 @@ def clean(raw: pd.DataFrame, config: AnalysisConfig, source_format: str = "spss"
     verified = months & (corrected >= lo) & (corrected <= hi)
     inside = ~months & (df["MedianAge"] >= lo) & (df["MedianAge"] <= hi)
     share_inside = inside.sum() / max(int((~months).sum()), 1)
-    coherent_text = "siempre cae" if share_inside == 1 else f"cae en el {100 * share_inside:.1f} %"
+    coherent_text = (
+        "siempre cae" if share_inside == 1 else f"cae en el {_fmt_dec(100 * share_inside, 1)} %"
+    )
     ratio = df.loc[months, "MedianAge"] / (
         (df.loc[months, "MedianAgeMale"] + df.loc[months, "MedianAgeFemale"]) / 2
     )

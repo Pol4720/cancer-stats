@@ -304,9 +304,10 @@ def analyze_missing(
             float("nan"),
         )
         verdict = "compatible con MCAR" if not significant and state_p >= alpha else "no MCAR"
+        p_text = f"{state_p:.3f}".replace(".", ",")
         mechanism[col] = (
             f"{verdict}: {len(significant)} de {len(rows)} comparaciones significativas tras "
-            f"corregir; χ² por estado p = {state_p:.3f}."
+            f"corregir; χ² por estado p = {p_text}."
         )
     return MissingReport(
         by_column=by_col,
