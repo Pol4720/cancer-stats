@@ -32,6 +32,7 @@ dependencies = [
   "rich>=13.7",
   "fastapi>=0.111",
   "uvicorn>=0.30",
+  "pyreadstat>=1.3.6",
 ]
 
 [project.optional-dependencies]
@@ -67,6 +68,8 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["PD"]
+# Las filas de las tablas LaTeX son cadenas largas que pierden legibilidad si se parten.
+"src/cancerstats/export/latex.py" = ["E501"]
 
 [tool.mypy]
 python_version = "3.12"
@@ -79,6 +82,7 @@ disallow_untyped_defs = true
 no_implicit_optional = true
 ignore_missing_imports = true
 files = ["src/cancerstats"]
+plugins = ["pydantic.mypy"]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
@@ -89,6 +93,9 @@ markers = [
 ]
 filterwarnings = [
   "error::FutureWarning:cancerstats",
+  "ignore:Using `httpx` with `starlette.testclient`",
+  "error::DeprecationWarning:cancerstats",
+  "error::matplotlib.MatplotlibDeprecationWarning",
 ]
 
 [tool.coverage.run]
