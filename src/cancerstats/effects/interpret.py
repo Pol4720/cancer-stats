@@ -10,6 +10,8 @@ con su varianza Var(β₁ + β₂) = Var(β₁) + Var(β₂) + 2·Cov(β₁, β�
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -43,11 +45,11 @@ def _per_unit_text(var: str) -> str:
     return f"una unidad más ({u})" if u else "una unidad más"
 
 
-def effects_table(
+def effects_table(  # type: ignore[no-untyped-def]
     res,
     design: Design,
     df: pd.DataFrame,
-    terms: list[str],  # type: ignore[no-untyped-def]
+    terms: list[str],
     alpha: float,
 ) -> list[Record]:
     """Efecto de cada explicativa continua: por unidad, por 10 % (logaritmos) y por IQR."""
@@ -177,7 +179,8 @@ def sentence(effect: Record, alpha: float) -> str:
     var = str(effect["etiqueta"])
     if effect.get("interaccion_region"):
         parts = []
-        for s in effect["by_region"]:  # type: ignore[union-attr]
+        by_region: list[dict[str, Any]] = effect["by_region"]  # type: ignore[assignment]
+        for s in by_region:
             parts.append(f"{s['region']}: {_es(float(s['coef']), 3)}")
         return (
             f"El efecto de {var.lower()} difiere según la región (interacción): "

@@ -42,7 +42,10 @@ Logger = Callable[[str], None]
 
 
 def _records(df: pd.DataFrame) -> list[Record]:
-    return df.replace({np.nan: None}).to_dict(orient="records")
+    return [
+        {str(k): v for k, v in row.items()}
+        for row in df.replace({np.nan: None}).to_dict(orient="records")
+    ]
 
 
 def _term_tests(res, design: Design, terms: list[str]) -> list[Record]:  # type: ignore[no-untyped-def]
@@ -153,7 +156,7 @@ def run_effects(
     )
     kept = list(coll["kept"])  # type: ignore[call-overload]
 
-    pairs = [tuple(_model_names(p, [*numeric, REGION])) for p in eff.interactions]
+    pairs: list[list[str]] = [_model_names(p, [*numeric, REGION]) for p in eff.interactions]
     pairs = [
         p
         for p in pairs
@@ -177,12 +180,11 @@ def run_effects(
     initial = fit(design, main_terms, None, "nonrobust")
     before = residual_check_before(design, main_terms)
 
-    # 3. Función de varianza (FGLS) --------------------------------------------------------
-    if eff.weighting == "fgls":
-        say("Estimando la función de varianza σ²(n) = a + b/n (FGLS)")
-        vf0, w0 = estimate_variance_function(design, main_terms, eff.fgls_iterations)
-    else:
-        vf0, w0 = None, None
+    # 3. Función de varianza: se estima siempre (diagnóstico y sensibilidad); sólo pondera el
+    #    ajuste si el estimador elegido es MCPF.
+    say("Estimando la función de varianza σ²(n) = a + b/n")
+    vf0, w_fgls0 = estimate_variance_function(design, main_terms, eff.fgls_iterations)
+    w0 = w_fgls0 if eff.weighting == "fgls" else None
 
     # 4. Selección --------------------------------------------------------------------------
     say(f"Selección de variables ({eff.selection}) con covarianza {eff.covariance}")
@@ -216,8 +218,16 @@ def run_effects(
     naive = backward(design, main_terms, protected, None, "nonrobust", eff.alpha_remove)
 
     # 5. Confusión ---------------------------------------------------------------------------
+    exposures = _model_names(eff.exposures, numeric)
     terms, confounding = confounding_check(
-        design, sel.selected, main_terms, w0, eff.covariance, eff.confounding_threshold, alpha
+        design,
+        sel.selected,
+        main_terms,
+        w0,
+        eff.covariance,
+        eff.confounding_threshold,
+        alpha,
+        exposures,
     )
 
     # 6. Interacciones ---------------------------------------------------------------------
@@ -256,15 +266,17 @@ def run_effects(
         final_pairs,
         eff.center_predictors,
     )
-    if eff.weighting == "fgls":
-        vf, wf = estimate_variance_function(fdesign, final_terms, eff.fgls_iterations)
-    else:
-        vf, wf = None, None
+    vf, w_fgls = estimate_variance_function(fdesign, final_terms, eff.fgls_iterations)
+    wf = w_fgls if eff.weighting == "fgls" else None
     say(f"Modelo final: {len(final_terms)} términos, n = {fdesign.n}")
     res = fit(fdesign, final_terms, wf, eff.covariance)
     n_clusters = len(np.unique(fdesign.groups))
     coef = coef_table(res, fdesign, alpha)
     summary = summary_stats(res, n_clusters)
+    res_classic = fit(fdesign, final_terms, wf, "nonrobust")
+    res_hc3 = fit(fdesign, final_terms, wf, "HC3")
+    coef_classic = coef_table(res_classic, fdesign, alpha)
+    coef_hc3 = coef_table(res_hc3, fdesign, alpha)
 
     # 8. Diagnóstico -----------------------------------------------------------------------
     say("Diagnóstico de las hipótesis e influencia")
@@ -272,6 +284,41 @@ def run_effects(
         fdesign, final_terms, wf, eff.covariance, alpha, config.inference.multiple_testing, seed
     )
     residual_table: pd.DataFrame = diag.pop("table")  # type: ignore[assignment]
+    # Varianza de los residuos por decil de población en la escala original (MCO) y tras
+    # ponderar por la función de varianza estimada (MCPF, especificación de sensibilidad).
+    pop_bins = pd.qcut(fdesign.population, 10, labels=False, duplicates="drop")
+    res_wls = fit(fdesign, final_terms, w_fgls, "nonrobust")
+    e2_wls = w_fgls * np.asarray(res_wls.resid) ** 2
+    variance_by_decile = {
+        "mco": pd.Series(np.asarray(res_classic.resid) ** 2).groupby(pop_bins).mean().tolist(),
+        "mcpf": pd.Series(e2_wls).groupby(pop_bins).mean().tolist(),
+    }
+    vif_by = {v["variable"]: v for v in diag["collinearity"]["vif"]}  # type: ignore[index]
+    spss_coef = []
+    for row in _records(coef_classic):
+        extra = vif_by.get(str(row["term"]), {})
+        spss_coef.append({**row, "tolerancia": extra.get("tolerancia"), "fiv": extra.get("fiv")})
+    spss = {
+        "model_summary": {
+            "R": float(np.sqrt(max(summary["r2"], 0.0))),
+            "R2": summary["r2"],
+            "R2_adj": summary["r2_adj"],
+            "se_estimate": summary["sigma"],
+            "rmse": summary["rmse_unweighted"],
+            "durbin_watson": diag["independence"]["durbin_watson"],  # type: ignore[index]
+            "n": summary["n"],
+        },
+        "anova": {
+            "scr": summary["scr"],
+            "sce": summary["sce"],
+            "sct": summary["sct"],
+            "k": summary["k"],
+            "n": summary["n"],
+            "F": summary["f_classic"],
+            "p": summary["p_f_classic"],
+        },
+        "coefficients": spss_coef,
+    }
 
     # 9. Interpretación -------------------------------------------------------------------
     effects = interpret.effects_table(res, fdesign, df, final_terms, alpha)
@@ -298,21 +345,35 @@ def run_effects(
     # 11. Sensibilidad --------------------------------------------------------------------
     say("Análisis de sensibilidad (especificaciones alternativas)")
     w_or_one = wf if wf is not None else np.ones(fdesign.n)
+    principal = (
+        "Principal: MCPF + errores cluster por estado"
+        if eff.weighting == "fgls"
+        else "Principal: MCO + errores cluster por estado"
+    )
+    alternative = (
+        sensitivity._from_res(
+            "wls",
+            "MCPF con σ²(n) = a + b/n y errores cluster",
+            fit(fdesign, final_terms, w_fgls, eff.covariance),
+        )
+        if eff.weighting != "fgls"
+        else sensitivity._from_res(
+            "ols_cluster",
+            "MCO con errores cluster",
+            fit(fdesign, final_terms, None, eff.covariance),
+        )
+    )
     specs: list[Record] = [
         sensitivity._from_res(
             "ols",
-            "MCO clásico (sin ponderar, errores i.i.d.)",
+            "MCO con errores típicos clásicos (salida tipo SPSS)",
             fit(fdesign, final_terms, None, "nonrobust"),
         ),
         sensitivity._from_res(
             "ols_hc3", "MCO con errores típicos HC3", fit(fdesign, final_terms, None, "HC3")
         ),
-        sensitivity._from_res(
-            "wls",
-            "MCPF con errores típicos clásicos",
-            fit(fdesign, final_terms, w_or_one, "nonrobust"),
-        ),
-        sensitivity._from_res("main", "Principal: MCPF + cluster por estado", res),
+        sensitivity._from_res("main", principal, res),
+        alternative,
         sensitivity.state_fixed_effects(df, fdesign, final_terms, w_or_one),
         sensitivity.mixed_model(fdesign, final_terms),
         sensitivity.huber(fdesign, final_terms, w_or_one),
@@ -324,7 +385,7 @@ def run_effects(
                 fdesign,
                 final_terms,
                 w_or_one,
-                flagged,  # type: ignore[arg-type]
+                flagged,
                 eff.covariance,
             )
         )
@@ -369,10 +430,14 @@ def run_effects(
         "variance_function": vf0.to_dict() if vf0 else None,
         "variance_function_final": vf.to_dict() if vf else None,
         "variance_examples": _variance_examples(vf) if vf else None,
+        "variance_by_decile": variance_by_decile,
+        "weighting": eff.weighting,
+        "covariance": eff.covariance,
         "selection": sel.to_dict(),
         "strategies": strategies,
         "naive_selection": naive.to_dict(),
         "confounding": confounding,
+        "exposures": exposures,
         "interactions": inter_trace,
         "model_comparison": comparison,
         "final": {
@@ -382,6 +447,9 @@ def run_effects(
             "n_clusters": n_clusters,
             "centers": fdesign.centers,
             "coef": _records(coef),
+            "coef_classic": _records(coef_classic),
+            "coef_hc3": _records(coef_hc3),
+            "spss": spss,
             "summary": summary,
             "term_tests": _term_tests(res, fdesign, final_terms),
             "construct_tests": _construct_blocks(res, fdesign, final_terms),
@@ -402,7 +470,7 @@ def run_effects(
 
 
 def _variance_examples(vf) -> list[Record]:  # type: ignore[no-untyped-def]
-    out = []
+    out: list[Record] = []
     for pop in (2_000, 10_000, 25_000, 100_000, 1_000_000):
         out.append(
             {

@@ -201,19 +201,25 @@ def confounding_check(
     cov: str,
     threshold: float,
     alpha: float,
+    exposures: list[str] | None = None,
 ) -> tuple[list[str], list[Record]]:
     """Reincorpora las variables de confusión eliminadas (criterio del cambio en la estimación).
 
-    Para cada término eliminado se compara el modelo seleccionado con el que lo añade: si el
-    coeficiente de alguna explicativa retenida y significativa cambia más que ``threshold``
-    (en términos relativos), el término es confusor de esa asociación y vuelve al modelo.
-    Se reincorpora primero el de mayor cambio y se repite hasta que ninguno lo supera.
+    La confusión se define respecto de un factor de estudio: para cada término eliminado se
+    compara el modelo seleccionado con el que lo añade, y si el coeficiente de alguna
+    *exposición de interés* retenida y significativa cambia más que ``threshold`` (en términos
+    relativos), el término confunde esa asociación y vuelve al modelo. Se reincorpora primero
+    el de mayor cambio y se repite hasta que ninguno lo supera. Sin ``exposures`` se vigilan
+    todas las explicativas continuas significativas.
     """
     current = list(selected)
     trace: list[Record] = []
     while True:
         base = fit(design, current, weights, cov)
-        monitored = [t for t in current if t in design.numeric and float(base.pvalues[t]) < alpha]
+        watch = [
+            t for t in current if t in design.numeric and (exposures is None or t in exposures)
+        ]
+        monitored = [t for t in watch if float(base.pvalues[t]) < alpha]
         removed = [t for t in candidates if t not in current]
         best: tuple[str, float, str] | None = None
         for term in removed:

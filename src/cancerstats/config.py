@@ -29,8 +29,12 @@ FORBIDDEN_PREDICTORS: dict[str, str] = {
         "fuga de información: es el numerador de la tasa de mortalidad que se quiere explicar."
     ),
     "avgAnnCount": (
-        "es un conteo que escala con la población (numerador de la incidencia) y contiene un "
-        "valor centinela imputado en 206 condados."
+        "es un conteo que escala con la población (numerador de la incidencia) y falta, o es "
+        "un valor centinela, en los condados de Kansas, Minnesota y Nevada."
+    ),
+    "Notificadomuerte": (
+        "fuga de información: es exactamente avgAnnCount − avgDeathsPerYear, de modo que "
+        "contiene el numerador de la respuesta."
     ),
     "binnedInc": "es una función determinista de medIncome (su decil), información redundante.",
     "Geography": "es un identificador, no una característica del condado.",
@@ -112,15 +116,22 @@ class DataConfig(_Section):
     """Origen de los datos."""
 
     path: str = Field(
-        "data/raw/CANCER.csv",
+        "data/raw/practica.sav",
         title="Fichero de datos",
-        description="Ruta relativa a la raíz del repositorio.",
+        description="Fuente oficial (fichero de SPSS entregado por el profesor). Ruta relativa "
+        "a la raíz del repositorio; también admite el CSV de Kaggle.",
+    )
+    reference_path: str | None = Field(
+        "data/raw/CANCER.csv",
+        title="Fuente de referencia",
+        description="CSV público de Kaggle con el que se verifica celda a celda la procedencia "
+        "de la fuente oficial. Vacío para omitir la comprobación.",
     )
     encoding: Literal["auto", "mac_roman", "utf-8", "cp1252"] = Field(
         "auto",
-        title="Codificación",
-        description="«auto» detecta la codificación. El fichero original está en Mac Roman "
-        "con finales de línea CR (formato del Mac clásico).",
+        title="Codificación del CSV",
+        description="«auto» detecta la codificación. El CSV de Kaggle está en Mac Roman con "
+        "finales de línea CR (formato del Mac clásico); el .sav declara la suya.",
     )
 
 
@@ -370,10 +381,11 @@ class EffectsConfig(_Section):
         "colinealidad no esencial de las interacciones.",
     )
     weighting: Literal["none", "fgls"] = Field(
-        "fgls",
-        title="Ponderación",
-        description="«fgls»: mínimos cuadrados ponderados factibles con varianza σ²(n) = a + "
-        "b/población, coherente con el ruido de muestreo de una tasa.",
+        "none",
+        title="Estimador",
+        description="«none»: mínimos cuadrados ordinarios (MCO), el estimador que pide la "
+        "orientación oficial. «fgls»: mínimos cuadrados ponderados factibles con varianza "
+        "σ²(n) = a + b/población; con MCO se ajusta igualmente como análisis de sensibilidad.",
     )
     fgls_iterations: int = Field(5, title="Iteraciones FGLS", ge=1, le=50)
     covariance: Literal["nonrobust", "HC3", "cluster"] = Field(
@@ -389,6 +401,17 @@ class EffectsConfig(_Section):
     )
     alpha_enter: float = Field(0.05, title="α de entrada", gt=0, lt=1)
     alpha_remove: float = Field(0.05, title="α de salida", gt=0, lt=1)
+    exposures: list[str] = Field(
+        default_factory=lambda: [
+            "PctBachDeg25_Over",
+            "povertyPercent",
+            "medIncome",
+        ],
+        title="Exposiciones de interés",
+        description="Indicadores del nivel socioeconómico (educación, pobreza y renta): "
+        "factores de estudio cuyo efecto se quiere estimar sin confusión. El criterio del "
+        "cambio en la estimación sólo vigila sus coeficientes.",
+    )
     confounding_threshold: float = Field(
         0.10,
         title="Cambio relativo que indica confusión",
@@ -454,7 +477,7 @@ class PredictiveConfig(_Section):
         description="Indicadoras de estado (sólo ayudan a predecir condados de estados vistos).",
     )
     models: list[PredictiveModelName] = Field(
-        default_factory=lambda: [
+        default_factory=lambda: [  # type: ignore[arg-type]
             "baseline",
             "ols_effects",
             "ols_full",

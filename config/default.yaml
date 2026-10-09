@@ -1,0 +1,124 @@
+# =============================================================================
+# Configuración por defecto de la metodología
+#
+# Es la configuración con la que se elaboró el informe final. Cada clave es una
+# decisión del análisis; su significado se documenta en src/cancerstats/config.py
+# y en la interfaz (que genera sus formularios a partir de ese esquema).
+#
+# Para ensayar otra metodología, copie este fichero, cambie lo que necesite y
+# ejecútelo con:   uv run cancerstats run --config config/mi-variante.yaml
+# o sobrescriba claves sueltas:   uv run cancerstats run --set effects.weighting=fgls
+# =============================================================================
+meta:
+  name: Metodología por defecto
+  description: Configuración con la que se elaboró el informe final.
+  seed: 20261007
+data:
+  path: data/raw/practica.sav
+  reference_path: data/raw/CANCER.csv
+  encoding: auto
+cleaning:
+  sentinel_to_missing: true
+  sentinel_min_repeats: 10
+  sentinel_min_decimals: 4
+  repair_median_age: true
+  median_age_tolerance: 0.5
+  repair_household_size: true
+  recover_some_college: true
+  identity_tolerance: 0.2
+  derive_native_multi: true
+  mir_max: 1.0
+transforms:
+  log_population: true
+  log_income: true
+  study: log1p
+  response: none
+missing:
+  strategy: complete_case
+  n_imputations: 20
+  max_iter: 15
+  sensitivity: true
+variables:
+  candidates:
+    - incidenceRate
+    - povertyPercent
+    - medIncome
+    - MedianAge
+    - AvgHouseholdSize
+    - PercentMarried
+    - PctNoHS18_24
+    - PctHS18_24
+    - PctBachDeg18_24
+    - PctHS25_Over
+    - PctBachDeg25_Over
+    - PctEmployed16_Over
+    - PctUnemployed16_Over
+    - PctPrivateCoverage
+    - PctEmpPrivCoverage
+    - PctPublicCoverage
+    - PctPublicCoverageAlone
+    - PctBlack
+    - PctAsian
+    - PctOtherRace
+    - PctNativeMulti
+    - PctMarriedHouseholds
+    - BirthRate
+    - studyPerCap
+    - popEst2015
+  protected: []
+  use_region: true
+  region_reference: Sur
+outliers:
+  iqr_factor: 1.5
+  robust_z: 3.5
+  mahalanobis_quantile: 0.975
+collinearity:
+  corr_threshold: 0.8
+  vif_threshold: 10.0
+  condition_index_threshold: 30.0
+inference:
+  alpha: 0.05
+  bootstrap_reps: 2000
+  multiple_testing: holm
+effects:
+  include_incidence: true
+  center_predictors: true
+  weighting: none
+  fgls_iterations: 5
+  covariance: cluster
+  selection: backward
+  alpha_enter: 0.05
+  alpha_remove: 0.05
+  exposures:
+    - PctBachDeg25_Over
+    - povertyPercent
+    - medIncome
+  confounding_threshold: 0.1
+  interactions:
+    - [incidenceRate, region]
+    - [PctBachDeg25_Over, region]
+    - [PctPublicCoverageAlone, region]
+    - [PctUnemployed16_Over, region]
+    - [povertyPercent, region]
+    - [incidenceRate, PctBachDeg25_Over]
+  interaction_correction: holm
+  bootstrap_reps: 999
+  influence_sensitivity: true
+predictive:
+  enabled: true
+  test_size: 0.2
+  cv_folds: 10
+  group_cv: true
+  use_state: true
+  models:
+    - baseline
+    - ols_effects
+    - ols_full
+    - ridge
+    - lasso
+    - elasticnet
+    - random_forest
+    - gradient_boosting
+  selection_rule: min
+  conformal_alpha: 0.1
+  n_jobs: -1

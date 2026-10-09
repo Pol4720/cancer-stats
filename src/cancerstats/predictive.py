@@ -52,7 +52,7 @@ MODEL_LABELS: dict[str, str] = {
 }
 
 
-class EffectsSpec(BaseEstimator, TransformerMixin):  # type: ignore[misc]
+class EffectsSpec(BaseEstimator, TransformerMixin):
     """Reproduce la matriz de diseño del modelo de efectos (centrado, región e interacciones).
 
     Las medianas para imputar y las medias para centrar se aprenden en ``fit`` con los
@@ -430,7 +430,7 @@ def run_predictive(
 
     say("Importancia por permutación y dependencia parcial")
     perm = permutation_importance(
-        fitted[best],
+        fitted[chosen],
         Xte,
         yte,
         n_repeats=15,
@@ -443,8 +443,8 @@ def run_predictive(
             {"variable": f, "etiqueta": label(f), "importancia": float(m), "dt": float(s)}
             for f, m, s in zip(features, perm.importances_mean, perm.importances_std, strict=True)
         ],
-        key=lambda r: -float(r["importancia"]),
-    )  # type: ignore[arg-type]
+        key=lambda r: -float(r["importancia"]),  # type: ignore[arg-type]
+    )
     pd_rows = []
     top_numeric = [r["variable"] for r in importance if r["variable"] in numeric][:4]
     for var in top_numeric:
