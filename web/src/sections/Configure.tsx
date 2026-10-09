@@ -80,6 +80,20 @@ function Field({ name, node, value, onChange }: { name: string; node: Schema; va
   );
 }
 
+const SECTION_TITLES: Record<string, string> = {
+  meta: "Identificación de la corrida",
+  data: "Datos de entrada",
+  cleaning: "Validación y depuración",
+  transforms: "Transformaciones",
+  missing: "Datos ausentes",
+  variables: "Variables candidatas",
+  outliers: "Atípicos",
+  collinearity: "Colinealidad",
+  inference: "Inferencia clásica",
+  effects: "Modelo de efectos",
+  predictive: "Modelo predictivo",
+};
+
 const STAGE_TITLES: Record<string, string> = {
   ingesta: "Ingesta",
   validacion: "Validación",
@@ -115,7 +129,9 @@ export default function Configure() {
   }, [source]);
 
   const overrides = useMemo(() => (base && cfg ? diff(base, cfg) ?? {} : {}), [base, cfg]);
-  const nChanges = JSON.stringify(overrides).split(":").length - 1;
+  const countLeaves = (o: any): number =>
+    o && typeof o === "object" && !Array.isArray(o) ? Object.values(o).reduce((n: number, v) => n + countLeaves(v), 0) : 1;
+  const nChanges = Object.keys(overrides).length ? countLeaves(overrides) : 0;
   if (error) return <ErrorBox error={error} />;
   if (!schema || !cfg) return <Loading what="la configuración" />;
 
@@ -152,7 +168,7 @@ export default function Configure() {
       setJob({ status: "error", error: String(e) });
     }
   };
-  const progress = events.length ? events[events.length - 1].progress : 0;
+  const progress = job?.status === "terminada" ? 1 : events.length ? events[events.length - 1].progress : 0;
   const stageState = new Map<string, string>();
   events.forEach((e) => stageState.set(e.stage, e.status));
 
@@ -182,7 +198,7 @@ export default function Configure() {
           {sections.map(([sec, node]) => (
             <details key={sec} className="explain" open={open === sec} onToggle={(e) => (e.currentTarget as HTMLDetailsElement).open && setOpen(sec)} style={{ borderLeftColor: overrides[sec] ? "var(--s2)" : undefined }}>
               <summary>
-                {node.title ?? sec}
+                {SECTION_TITLES[sec] ?? node.title ?? sec}
                 {overrides[sec] && <span className="badge" style={{ marginLeft: 8 }}>modificada</span>}
               </summary>
               {node.description && <p className="small ink2">{node.description}</p>}

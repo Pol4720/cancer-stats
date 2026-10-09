@@ -31,7 +31,8 @@ export default function App() {
   useEffect(() => {
     if (!source || !runId) return;
     let alive = true;
-    setRes(null);
+    // Se mantiene la corrida anterior en pantalla hasta que llega la nueva: así no se
+    // desmonta la interfaz (ni se pierde el progreso de una corrida recién terminada).
     source
       .results(runId)
       .then((r) => alive && setRes(r))

@@ -120,7 +120,7 @@ export function Shell() {
         <main className="content" id="contenido">
           <Suspense fallback={<Loading what="la sección" />}>
             <AnimatePresence mode="wait">
-              <motion.div key={`${current.id}-${runId}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
+              <motion.div key={current.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
                 <SectionBoundary name={current.id}>
                   <Comp />
                 </SectionBoundary>
