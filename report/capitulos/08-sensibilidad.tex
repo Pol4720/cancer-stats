@@ -1,0 +1,54 @@
+\chapter{Análisis de sensibilidad}\label{cap:sensibilidad}
+
+Varias decisiones del análisis son razonables pero discutibles: estimar por MCO y no por
+mínimos cuadrados ponderados, seleccionar variables, analizar casos completos, conservar los
+atípicos o tratar la dependencia por estado sólo a través de los errores típicos. Para comprobar
+que las conclusiones no dependen de ellas, el modelo final se reestimó bajo
+\res{n-especificaciones} especificaciones alternativas y con un bootstrap por conglomerados
+(\cref{tab:sensibilidad,fig:sensibilidad}):
+
+\begin{description}[style=nextline,leftmargin=1.2em]
+  \item[Ponderación (MCPF).] Pesos $1/\hat\sigma^2(n)$ con la función de varianza estimada: el
+  estimador eficiente si la heterocedasticidad se debe al tamaño del condado.
+  \item[Modelo máximo.] Todas las candidatas tras la poda, sin selección de variables
+  (\cref{sec:comparacion}).
+  \item[Efectos fijos de estado.] Una indicadora por estado: los coeficientes se estiman sólo con la
+  variación entre condados del mismo estado, lo que elimina cualquier factor estatal no medido
+  (registro, políticas sanitarias, clima). La región desaparece, absorbida por los estados.
+  \item[Modelo mixto.] Intercepto aleatorio por estado, que modela explícitamente la dependencia
+  intraestatal en lugar de corregirla en los errores típicos.
+  \item[Regresión robusta de Huber.] M-estimador que pondera a la baja los residuos grandes
+  \parencite{huber1964}: resistente a los atípicos en la respuesta.
+  \item[Sin observaciones influyentes.] Reajuste sin los condados con distancia de Cook mayor que
+  $4/n$ (\res{n-sin-influyentes} condados restantes).
+  \item[Imputación múltiple.] Los \res{n-imputacion} condados, con los ausentes imputados en
+  \res{m-imputaciones} conjuntos y los resultados combinados por las reglas de Rubin (\cref{cap:ausentes}).
+  \item[Bootstrap por conglomerados.] \res{boot-reps} remuestreos de estados completos con
+  reemplazo; los intervalos percentiles no suponen normalidad ni una forma concreta de la
+  heterocedasticidad \parencite{efron1993,cameron2015}.
+\end{description}
+
+\input{generado/tablas/sensibilidad}
+
+\figura{sensibilidad}{Coeficientes de las seis explicativas con mayor estadístico $|t|$ bajo
+cada especificación, con su intervalo de confianza al 95\,\%. La especificación principal está
+resaltada y el bootstrap por conglomerados aparece al final.}
+
+Los resultados son estables. En todas las especificaciones los coeficientes conservan el signo y
+un orden de magnitud similar; por ejemplo, el del título universitario (en el Sur) varía entre
+\res{rango-grado25}, el de la cobertura sólo pública entre \res{rango-solopublico} y el de la
+incidencia entre \res{rango-incidencia}. Las mayores diferencias aparecen con los efectos fijos de
+estado y el modelo mixto en la edad mediana y el tamaño del hogar: parte de su asociación con la
+mortalidad se produce entre estados, no dentro de ellos. El bootstrap por conglomerados da
+intervalos muy parecidos a los paramétricos (por ejemplo, \res{boot-grado25} para el título
+universitario frente a \res{ic-grado25}), lo que confirma que la falta de normalidad de los
+residuos no afecta a la inferencia.
+
+\section{¿Habría que transformar la respuesta?}
+
+El perfil de verosimilitud de Box-Cox condicionado a las explicativas del modelo final sitúa el
+parámetro en $\lambda=\res{boxcox-modelo}$ \res{boxcox-modelo-ic}. El intervalo no contiene
+exactamente el 1, pero la transformación óptima es suave y la mejora en la forma de los residuos
+no compensa la pérdida de interpretabilidad: los coeficientes dejarían de estar en muertes por
+\num{100000} habitantes. Con la inferencia robusta y el tamaño muestral disponibles, se mantiene la
+escala original, como pide la orientación.

@@ -1,0 +1,85 @@
+\chapter{Modelo predictivo}\label{cap:prediccion}
+
+El modelo de efectos se construyó para interpretar. Si el objetivo es predecir la mortalidad de
+condados nuevos, el criterio cambia: lo que importa es el error fuera de la muestra, y pueden
+convenir modelos con más variables, regularizados o no lineales \parencite{hastie2009}. Este
+capítulo compara ocho modelos con un protocolo que evita estimaciones optimistas del error.
+
+\section{Protocolo}
+
+\begin{enumerate}
+  \item Se reserva una partición de prueba de \res{n-prueba} condados (20\,\%, estratificada por
+  región) que no se usa para ajustar ni para elegir. Los \res{n-entrenamiento} restantes forman el
+  entrenamiento.
+  \item En entrenamiento se comparan los modelos por validación cruzada de 10 pliegues. Los
+  hiperparámetros (penalización de ridge, lasso y red elástica; profundidad y tasa de aprendizaje de
+  los árboles) se eligen dentro de cada pliegue con una segunda validación cruzada (validación
+  cruzada \emph{anidada}), y la imputación de ausentes y la tipificación se ajustan también dentro
+  del pliegue, para no filtrar información de la parte de validación.
+  \item Se repite con validación cruzada agrupada por estado: cada pliegue deja fuera estados
+  completos. Mide la capacidad de predecir condados de estados no vistos; una partición aleatoria es
+  optimista porque los condados de un mismo estado se parecen.
+  \item El modelo con menor RMSE en validación cruzada se evalúa una única vez en la prueba.
+\end{enumerate}
+
+Los modelos comparados son: la media del entrenamiento (referencia), MCO con la especificación
+del modelo de efectos, MCO con todas las candidatas, ridge, lasso y red elástica (que pueden usar
+también indicadoras de estado), un bosque aleatorio y una potenciación del gradiente sobre
+histogramas.
+
+\section{Resultados}
+
+\input{generado/tablas/prediccion}
+
+\figura{validacion-cruzada}{RMSE de cada modelo en validación cruzada aleatoria (media y
+desviación típica entre pliegues) y agrupada por estado.}
+
+El mejor modelo en validación cruzada es \res{modelo-elegido} (RMSE \res{cv-rmse-ridge}); lasso y
+red elástica quedan prácticamente empatados (\res{cv-rmse-lasso}), y la regla de un error típico,
+que elegiría el modelo más sencillo cuyo error no supere al mínimo en más de una desviación típica,
+elegiría \res{modelo-1ee}. Los modelos de árboles no mejoran a los lineales regularizados: la
+relación es esencialmente lineal y aditiva, como sugería el diagnóstico. En la partición de prueba
+el modelo elegido obtiene un RMSE de \res{test-rmse-elegido} \res{test-rmse-ic} (intervalo
+bootstrap), $R^2=\res{test-r2-elegido}$ y un error absoluto medio de \res{test-mae-elegido}; su
+ventaja sobre el MCO con la especificación de efectos es pequeña pero significativa (diferencia de
+RMSE \res{test-dif-ic}), atribuible a las covariables adicionales y, sobre todo, a las
+indicadoras de estado, que el modelo de efectos no usa. Ambos reducen en torno a un tercio el error
+de la predicción ingenua por la media (\res{test-rmse-referencia}).
+
+\figura{prueba}{Partición de prueba. Izquierda: mortalidad observada frente a la predicha por el
+modelo elegido, por región. Derecha: cobertura de los intervalos conformales estándar y
+normalizados según el tamaño del condado.}
+
+Dos matices sobre la honestidad de estas cifras. Primero, el RMSE de prueba es algo menor que el de
+validación cruzada por azar de la partición: el intervalo bootstrap lo cuantifica. Segundo, la
+especificación del modelo de efectos se seleccionó con todos los condados, de modo que su error en
+prueba es ligeramente optimista; el resto de modelos se ajustó sólo con el entrenamiento.
+
+Cuando hay que predecir estados no vistos (validación agrupada), el error aumenta para todos los
+modelos y el mejor pasa a ser el \res{modelo-mejor-gcv} (RMSE \res{gcv-rmse-mco-efectos}): las
+indicadoras de estado no sirven para estados nuevos, y un modelo parsimonioso generaliza mejor.
+
+\section{Importancia de las variables}
+
+La importancia por permutación mide cuánto empeora el RMSE en prueba al desordenar cada variable.
+Las tres más importantes para el modelo elegido son \res{importancia1}, \res{importancia2} y
+\res{importancia3}, en coherencia con el modelo de efectos.
+
+\figura{importancia}{Importancia por permutación en la partición de prueba (aumento medio del RMSE
+y su desviación típica en 15 permutaciones).}
+
+\section{Intervalos de predicción conformales}
+
+Para acompañar cada predicción con un intervalo sin suponer normalidad se usó la predicción
+conformal \parencite{lei2018}: con los residuos fuera de pliegue del entrenamiento se calcula el
+cuantil que garantiza, para un condado nuevo intercambiable con los de entrenamiento, una cobertura
+de al menos el \res{conf-nominal}\,\%. El intervalo estándar tiene la misma anchura
+(\res{conf-anchura-std}) para todos los condados y cubre el \res{conf-std}\,\% en prueba, pero de
+forma desigual: \res{conf-std-peq}\,\% en los condados pequeños y \res{conf-std-gra}\,\% en los
+grandes. El intervalo \emph{normalizado} divide los residuos por $\hat\sigma(n)$, la desviación
+típica que da la función de varianza, y se ensancha donde la tasa es más ruidosa: cubre el
+\res{conf-norm}\,\% globalmente, con una cobertura más equilibrada (\res{conf-norm-peq}\,\% en los
+pequeños, \res{conf-norm-gra}\,\% en los grandes) y anchuras de \res{conf-anchura-norm-peq} a
+\res{conf-anchura-norm-gra} (\cref{tab:conformal}).
+
+\input{generado/tablas/conformal}

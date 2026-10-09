@@ -1,0 +1,37 @@
+\chapter*{Resumen}
+\addcontentsline{toc}{chapter}{Resumen}
+
+Se estudia qué características socioeconómicas, demográficas y sanitarias de los condados de
+Estados Unidos se asocian con su tasa de mortalidad por cáncer (muertes anuales por
+\num{100000} habitantes), a partir del fichero oficial \var{practica.sav}
+(\res{n-condados} condados), que se comprueba celda a celda que coincide con el conjunto
+público del que procede \parencite{rippner2017}. Un catálogo de \res{n-reglas} reglas de
+validación detecta valores centinela, edades registradas en meses, tamaños de hogar divididos
+por cien y una variable que filtra la respuesta; once decisiones documentadas los resuelven y,
+tras la depuración, ninguna regla queda en estado de error.
+
+El modelo final se estima por mínimos cuadrados ordinarios (MCO), como pide la orientación,
+con \res{n-final} condados y \res{k-final} regresores: \res{n-seleccionadas} términos elegidos
+por eliminación hacia atrás con contrastes robustos, \res{n-confusoras} variable reincorporada
+por confusión y \res{n-interacciones} interacciones con la región censal. Explica el
+\res{pct-r2-final}\,\% de la variabilidad ($R^2 = \res{r2-final}$, $\bar R^2 = \res{r2aj-final}$)
+con un error cuadrático medio de \res{rmse-final} muertes por \num{100000} habitantes dentro de
+la muestra. Como los errores son heterocedásticos (su varianza decrece con la población del
+condado) y dependen dentro de cada estado (correlación intraclase \res{icc-final}), la
+inferencia usa errores típicos robustos por conglomerados de estado; los clásicos se presentan
+como salida tipo SPSS y una sintaxis generada automáticamente reproduce el modelo en ese
+programa.
+
+A igualdad del resto de variables, la mortalidad crece con la incidencia de cáncer y con la
+proporción de residentes que sólo tienen cobertura pública, y decrece con el porcentaje de
+adultos con título universitario, con un gradiente educativo que es menor en el Noreste. Las
+conclusiones se mantienen en las \res{n-especificaciones} especificaciones del análisis de
+sensibilidad y en el bootstrap por conglomerados (ponderación por la función
+de varianza, efectos fijos de estado, modelo mixto, regresión robusta, exclusión de observaciones
+influyentes e imputación múltiple, entre otras). Como complemento, un modelo
+predictivo (\res{modelo-elegido}) alcanza un RMSE de \res{test-rmse-elegido} en una partición de
+prueba no usada para ajustar ni elegir.
+
+\par\medskip\noindent\textbf{Palabras clave:} regresión lineal múltiple, mínimos cuadrados
+ordinarios, errores típicos robustos por conglomerados, diagnóstico de hipótesis, datos
+ausentes, mortalidad por cáncer.

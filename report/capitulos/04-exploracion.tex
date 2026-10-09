@@ -1,0 +1,107 @@
+\chapter{Análisis exploratorio e inferencia clásica}\label{cap:exploracion}
+
+Antes de modelar conviene conocer la respuesta, cuantificar con intervalos de confianza su
+centro y su dispersión, y examinar sus relaciones marginales con cada explicativa. Este capítulo
+aplica las herramientas de inferencia del curso \parencite[caps.~6--10]{wasserman2004}.
+
+\section{La respuesta: mortalidad por cáncer}
+
+La mortalidad media es de \res{media} muertes por \num{100000} habitantes, con una desviación
+típica de \res{dt}. La \cref{tab:respuesta} recoge los intervalos de confianza al 95\,\% para los
+parámetros de posición y dispersión, cada uno construido con la cantidad pivotal adecuada:
+
+\begin{itemize}
+  \item para la media, $\bar X \pm t_{n-1,\,\alpha/2}\,S/\sqrt n$, válido por el teorema central
+  del límite aunque la distribución no sea normal (con $n=\res{n-condados}$);
+  \item para la varianza, el pivote $(n-1)S^2/\sigma^2\sim\chi^2_{n-1}$, que sí exige normalidad;
+  por eso se acompaña de estimadores robustos;
+  \item para la mediana, un intervalo de libre distribución basado en estadísticos de orden
+  (cobertura exacta \res{cobertura-mediana}\,\%) y otro bootstrap percentil
+  \parencite{efron1993}, que coinciden.
+\end{itemize}
+
+\input{generado/tablas/respuesta}
+
+La media, la mediana (\res{mediana}), la media recortada y el M-estimador de Huber
+\parencite{huber1964} prácticamente coinciden, de modo que los atípicos no desplazan el centro de
+la distribución. La asimetría es leve (\res{asimetria}) y la curtosis en exceso moderada
+(\res{curtosis}): las colas son algo más pesadas que las de la normal.
+
+\figura{respuesta}{Distribución de la mortalidad por cáncer: histograma con la densidad normal
+ajustada y la estimación núcleo, y gráfico cuantil-cuantil normal.}
+
+\subsection{Normalidad}
+
+Todos los contrastes rechazan la normalidad exacta (\cref{tab:normalidad}). Con más de tres mil
+observaciones cualquier desviación mínima es detectable, así que el resultado se interpreta
+junto al gráfico Q-Q: la forma es casi simétrica y las desviaciones se concentran en las colas.
+Para el modelo de regresión la hipótesis relevante no es la normalidad de la respuesta sino la de
+los errores, que se examina en el \cref{cap:diagnostico}. El perfil de verosimilitud de Box-Cox
+\parencite{boxcox1964} para la respuesta sin explicativas sitúa $\lambda$ en \res{boxcox-lambda}
+\res{boxcox-ic}; la transformación se reconsidera, condicionada a las explicativas, en el
+\cref{cap:sensibilidad}.
+
+\input{generado/tablas/normalidad}
+
+\subsection{Independencia en el orden del fichero}
+
+Una prueba de rachas sobre los signos de las desviaciones respecto de la mediana, en el orden del
+fichero, encuentra \res{rachas} rachas frente a \res{rachas-esperadas} esperadas bajo
+independencia ($z=\res{rachas-z}$, \res{rachas-p}). El fichero está ordenado por estado, de modo
+que los condados vecinos se parecen: es la primera señal de dependencia geográfica, que
+condicionará la inferencia del modelo.
+
+\section{Diferencias entre regiones}
+
+La mortalidad media difiere entre regiones censales (\cref{tab:regiones}): el Sur
+(\res{media-sur}) supera a todas las demás y el Oeste (\res{media-oeste}) es la más baja. Como las
+varianzas difieren (Levene, \res{levene-p}), la comparación global se hace con el ANOVA de Welch
+($F=\res{welch-f}$, \res{welch-gl2} g.\,l. en el denominador, \res{welch-p}), confirmado por el
+contraste no paramétrico de Kruskal-Wallis ($H=\res{kruskal-h}$, \res{kruskal-p}). La región
+explica el \res{pct-region}\,\% de la variabilidad ($\eta^2=\res{eta2-region}$) y el estado, el
+\res{pct-estado}\,\%. Las comparaciones por pares (\cref{tab:pares}) muestran que sólo el Medio
+Oeste y el Noreste no difieren entre sí.
+
+\input{generado/tablas/regiones}
+\input{generado/tablas/pares}
+
+\figura{regiones}{Mortalidad por región censal: distribución en cada región y media con su
+intervalo de confianza al 95\,\%.}
+
+\section{Dos contrastes de dos muestras}
+
+\begin{itemize}
+  \item \textbf{Pobreza.} Los condados con al menos un 20\,\% de población bajo el umbral de
+  pobreza (\res{pobreza-n-alta}) tienen una mortalidad media de \res{pobreza-media-alta}, frente a
+  \res{pobreza-media-baja} en el resto: una diferencia de \res{pobreza-dif} muertes por
+  \num{100000} habitantes \res{pobreza-dif-ic} (Welch, $t=\res{pobreza-welch-t}$), con un tamaño
+  del efecto grande ($d=\res{pobreza-d}$).
+  \item \textbf{Ensayos clínicos.} Los \res{ensayos-n-con} condados con algún ensayo clínico
+  tienen una mortalidad \res{ensayos-dif} puntos menor (Welch \res{ensayos-welch-p};
+  Mann-Whitney \res{ensayos-mw-p}). Es una diferencia marginal que, como se verá, desaparece al
+  ajustar por las características socioeconómicas: los ensayos se concentran en condados urbanos
+  y ricos.
+\end{itemize}
+
+\section{Asociaciones marginales}
+
+La \cref{fig:correlaciones} y la \cref{tab:correlaciones} (\cref{ap:tablas}) recogen la
+correlación de cada explicativa con la mortalidad, con su intervalo de confianza por la
+transformación $z$ de Fisher y $p$ corregidos por Holm \parencite{holm1979}; \res{n-corr-sig} de
+las \res{n-corr} son significativas. Las más fuertes son la incidencia ($r=\res{r-incidencia}$), el
+porcentaje de adultos con título universitario ($r=\res{r-grado25}$), la renta mediana
+($r=\res{r-renta}$), la cobertura sólo pública ($r=\res{r-solopublico}$) y la pobreza
+($r=\res{r-pobreza}$). El gradiente por renta es monótono: la mortalidad media pasa de
+\res{renta-decil1} en el decil más pobre a \res{renta-decil10} en el más rico ($\rho$ de
+Spearman $=\res{renta-spearman}$).
+
+\figura{correlaciones}{Correlación de Pearson de cada explicativa con la mortalidad, con su
+intervalo de confianza al 95\,\%.}
+
+Estas correlaciones son marginales: muchas explicativas están muy correlacionadas entre sí
+(\cref{fig:matriz-correlaciones}), de modo que parte de cada asociación se debe a las demás. El
+modelo de regresión múltiple separa esas contribuciones.
+
+\figura{matriz-correlaciones}{Matriz de correlaciones entre las variables candidatas. Los bloques
+de correlaciones intensas (educación, renta, pobreza, cobertura sanitaria y empleo) anticipan
+problemas de colinealidad.}

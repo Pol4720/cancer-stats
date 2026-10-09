@@ -1,0 +1,61 @@
+\chapter{Introducción}\label{cap:introduccion}
+
+\section{Pregunta y alcance}
+
+La mortalidad por cáncer varía mucho entre los condados de Estados Unidos: en el fichero
+analizado va de \res{min-valor} muertes por \num{100000} habitantes (\res{min-condado}) a
+\res{max-valor} (\res{max-condado}). El objetivo del trabajo, fijado por la orientación del
+proyecto, es construir un modelo de regresión lineal múltiple estimado por mínimos cuadrados
+ordinarios que explique y prediga esa tasa (\var{TARGET\_deathRate}) a partir de las demás
+características del condado, y acompañarlo de su diagnóstico completo.
+
+Se distinguen dos usos del modelo, que requieren criterios distintos:
+\begin{itemize}
+  \item \textbf{Modelo de efectos} (\cref{cap:construccion,cap:modelo-final,cap:diagnostico,cap:sensibilidad}):
+  estimar e interpretar la asociación de cada característica con la mortalidad, ajustada por
+  las demás, con una inferencia válida (intervalos y contrastes con la cobertura y el nivel
+  nominales).
+  \item \textbf{Modelo predictivo} (\cref{cap:prediccion}): acertar en condados nuevos,
+  evaluado con validación cruzada y una partición de prueba independiente.
+\end{itemize}
+
+Los datos son \emph{ecológicos}: cada observación es un condado, no una persona. Las
+asociaciones estimadas describen condados y no deben trasladarse a individuos (falacia
+ecológica, \cite{robinson1950}). Además, el diseño es observacional, por lo que los
+coeficientes son asociaciones condicionales, no efectos causales.
+
+\section{Correspondencia con los entregables}
+
+La orientación pide seis entregables. La \cref{tab:entregables} indica dónde se responde cada uno.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Entregables de la orientación y su localización en el informe}\label{tab:entregables}
+\begin{tabularx}{\linewidth}{c X l}
+\toprule
+& Entregable & Dónde \\
+\midrule
+(a) & Modelo final y pasos seguidos para construirlo & \cref{cap:construccion,cap:modelo-final} \\
+(b) & Salida del software con $R^2$, $R^2$ ajustado y RMSE & \cref{sec:salida-spss} \\
+(c) & Código & \cref{ap:reproducibilidad} \\
+(d) & Diagnóstico: linealidad, independencia, homocedasticidad, normalidad, multicolinealidad & \cref{cap:diagnostico} \\
+(e) & Interpretación del modelo & \cref{sec:interpretacion} \\
+(f) & Atípicos, valores perdidos y variables categóricas & \cref{cap:datos,cap:ausentes} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Cómo está hecho este informe}
+
+Todo el análisis se ejecuta con un paquete de Python propio (\var{cancerstats}) a partir de
+una configuración declarativa: cada decisión metodológica (umbrales, estimador, estrategia de
+selección, interacciones candidatas\dots) es una opción con su justificación. Cada ejecución
+queda registrada como una \emph{corrida} con su configuración, el entorno de software, la
+huella del código y de los datos, el registro y todos los resultados. Las cifras, tablas y
+figuras de este documento se generan automáticamente a partir de la última corrida
+(\res{corrida-id}, del \res{corrida-fecha}); ninguna se ha copiado a mano. El
+\cref{ap:reproducibilidad} describe cómo reproducirlo, la interfaz interactiva y la sintaxis
+de SPSS equivalente.
+
+La referencia teórica es \textcite{wasserman2004}, texto del curso, complementado con
+\textcite{fox2016} y \textcite{wooldridge2010} para el diagnóstico y la inferencia robusta.

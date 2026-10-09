@@ -1,0 +1,179 @@
+\chapter{El modelo final}\label{cap:modelo-final}
+
+\section{Especificación y coeficientes}
+
+El modelo final, estimado por MCO con \res{n-final} condados de \res{n-estados-final} estados, es
+\[
+\begin{aligned}
+\widehat{\text{Mortalidad}} ={}& \beta_0
+ + \beta_1\,\text{Incidencia} + \beta_2\,\text{Edad mediana}
+ + \beta_3\,\text{Tamaño del hogar}\\
+&+ \beta_4\,\text{Bachillerato 18--24} + \beta_5\,\text{Grado universitario 25+}
+ + \beta_6\,\text{Bachillerato 25+}\\
+&+ \beta_7\,\text{Desempleo} + \beta_8\,\text{Sólo seguro público}
+ + \beta_9\,\text{Otra raza} + \beta_{10}\,\text{Natalidad}\\
+&+ \textstyle\sum_{r}\gamma_r\,\text{Región}_r
+ + \sum_{r}\delta_r\,(\text{Grado universitario}\times\text{Región}_r)\\
+&+ \textstyle\sum_{r}\eta_r\,(\text{Desempleo}\times\text{Región}_r),
+\end{aligned}
+\]
+con las explicativas continuas centradas en su media y $r\in\{\text{Noreste},\text{Medio Oeste},
+\text{Oeste}\}$ (el Sur es la referencia): \res{k-final} regresores además de la constante. La
+\cref{tab:coeficientes} recoge las estimaciones con errores típicos robustos por conglomerados de
+estado e intervalos de confianza con la $t$ de \res{gl-inferencia} grados de libertad.
+
+\input{generado/tablas/coeficientes}
+
+\section{Salida tipo SPSS: \texorpdfstring{$R^2$}{R²}, \texorpdfstring{$R^2$}{R²} ajustado y RMSE}\label{sec:salida-spss}
+
+\begin{entregable}{(b): salida del software}
+El modelo explica el \res{pct-r2-final}\,\% de la variabilidad de la mortalidad entre condados:
+$R^2=\res{r2-final}$ y $\bar R^2=\res{r2aj-final}$. El error típico de la estimación es
+$\hat\sigma=\sqrt{\mathrm{SCE}/(n-k-1)}=\res{sigma-final}$ y la raíz del error cuadrático medio
+dentro de la muestra, $\mathrm{RMSE}=\sqrt{\mathrm{SCE}/n}=\res{rmse-final}$ muertes por
+\num{100000} habitantes. Fuera de la muestra, la validación cruzada de esta especificación da un
+RMSE de \res{cv-rmse-mco-efectos} y la partición de prueba, \res{test-rmse-mco-efectos}
+(\cref{cap:prediccion}).
+\end{entregable}
+
+Las \cref{tab:spss-resumen,tab:anova,tab:spss-coeficientes} reproducen las tablas que imprime el
+procedimiento \var{REGRESSION} de SPSS: resumen del modelo, ANOVA y coeficientes con errores
+típicos clásicos, coeficientes tipificados (Beta), tolerancia y FIV. La sintaxis del
+\cref{ap:reproducibilidad}, generada automáticamente a partir de la corrida, aplica la misma
+depuración sobre \var{practica.sav} y obtiene exactamente estas cifras.
+
+\input{generado/tablas/spss-resumen}
+\input{generado/tablas/anova}
+
+Recuérdese que
+\[
+R^2=1-\frac{\mathrm{SCE}}{\mathrm{SCT}},\qquad
+\bar R^2=1-\frac{\mathrm{SCE}/(n-k-1)}{\mathrm{SCT}/(n-1)}=1-(1-R^2)\frac{n-1}{n-k-1}.
+\]
+El $R^2$ ajustado penaliza el número de regresores; con $n$ tan grande frente a $k$ apenas
+difiere del $R^2$. Un $R^2$ del orden de 0,56 es alto para datos ecológicos transversales: buena
+parte de la variabilidad restante es ruido de muestreo de las tasas de los condados pequeños
+(\cref{sec:estructura-error}), que ninguna explicativa puede capturar.
+
+El contraste global clásico ($F=\res{f-clasico}$) y su versión robusta (Wald con covarianza por
+conglomerados, $F=\res{f-robusto}$, \res{f-robusto-p}) rechazan con claridad que todos los
+coeficientes sean nulos.
+
+\input{generado/tablas/spss-coeficientes}
+
+\subsection{Errores típicos clásicos, HC3 y por conglomerados}
+
+Los coeficientes son idénticos con las tres estimaciones de la covarianza; cambian sus errores
+típicos (\cref{tab:errores}). Los robustos por conglomerados son, en casi todos los términos,
+claramente mayores que los clásicos (la columna «Razón» de la tabla): la inferencia clásica sería
+optimista. Con errores típicos clásicos parecerían significativos la natalidad, el bachillerato de
+25 años o más, el desempleo en el Sur y la diferencia entre el Medio Oeste y el Sur; con los
+robustos no lo son.
+
+\input{generado/tablas/errores}
+
+\section{Interpretación}\label{sec:interpretacion}
+
+\begin{entregable}{(e): interpretación del modelo}
+Cada coeficiente es el cambio esperado en la mortalidad (muertes por \num{100000} habitantes) por
+una unidad más de su explicativa, manteniendo constantes las demás. Son asociaciones entre
+condados, no efectos causales: el diseño es observacional y ecológico. Para comparar variables
+medidas en escalas distintas, la \cref{tab:efectos} expresa cada efecto como el cambio al pasar del
+primer al tercer cuartil de la explicativa (rango intercuartílico, RIC).
+\end{entregable}
+
+\subsection{La constante y las regiones}
+
+Como las explicativas están centradas, la constante (\res{b-const}) es la mortalidad esperada de un
+condado del Sur con todas las explicativas en su media. A igualdad de las demás características, un
+condado medio del Noreste tiene \res{b-noreste} muertes por \num{100000} habitantes respecto del
+Sur (\res{ic-noreste}), uno del Oeste \res{b-oeste} (\res{ic-oeste}) y uno del Medio Oeste
+\res{b-medio-oeste} (\res{ic-medio-oeste}; \res{p-medio-oeste}). La composición socioeconómica
+explica una parte importante de las diferencias regionales: la brecha bruta entre el Sur y el Oeste,
+\res{brecha-bruta} muertes, se reduce a \res{brecha-ajustada} al ajustar, de modo que el modelo
+explica el \res{pct-brecha-explicada}\,\% de ella (\cref{fig:regiones-ajustadas}).
+
+\figura{regiones-ajustadas}{Mortalidad media bruta y ajustada por región. La ajustada es la
+predicción del modelo para un condado de esa región con las explicativas en su media.}
+
+\subsection{Efectos principales}
+
+\begin{itemize}
+  \item \textbf{Incidencia.} Cada caso diagnosticado más por \num{100000} habitantes se asocia con
+  \res{b-incidencia} muertes más \res{ic-incidencia}. Pasar del primer al tercer cuartil
+  (\res{iqr-incidencia} casos) supone \res{efiqr-incidencia} muertes más \res{efiqr-incidencia-ic}:
+  es, con diferencia, la explicativa más importante ($\text{Beta}=\res{beta-incidencia}$).
+  \item \textbf{Cobertura sanitaria sólo pública.} Cada punto porcentual más de residentes cuyo
+  único seguro es público (\emph{Medicaid} o \emph{Medicare}) se asocia con \res{b-solopublico}
+  muertes más \res{ic-solopublico}; del primer al tercer cuartil, \res{efiqr-solopublico}
+  \res{efiqr-solopublico-ic}. Es un indicador de pobreza, edad avanzada y peor acceso a la atención
+  especializada.
+  \item \textbf{Educación.} El porcentaje de adultos con título universitario tiene el efecto
+  protector más claro, pero su magnitud depende de la región (\cref{sec:interacciones-interp}). El
+  porcentaje de jóvenes de 18 a 24 años cuyo nivel máximo es el bachillerato se asocia con más
+  mortalidad (\res{b-bach1824} por punto, \res{ic-bach1824}), como indicador de menor acceso a
+  estudios superiores. El de adultos con bachillerato (\res{b-bach25}, \res{p-bach25}) no es
+  significativo, pero se mantiene por ser confusor del efecto del título universitario.
+  \item \textbf{Edad mediana.} Cada año más de edad mediana se asocia con \res{b-edad} muertes
+  \res{ic-edad}. El signo negativo no significa que envejecer proteja: compara condados con la
+  misma incidencia y el mismo perfil socioeconómico. Una explicación compatible, que este diseño no
+  permite contrastar, es la migración de jubilados con mejor salud y recursos hacia condados
+  envejecidos.
+  \item \textbf{Tamaño medio del hogar.} Una persona más por hogar se asocia con \res{b-hogar}
+  muertes \res{ic-hogar}; como el rango intercuartílico es sólo de \res{iqr-hogar} personas, el
+  efecto entre condados típicos es de \res{efiqr-hogar} \res{efiqr-hogar-ic}.
+  \item \textbf{Otra raza.} Cada punto porcentual más de población de otras razas (sobre todo
+  hispana, que en el censo puede declararse en esta categoría) se asocia con \res{b-otraraza}
+  muertes \res{ic-otraraza}, en línea con la menor mortalidad por cáncer documentada en la población
+  hispana.
+  \item \textbf{Natalidad} (\res{b-natalidad}, \res{p-natalidad}): no significativa.
+\end{itemize}
+
+\input{generado/tablas/efectos}
+
+\figura{coeficientes}{Efecto de cada explicativa al pasar del primer al tercer cuartil, con su
+intervalo de confianza al 95\,\% (errores típicos por conglomerados). Las variables con interacción
+muestran un efecto por región; los marcadores huecos no son significativos.}
+
+\subsection{Interacciones: efectos que dependen de la región}\label{sec:interacciones-interp}
+
+Con interacciones, el coeficiente de una variable en una región es la suma de su efecto principal
+(el del Sur) y de la interacción correspondiente; su error típico se obtiene de la combinación
+lineal de coeficientes con la matriz de covarianzas robusta. La \cref{tab:pendientes} y la
+\cref{fig:interacciones} recogen las pendientes resultantes.
+
+\begin{itemize}
+  \item \textbf{Título universitario.} Cada punto porcentual más de adultos con título universitario
+  se asocia con \res{pend-grado25-sur} muertes en el Sur (\res{pend-grado25-sur-p}),
+  \res{pend-grado25-oeste} en el Oeste (\res{pend-grado25-oeste-p}) y \res{pend-grado25-medio-oeste}
+  en el Medio Oeste (\res{pend-grado25-medio-oeste-p}). En el Noreste la pendiente es
+  \res{pend-grado25-noreste} y no significativa (\res{pend-grado25-noreste-p}): el gradiente
+  educativo es mucho más débil allí.
+  \item \textbf{Desempleo.} En el Sur la pendiente es \res{pend-desempleo-sur}
+  (\res{pend-desempleo-sur-p}) y en el Oeste \res{pend-desempleo-oeste}
+  (\res{pend-desempleo-oeste-p}), ninguna significativa; en cambio, en el Medio Oeste cada punto de
+  desempleo se asocia con \res{pend-desempleo-medio-oeste} muertes más
+  (\res{pend-desempleo-medio-oeste-p}) y en el Noreste con \res{pend-desempleo-noreste}
+  (\res{pend-desempleo-noreste-p}).
+\end{itemize}
+
+\input{generado/tablas/pendientes}
+
+\figura{interacciones}{Pendiente del título universitario y del desempleo en cada región, con su
+intervalo de confianza al 95\,\%. Marcador hueco: pendiente no significativa.}
+
+\subsection{¿Qué cambia si no se ajusta por la incidencia?}
+
+Incluir la incidencia cambia la pregunta: con ella, los demás coeficientes describen la mortalidad
+a igual número de diagnósticos, es decir, sobre todo la supervivencia; sin ella, la asociación
+total, que incluye también el riesgo de enfermar. La \cref{tab:incidencia} compara ambos ajustes
+sobre la misma muestra. Sin la incidencia el $R^2$ cae de \res{r2-con-incidencia} a
+\res{r2-sin-incidencia}, y algunos coeficientes cambian mucho: el del desempleo crece un
+\res{cambio-desempleo}\,\%, porque el desempleo se asocia también con mayor incidencia (por ejemplo,
+a través del tabaquismo). El del título universitario cambia sólo un \res{cambio-grado25}\,\%: su
+asociación con la mortalidad no pasa por la incidencia.
+
+\input{generado/tablas/incidencia}
+
+\figura{incidencia}{Cambio relativo de cada coeficiente al retirar la incidencia del modelo. Las
+líneas discontinuas marcan $\pm 10$\,\%.}

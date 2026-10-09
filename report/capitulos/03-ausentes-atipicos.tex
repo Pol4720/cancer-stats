@@ -1,0 +1,80 @@
+\chapter{Datos ausentes y valores atípicos}\label{cap:ausentes}
+
+\section{Cuánto falta y dónde}
+
+Tras la depuración faltan datos en tres variables (\cref{tab:ausentes}): la cobertura sólo
+privada (\res{n-ausente-soloprivado} condados, \res{pct-ausente-soloprivado}\,\%), la incidencia
+(\res{n-ausente-incidencia}, \res{pct-ausente-incidencia}\,\%) y el empleo
+(\res{n-ausente-empleo}, \res{pct-ausente-empleo}\,\%). Sólo el \res{pct-completos-todo}\,\% de
+los condados (\res{n-completos-todo}) está completo en todas las variables, pero la cobertura
+sólo privada no se usa como explicativa (es combinación casi lineal de las demás coberturas,
+\cref{sec:colinealidad}), de modo que el modelo pierde mucho menos.
+
+\input{generado/tablas/ausentes}
+
+\section{Mecanismo de la ausencia}
+
+El tratamiento adecuado depende del mecanismo \parencite{rubin1987}: si la ausencia es
+completamente aleatoria (MCAR), analizar los casos completos no sesga, sólo resta precisión; si
+depende de variables observadas (MAR), los casos completos pueden sesgar y conviene imputar con
+esas variables; si depende del propio valor no observado (MNAR), ningún método lo resuelve sin
+supuestos externos. Se combinaron tres comprobaciones:
+
+\begin{enumerate}
+  \item \textbf{Contraste de Little} \parencite{little1988}. Estima por el algoritmo EM la media
+  y la covarianza de todas las variables bajo normalidad y compara la media de cada patrón de
+  ausencia con la estimada; bajo MCAR, el estadístico
+  $d^2=\sum_j n_j(\bar{\mathbf y}_j-\hat{\boldsymbol\mu}_j)^{\top}\hat{\boldsymbol\Sigma}_j^{-1}(\bar{\mathbf y}_j-\hat{\boldsymbol\mu}_j)$
+  sigue aproximadamente una $\chi^2$. Con las dos variables de ausencia dispersa no se rechaza
+  MCAR ($d^2=\res{little-aleatorio-est}$, \res{little-aleatorio-gl} g.\,l.,
+  \res{little-aleatorio-p}); al añadir la incidencia se rechaza con claridad
+  ($d^2=\res{little-todo-est}$, \res{little-todo-gl} g.\,l., \res{little-todo-p}).
+  \item \textbf{Comparación de medias.} Para cada variable con ausentes, se compara la media de
+  las demás entre condados con y sin el dato (Welch, corrección de Holm): ninguna diferencia es
+  significativa para el empleo ni para la cobertura sólo privada.
+  \item \textbf{Asociación con el estado} ($\chi^2$ de independencia entre la ausencia y el
+  estado): la ausencia de la incidencia depende por completo del estado
+  (\res{chi-estado-incidencia-p}); la del empleo no (\res{chi-estado-empleo-p}).
+\end{enumerate}
+
+\figura{ausentes}{Porcentaje de condados con el dato ausente en los catorce estados con más
+ausencias de incidencia: la de la incidencia afecta a estados completos (registros que no
+publican datos por condado); las del empleo y la cobertura sólo privada se reparten sin patrón.}
+
+La conclusión es que la incidencia falta por estados enteros (registros que no publican la
+cifra por condado): es una ausencia \emph{estructural}, que no depende del valor no observado
+(no es MNAR) pero sí del estado, es decir, MAR dado el estado. Las otras dos ausencias son
+compatibles con MCAR.
+
+\begin{idea}[Tratamiento elegido.]
+El modelo de efectos usa los casos completos de sus variables. Como la ausencia de la incidencia
+es MAR, se comprueba que esa elección no altera las conclusiones con una imputación múltiple por
+ecuaciones encadenadas \parencite{vanbuuren2011}, con extracciones de la distribución a
+posteriori de una regresión bayesiana: \res{m-imputaciones} conjuntos imputados que usan como auxiliares la
+respuesta, las demás explicativas y la región, combinados con las reglas de Rubin y los grados de libertad de
+\textcite{barnard1999} (\cref{cap:sensibilidad}). La imputación se evalúa sobre los
+\res{n-imputacion} condados.
+\end{idea}
+
+\section{Valores atípicos}\label{sec:atipicos}
+
+Se buscaron atípicos en tres niveles. Un valor atípico \emph{verificado como real} no se elimina:
+eliminarlo sesgaría las estimaciones y subestimaría la variabilidad; lo que importa es si una
+observación \emph{influye} desproporcionadamente en el modelo, lo que se evalúa en el
+\cref{cap:diagnostico}.
+
+\begin{itemize}
+  \item \textbf{Univariantes.} Vallas de Tukey ($Q_1-1{,}5\,\mathrm{RIC}$, $Q_3+1{,}5\,\mathrm{RIC}$)
+  y $z$ robusto con la mediana y la MEDA. En la mortalidad hay \res{n-tukey-respuesta} condados
+  fuera de las vallas y \res{n-atipicos-respuesta} con $|z|>3{,}5$; todos son condados reales
+  (enclaves de altos ingresos con mortalidad muy baja, como \res{min-condado}, o condados rurales
+  muy envejecidos o pobres con mortalidad muy alta).
+  \item \textbf{Multivariantes.} Distancia de Mahalanobis robusta con el determinante de
+  covarianza mínimo \parencite{rousseeuw1999} sobre las \res{mcd-p} explicativas: \res{n-mcd}
+  condados superan el cuantil 0,975 de la $\chi^2$ (\res{mcd-corte}), frente a \res{n-mahal-clasica}
+  con la distancia clásica. La diferencia ilustra el \emph{efecto máscara}: los atípicos inflan la
+  covarianza clásica y se ocultan a sí mismos. Muchos son condados poco poblados con
+  composiciones extremas (reservas indígenas, enclaves universitarios), auténticos y no errores.
+  \item \textbf{En el modelo}: residuos estudentizados, apalancamiento y distancia de Cook
+  (\cref{sec:influencia}).
+\end{itemize}

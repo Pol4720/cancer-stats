@@ -1,0 +1,133 @@
+\chapter{Diagnóstico del modelo}\label{cap:diagnostico}
+
+\begin{entregable}{(d): diagnóstico}
+Se contrastan las hipótesis del modelo lineal sobre los residuos del modelo final: linealidad,
+independencia de los errores, homocedasticidad, normalidad y ausencia de multicolinealidad, y se
+identifican las observaciones influyentes. La \cref{tab:diagnostico} resume los contrastes; para
+cada violación se indica cómo la absorbe la estrategia de inferencia.
+\end{entregable}
+
+Bajo las hipótesis clásicas, $\mathbf y=X\boldsymbol\beta+\boldsymbol\varepsilon$ con
+$\E(\boldsymbol\varepsilon\mid X)=\mathbf 0$ y $\Var(\boldsymbol\varepsilon\mid X)=\sigma^2 I$, el
+estimador MCO $\hat{\boldsymbol\beta}=(X^{\top}X)^{-1}X^{\top}\mathbf y$ es el de menor varianza
+entre los lineales insesgados (teorema de Gauss-Markov) y, si además los errores son normales, los
+contrastes $t$ y $F$ son exactos. Conviene separar qué hipótesis afecta a qué:
+\begin{itemize}
+  \item la \textbf{linealidad} (media condicional bien especificada) es la única cuya violación
+  sesga los coeficientes;
+  \item la \textbf{homocedasticidad} y la \textbf{independencia} afectan a la varianza de
+  $\hat{\boldsymbol\beta}$ y, por tanto, a los errores típicos, intervalos y contrastes;
+  \item la \textbf{normalidad} sólo es necesaria para la inferencia exacta en muestras pequeñas;
+  con $n$ grande, el teorema central del límite garantiza la normalidad aproximada de
+  $\hat{\boldsymbol\beta}$.
+\end{itemize}
+
+\input{generado/tablas/diagnostico}
+
+\figura{diagnostico}{Gráficos de diagnóstico del modelo final: residuos tipificados frente a
+valores ajustados, gráfico cuantil-cuantil normal, escala-localización y residuos estudentizados
+frente al apalancamiento (el área de cada punto es proporcional a la distancia de Cook).}
+
+\section{Linealidad}
+
+El contraste RESET de \textcite{ramsey1969} añade al modelo las potencias segunda y tercera de los
+valores ajustados: si la media condicional no fuera lineal en las explicativas, esos términos
+captarían la curvatura omitida. No se rechaza la especificación ($F=\res{reset-f}$,
+\res{reset-p}). Además, para cada explicativa continua se contrastó un término cuadrático con
+corrección de Holm: el número de curvaturas significativas es \res{n-curvatura}
+(\res{curvatura}). Los gráficos de residuos parciales (componente más residuo,
+\cref{fig:residuos-parciales}) lo confirman: la curva suavizada sigue la recta del modelo en el
+rango donde están casi todos los datos. Las transformaciones logarítmicas de la depuración
+(D10) contribuyen a esta linealidad.
+
+\figura{residuos-parciales}{Residuos parciales de las seis explicativas con mayor efecto: la recta
+es la contribución estimada por el modelo y la curva, un suavizado LOWESS de los puntos.}
+
+\section{Independencia de los errores}
+
+El estadístico de \textcite{durbin1950},
+\[
+d=\frac{\sum_{i=2}^{n}(e_i-e_{i-1})^2}{\sum_{i=1}^{n}e_i^2}\approx 2(1-\hat\rho_1),
+\]
+vale \res{dw-final}, cerca de 2: no hay una autocorrelación de primer orden apreciable. Pero el
+contraste se diseñó para series temporales, en las que el orden de las filas tiene sentido; en
+datos transversales su resultado depende del orden arbitrario del fichero. Aquí el fichero está
+agrupado por estado, de modo que la pregunta pertinente es si los condados de un mismo estado
+tienen errores parecidos. Lo tienen:
+\begin{itemize}
+  \item la prueba de rachas sobre los signos de los residuos en el orden del fichero da $z=\res{rachas-res-z}$
+  (\res{rachas-res-p}): menos rachas de las esperadas, es decir, residuos del mismo signo agrupados;
+  \item la correlación intraclase de los residuos por estado es \res{icc-final}
+  ($F=\res{icc-final-f}$, \res{icc-final-p}), y en un modelo mixto con intercepto aleatorio por estado
+  la varianza entre estados representa una proporción \res{icc-mixto} de la varianza total.
+\end{itemize}
+La dependencia dentro del estado no sesga los coeficientes, pero sí hace que los errores típicos
+clásicos sean demasiado pequeños: es la razón de usar errores típicos por conglomerados de estado
+(\cref{sec:estructura-error}).
+
+\section{Homocedasticidad}
+
+El gráfico de residuos frente a valores ajustados no muestra un embudo marcado, pero los
+contrastes detectan heterocedasticidad: Breusch-Pagan en la versión robusta de
+\textcite{koenker1981} ($\mathrm{LM}=\res{bp-despues}$, \res{bp-despues-p}), White con los valores
+ajustados y sus cuadrados ($\mathrm{LM}=\res{white-despues}$, \res{white-despues-p}) y, sobre
+todo, el contraste frente a $1/n$ ($\mathrm{LM}=\res{bp-pob-despues}$, \res{bp-pob-despues-p}),
+que identifica la fuente: la población del condado (\cref{sec:estructura-error}). El cociente de
+Goldfeld-Quandt entre la varianza residual del tercio de condados más pequeños y la del tercio más
+grande es \res{gq-despues}. La heterocedasticidad no sesga los coeficientes; la inferencia la
+absorbe con los errores típicos robustos, y la estimación ponderada por la función de varianza
+(\cref{cap:sensibilidad}) confirma que los coeficientes apenas cambian cuando se pondera.
+
+\section{Normalidad de los residuos}
+
+Los residuos tipificados tienen asimetría \res{res-asimetria} y curtosis en exceso
+\res{res-curtosis}: son casi simétricos pero con colas más pesadas que la normal, como muestra el
+gráfico Q-Q. Shapiro-Wilk ($W=\res{res-sw}$, \res{res-sw-p}) y Jarque-Bera
+($\mathrm{JB}=\res{res-jb}$, \res{res-jb-p}) rechazan la normalidad exacta, como es esperable con
+casi tres mil residuos y una mezcla de condados de tamaños muy distintos (los pequeños aportan los
+residuos extremos). Las consecuencias son limitadas: los estimadores siguen siendo insesgados, y
+con $n=\res{n-final}$ la distribución de $\hat{\boldsymbol\beta}$ es aproximadamente normal. Como
+comprobación independiente, el bootstrap por conglomerados, que no supone normalidad, produce
+intervalos muy parecidos a los paramétricos (\cref{cap:sensibilidad}).
+
+\section{Multicolinealidad}
+
+Tras la poda (\cref{sec:colinealidad}), el FIV máximo entre los efectos principales del modelo
+final es \res{fiv-max-final} (tolerancia mínima por encima de 0,1) y el número de condición
+\res{ncond-final}, lejos de los umbrales habituales (10 y 30). Las tolerancias y FIV de cada
+coeficiente están en la \cref{tab:spss-coeficientes}. Los términos de interacción comparten
+información con sus efectos principales por construcción, pero el centrado previo elimina la
+colinealidad no esencial.
+
+\section{Media de los residuos}
+
+Al incluir la constante, los residuos MCO suman cero por construcción (su media es
+\res{media-residuos}, error de redondeo). La hipótesis relevante,
+$\E(\varepsilon\mid X)=0$, es la de linealidad, ya examinada.
+
+\section{Observaciones atípicas e influyentes}\label{sec:influencia}
+
+Se calcularon, para cada condado, el apalancamiento $h_{ii}$ (diagonal de la matriz sombrero
+$H=X(X^{\top}X)^{-1}X^{\top}$), el residuo estudentizado externamente $r_i^{*}$, la distancia de
+\textcite{cook1977},
+\[
+D_i=\frac{r_i^{2}}{k+1}\,\frac{h_{ii}}{1-h_{ii}},
+\]
+y los DFBETAS de cada coeficiente:
+\begin{itemize}
+  \item \res{n-palanca} condados tienen apalancamiento mayor que $2(k+1)/n=\res{umbral-palanca}$:
+  combinaciones poco habituales de explicativas, no necesariamente problemáticas;
+  \item \res{n-estudentizados} tienen $|r_i^{*}|>3$; el mayor es \res{mayor-residuo}
+  ($r^{*}=\res{mayor-residuo-valor}$: mortalidad observada \res{mayor-residuo-y} frente a
+  \res{mayor-residuo-ajuste} ajustada);
+  \item \res{n-cook} superan el umbral orientativo $D_i>4/n=\res{umbral-cook}$, pero
+  \res{n-cook-f50} superan la mediana de la $F$ de referencia, el criterio de influencia grave: el
+  más influyente, \res{influyente1}, tiene $D=\res{influyente1-cook}$.
+\end{itemize}
+
+\input{generado/tablas/influyentes}
+
+Ningún condado domina el ajuste. Aun así, se reestimó el modelo sin los \res{n-cook} condados con
+$D_i>4/n$ y con regresión robusta de Huber, que pondera a la baja \res{n-huber} condados con
+residuos grandes en lugar de eliminarlos (\cref{cap:sensibilidad}): las conclusiones no cambian.
+Los atípicos detectados son condados reales, por lo que se mantienen en el modelo.

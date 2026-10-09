@@ -1,0 +1,103 @@
+\chapter{Datos, validación y depuración}\label{cap:datos}
+
+\section{Fuente y procedencia}
+
+El profesor entregó el fichero \var{practica.sav} (SPSS), con \res{n-condados} condados y
+\res{n-columnas} columnas; su huella SHA-256 empieza por \res{sha-corto}, lo que identifica sin
+ambigüedad el fichero analizado. Procede del conjunto público \emph{OLS Regression Challenge}
+\parencite{rippner2017}, que agrega datos de la \emph{American Community Survey}, de
+\var{clinicaltrials.gov} y de \var{cancer.gov}. Antes de reutilizar la documentación pública de
+las variables se comprobó, celda a celda y en el mismo orden de filas, que ambas fuentes
+contienen los mismos datos. Sólo hay dos diferencias, y las dos están explicadas:
+\begin{itemize}
+  \item el fichero oficial ya trae como perdidos del sistema los casos anuales
+  (\var{avgAnnCount}) de los condados cuyos registros no publican datos por condado, que el CSV
+  público rellena con un valor centinela;
+  \item el fichero oficial añade una variable sin documentar, \var{Notificadomuerte}, que resulta
+  ser exactamente \var{avgAnnCount} $-$ \var{avgDeathsPerYear} en todos los condados en que
+  ambas constan (regla R19).
+\end{itemize}
+
+La \cref{tab:variables} (\cref{ap:tablas}) recoge el diccionario: etiqueta, unidad, tipo, fuente
+y papel de cada variable en el análisis.
+
+\section{Variables que no pueden ser explicativas}
+
+Algunas columnas se excluyen de los modelos por motivos de fondo, no por su significación
+(\cref{tab:excluidas}, \cref{ap:tablas}):
+\begin{itemize}
+  \item \textbf{Fuga de información.} \var{avgDeathsPerYear} es el numerador de la tasa que se
+  quiere explicar, y \var{Notificadomuerte} la contiene. Usarlas como explicativas daría un
+  ajuste espectacular y vacío.
+  \item \textbf{Escala.} \var{avgAnnCount} es un conteo que crece con la población; su
+  versión por habitante es la incidencia, que sí se usa.
+  \item \textbf{Redundancia exacta o casi exacta.} Las composiciones que suman \num{100}\,\%
+  (educación de 18--24 años, raza) obligan a omitir una categoría de referencia, igual que se
+  omite una indicadora al codificar una variable cualitativa; las edades medianas por sexo
+  repiten la edad mediana total ($r > 0{,}9$).
+\end{itemize}
+
+\section{Validación}
+
+Se definió un catálogo de \res{n-reglas} reglas que comprueban el dominio de cada variable
+(porcentajes entre 0 y 100, tasas positivas), la coherencia entre variables (la edad mediana
+total entre la masculina y la femenina; empleo más desempleo no mayor que 100\,\%), las
+identidades contables (las cuatro categorías educativas de 18--24 años suman 100\,\%) y la
+plausibilidad (valores repetidos con muchos decimales, mortalidad mayor que incidencia). La
+\cref{tab:validacion} muestra el resultado antes y después de depurar: en el fichero original
+fallan \res{n-reglas-error} reglas y \res{n-reglas-advertencia} emite una advertencia; tras la
+depuración no queda ningún error (\res{n-reglas-error-dep}).
+
+\input{generado/tablas/validacion}
+
+\section{Depuración: once decisiones documentadas}
+
+Cada incidencia se trata con una decisión registrada (\cref{tab:decisiones}) que expone el
+problema, la evidencia que lo prueba con los propios datos, la acción y su justificación. Las
+más relevantes son:
+
+\begin{description}[style=nextline,leftmargin=1.2em]
+  \item[Valor centinela en la incidencia (D03).] La incidencia vale exactamente
+  \res{centinela-incidencia} en \res{n-centinela} condados, todos los de \res{estados-centinela}.
+  Una medición con siete decimales no se repite por azar cientos de veces: es una imputación
+  previa por la media disfrazada de dato. Se marca como ausente; conservarla introduciría cientos
+  de observaciones sin variación en la incidencia y sesgaría su coeficiente hacia cero.
+  \item[Edad mediana en meses (D04).] \res{n-edad-meses} condados declaran edades medianas de
+  varios cientos de años. Divididas entre 12 quedan entre la mediana masculina y la femenina del
+  mismo condado, lo que confirma el error de unidad; la razón media entre el valor erróneo y la
+  media de las edades por sexo es \res{razon-edad} (desviación típica \res{dt-razon-edad}).
+  \item[Tamaño del hogar dividido por cien (D05).] \res{n-hogar} condados declaran menos de una
+  persona por hogar; multiplicados por 100 quedan en el rango del resto.
+  \item[Recuperación por identidad (D06).] Falta el \res{pct-somecol}\,\% de
+  \var{PctSomeCol18\_24}, pero las cuatro categorías educativas de 18--24 años suman 100\,\%
+  (comprobado en los \res{n-identidad-completos} condados completos, con un error máximo de
+  \res{error-identidad} puntos por redondeo), así que el valor ausente se calcula sin error.
+  \item[Variable derivada (D07).] En \res{n-nativa} condados las cuatro categorías raciales
+  publicadas suman menos del 80\,\%: falta la población nativa americana y multirracial. Se
+  construye como residuo, \var{PctNativeMulti}.
+  \item[Incidencia inverosímil (D08).] En \res{n-mir} condado (\res{condados-mir}) la
+  mortalidad supera a la incidencia, cuando la razón mediana es \res{mir-mediana}; la incidencia
+  de ese condado se marca como ausente.
+  \item[Región censal (D09) y transformaciones (D10).] El estado tiene 51 categorías, algunas con
+  uno o tres condados; se agrupa en las cuatro regiones de la Oficina del Censo. La población, la
+  renta y los ensayos clínicos per cápita, muy asimétricos, se transforman con logaritmos.
+\end{description}
+
+\figura{depuracion}{Tres comprobaciones de la depuración: la edad mediana registrada en meses
+queda, al dividirla entre 12, entre las medianas por sexo; el tamaño del hogar dividido por 100;
+y la identidad educativa de 18--24 años que permite recuperar el dato ausente.}
+
+\input{generado/tablas/decisiones}
+
+\section{Variables categóricas}\label{sec:categoricas}
+
+El modelo incluye una explicativa cualitativa, la región censal (Sur, Noreste, Medio Oeste y
+Oeste), que se codifica con tres variables indicadoras y el Sur como categoría de referencia
+(la más numerosa: \res{n-sur} condados). Cada coeficiente de región es la diferencia esperada
+de mortalidad respecto del Sur a igualdad del resto de variables, y su significación conjunta se
+contrasta con un $F$ de tres grados de libertad. El estado no se usa como explicativa en el
+modelo de efectos: con 51 categorías, varias casi vacías, consumiría 50 grados de libertad y
+absorbería toda la variación entre estados; en cambio, se tiene en cuenta en la estimación de
+los errores típicos (conglomerados) y como especificación de sensibilidad (efectos fijos de
+estado, \cref{cap:sensibilidad}). El decil de renta (\var{binnedInc}) es una versión agrupada de
+la renta mediana y se descarta en favor de la variable continua.

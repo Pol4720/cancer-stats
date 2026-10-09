@@ -1,0 +1,39 @@
+% ============================================================================
+% Informe del proyecto final del Curso Propedéutico de Estadística (UCM).
+% Compilación: latexmk (ver .latexmkrc). Las cifras, tablas y figuras de la
+% carpeta generado/ se regeneran con «uv run cancerstats export» a partir de la
+% última corrida registrada en runs/.
+% ============================================================================
+\documentclass[11pt,a4paper,oneside]{report}
+\input{preambulo}
+
+\title{Mortalidad por cáncer en los condados de Estados Unidos:\\
+  un modelo de regresión lineal múltiple}
+\author{Lic. Richard Alejandro Matos Arderí \and Lic. Abel Ponce González \and Lic. Lidier Robayna}
+\date{Curso Propedéutico de Estadística · Universidad Complutense de Madrid}
+
+\begin{document}
+\input{capitulos/portada}
+\pagenumbering{roman}
+\input{capitulos/resumen}
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+
+\input{capitulos/01-introduccion}
+\input{capitulos/02-datos}
+\input{capitulos/03-ausentes-atipicos}
+\input{capitulos/04-exploracion}
+\input{capitulos/05-construccion}
+\input{capitulos/06-modelo-final}
+\input{capitulos/07-diagnostico}
+\input{capitulos/08-sensibilidad}
+\input{capitulos/09-prediccion}
+\input{capitulos/10-conclusiones}
+
+\appendix
+\input{apendices/A-reproducibilidad}
+\input{apendices/B-tablas}
+
+\printbibliography[heading=bibintoc,title={Bibliografía}]
+\end{document}

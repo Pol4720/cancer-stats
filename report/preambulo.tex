@@ -1,0 +1,130 @@
+% ============================================================================
+% Preámbulo del informe (LuaLaTeX). Tipografía: Libertinus (texto y matemáticas)
+% e Inter (títulos), la misma que usan las figuras generadas.
+% ============================================================================
+\usepackage[spanish,es-nodecimaldot,es-tabla,es-noshorthands]{babel}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\setmainfont{Libertinus Serif}
+\setsansfont{Inter}[Scale=MatchLowercase]
+\setmonofont{Latin Modern Mono}[Scale=MatchLowercase,BoldFont={Latin Modern Mono},BoldFeatures={FakeBold=2}]
+\setmathfont{Libertinus Math}
+\setmathfont{Libertinus Math}[version=bold,FakeBold=1.6]
+\usepackage[a4paper,margin=2.6cm,headheight=14pt]{geometry}
+\usepackage{microtype}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xltabular}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage{float}
+\usepackage[shortlabels]{enumitem}
+\usepackage{csquotes}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage[most]{tcolorbox}
+\usepackage{listings}
+\usepackage{siunitx}
+\usepackage[backend=biber,style=authoryear,maxcitenames=2,uniquelist=false,uniquename=false,dashed=false,useprefix=true]{biblatex}
+\usepackage[hidelinks,pdfusetitle,bookmarksnumbered,hypertexnames=false]{hyperref}
+\usepackage[spanish,noabbrev]{cleveref}
+
+\addbibresource{bibliografia.bib}
+\crefname{table}{tabla}{tablas}
+\Crefname{table}{Tabla}{Tablas}
+\crefname{lstlisting}{código}{códigos}
+\Crefname{lstlisting}{Código}{Códigos}
+
+% ------------------------------------------------------------------ colores
+\definecolor{acento}{HTML}{2A78D6}
+\definecolor{tinta2}{HTML}{52514E}
+\definecolor{fondo}{HTML}{F3F2EE}
+
+% ------------------------------------------------------------------ números
+\sisetup{
+  output-decimal-marker = {,},
+  group-separator = {\,},
+  group-minimum-digits = 5,
+  detect-all,
+  table-number-alignment = right,
+}
+
+% ---------------------------------------------------------------- resultados
+% Cada cifra citada viene de la última corrida (generado/resultados.tex). Si una
+% corrida posterior deja de producir una clave, el informe compila igualmente,
+% la marca en rojo y emite una advertencia (el CI la convierte en error).
+\makeatletter
+\newcommand{\resdef}[2]{\expandafter\def\csname cs@res@#1\endcsname{#2}}
+\newcommand{\res}[1]{%
+  \ifcsname cs@res@#1\endcsname\csname cs@res@#1\endcsname
+  \else\textcolor{red}{\textbf{[#1]}}\PackageWarning{resultados}{Falta la cifra «#1»}\fi}
+\makeatother
+\input{generado/resultados.tex}
+
+% ------------------------------------------------------------------ títulos
+\titleformat{\chapter}[display]
+  {\sffamily\bfseries\Huge}
+  {\color{acento}\large\MakeUppercase{\chaptertitlename}\ \thechapter}{6pt}{}
+\titlespacing*{\chapter}{0pt}{0pt}{24pt}
+\titleformat{\section}{\sffamily\bfseries\Large}{\color{acento}\thesection}{0.8em}{}
+\titleformat{\subsection}{\sffamily\bfseries\large}{\color{acento}\thesubsection}{0.8em}{}
+\titleformat{\subsubsection}{\sffamily\bfseries}{}{0pt}{}
+
+\captionsetup{font=small,labelfont={bf,sf},format=hang,skip=6pt}
+\captionsetup[table]{position=top}
+\setlength{\parskip}{0.35em}
+\setlength{\emergencystretch}{1.5em}
+\setlist{itemsep=0.2em,topsep=0.3em}
+\renewcommand{\arraystretch}{1.12}
+
+% ------------------------------------------------------------------ cabeceras
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\sffamily\footnotesize\color{tinta2}\leftmark}
+\fancyhead[R]{\sffamily\footnotesize\color{tinta2}Mortalidad por cáncer en EE.\,UU.}
+\fancyfoot[C]{\sffamily\footnotesize\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\sffamily\footnotesize\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+% ------------------------------------------------------------------ recuadros
+\newtcolorbox{idea}[1][]{enhanced,breakable,colback=acento!6,colframe=acento,
+  boxrule=0pt,leftrule=2.5pt,arc=2pt,left=8pt,right=8pt,top=6pt,bottom=6pt,
+  fonttitle=\sffamily\bfseries,coltitle=acento,attach title to upper={\ },title={#1}}
+\newtcolorbox{entregable}[1]{enhanced,breakable,colback=fondo,colframe=fondo,
+  boxrule=0pt,arc=3pt,left=8pt,right=8pt,top=6pt,bottom=6pt,
+  fontupper=\small,title={\sffamily\bfseries Entregable #1},coltitle=black,
+  colbacktitle=fondo,toptitle=2pt,bottomtitle=0pt}
+
+% ------------------------------------------------------------------ código
+\lstdefinestyle{codigo}{basicstyle=\ttfamily\footnotesize,columns=fullflexible,
+  keepspaces=true,breaklines=true,frame=single,rulecolor=\color{black!15},
+  backgroundcolor=\color{fondo},xleftmargin=4pt,xrightmargin=4pt,
+  showstringspaces=false,upquote=true,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1
+           {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1 {Ñ}{{\~N}}1
+           {«}{{\guillemotleft}}1 {»}{{\guillemotright}}1 {·}{{\textperiodcentered}}1
+           {−}{{-}}1 {σ}{{$\sigma$}}1 {²}{{$^2$}}1 {≥}{{$\geq$}}1 {≤}{{$\leq$}}1}
+\lstset{style=codigo}
+\renewcommand{\lstlistingname}{Código}
+
+% ------------------------------------------------------------------ utilidades
+\newcommand{\var}[1]{\texttt{#1}}
+\newcommand{\figura}[3][0.98]{%
+  \begin{figure}[htbp]\centering
+  \includegraphics[width=#1\linewidth]{generado/figuras/#2.pdf}
+  \caption{#3}\label{fig:#2}\end{figure}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\E}{E}
+\newcommand{\R}{\mathbb{R}}
+
+% Las páginas que sólo contienen flotantes los colocan arriba, no centrados en vertical.
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{12pt plus 1fil}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother

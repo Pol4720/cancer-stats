@@ -1,0 +1,50 @@
+\chapter{Conclusiones}\label{cap:conclusiones}
+
+\section{Respuesta a la pregunta}
+
+En los condados de Estados Unidos, la mortalidad por cáncer se asocia, a igualdad del resto de
+características, con:
+\begin{itemize}
+  \item la \textbf{incidencia}, que es el factor dominante: un condado en el tercer cuartil de
+  incidencia tiene \res{efiqr-incidencia} muertes por \num{100000} habitantes más que uno en el
+  primero;
+  \item la \textbf{cobertura sanitaria sólo pública}, indicador de pobreza y peor acceso a la
+  atención especializada (\res{efiqr-solopublico} muertes más entre el primer y el tercer cuartil);
+  \item la \textbf{educación}: más adultos con título universitario, menos mortalidad
+  (\res{efiqr-grado25-sur} muertes entre cuartiles en el Sur), con un gradiente mucho más débil en
+  el Noreste; y más jóvenes cuyo nivel máximo es el bachillerato, más mortalidad;
+  \item el \textbf{desempleo}, pero sólo en el Medio Oeste y el Noreste;
+  \item la \textbf{región}: a igualdad de composición, el Sur conserva una mortalidad mayor que el
+  Noreste y el Oeste, aunque el modelo explica el \res{pct-brecha-explicada}\,\% de la brecha bruta
+  entre el Sur y el Oeste.
+\end{itemize}
+
+El modelo final, estimado por MCO con \res{n-final} condados, explica el \res{pct-r2-final}\,\% de
+la variabilidad ($\bar R^2=\res{r2aj-final}$, $\mathrm{RMSE}=\res{rmse-final}$). Los errores son
+heterocedásticos y dependen dentro de cada estado; la inferencia lo tiene en cuenta mediante
+errores típicos robustos por conglomerados, y las conclusiones se mantienen en las
+\res{n-especificaciones} especificaciones del análisis de sensibilidad y en el bootstrap por
+conglomerados.
+
+\section{Limitaciones}
+
+\begin{itemize}
+  \item \textbf{Diseño ecológico y observacional.} Las asociaciones describen condados, no
+  personas, y no son efectos causales: un condado con más titulados universitarios difiere en
+  muchas otras cosas no medidas (tabaquismo, obesidad, exposición laboral, acceso a cribados).
+  \item \textbf{Variables omitidas.} No se dispone de prevalencia de tabaquismo, el principal factor
+  de riesgo evitable de muerte por cáncer, ni de la distribución por tipos de cáncer o por edad.
+  \item \textbf{Ausencia estructural de la incidencia.} Los condados de los estados cuyos registros
+  no publican la incidencia quedan fuera del modelo principal; la imputación múltiple muestra que
+  las conclusiones no cambian, pero bajo el supuesto MAR.
+  \item \textbf{Selección de variables.} Los errores típicos se calculan condicionados al modelo
+  seleccionado; la reestimación del modelo máximo y la concordancia entre estrategias de selección
+  limitan, pero no eliminan, este problema.
+\end{itemize}
+
+\section{Trabajo futuro}
+
+Los datos admiten una estimación más eficiente si se modela directamente el número de muertes con
+un modelo de Poisson o binomial negativo con la población como exposición, lo que incorpora de forma
+natural la heterocedasticidad debida al tamaño del condado; un modelo espacial permitiría además
+modelar la dependencia entre condados vecinos de estados distintos.

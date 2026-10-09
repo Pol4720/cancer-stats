@@ -1,0 +1,62 @@
+\chapter{Código y reproducibilidad}\label{ap:reproducibilidad}
+
+\begin{entregable}{(c): código}
+Todo el análisis está implementado en el paquete de Python \var{cancerstats}, con su
+configuración, pruebas automáticas e integración continua, en el repositorio del proyecto. Este
+apéndice describe cómo reproducirlo y reproduce la sintaxis de SPSS generada a partir de la
+corrida.
+\end{entregable}
+
+\section{Estructura}
+
+\begingroup\raggedright
+\begin{description}[style=nextline,leftmargin=1.2em]
+  \item[\var{config/default.yaml}] Configuración de la metodología: cada umbral y cada decisión es
+  una opción validada, con su descripción.
+  \item[\var{src/cancerstats/}] Paquete: ingesta y procedencia (\var{io}, \var{provenance}),
+  validación y depuración (\var{validation}, \var{cleaning}), ausentes (\var{missing}), exploración
+  e inferencia clásica (\var{exploration}, \var{inference}), atípicos y colinealidad
+  (\var{outliers}, \var{collinearity}), modelo de efectos (\var{effects/}: diseño, ajuste,
+  selección, diagnóstico, interpretación y sensibilidad), modelo predictivo (\var{predictive}),
+  registro de corridas (\var{runs}) y exportación (\var{export/}: macros y tablas del informe,
+  figuras, sintaxis de SPSS y datos de la interfaz).
+  \item[\var{runs/}] Una carpeta por corrida con la configuración, el manifiesto (entorno, huellas
+  del código y de los datos, tiempos), los resultados, el registro y tablas en CSV.
+  \item[\var{report/}] Este informe; \var{report/generado/} se regenera a partir de la última
+  corrida.
+  \item[\var{web/}] Interfaz interactiva (en vivo con el servidor de la API o estática en GitHub
+  Pages).
+  \item[\var{tests/}] Pruebas unitarias y de integración, que incluyen una reestimación
+  independiente del modelo final con las fórmulas de \var{statsmodels}.
+\end{description}
+\endgroup
+
+\section{Cómo reproducir el análisis}
+
+Con \var{uv} instalado:
+\begin{lstlisting}[language=bash]
+uv sync                         # entorno exacto (uv.lock)
+uv run cancerstats run          # ejecuta el pipeline y registra la corrida en runs/
+uv run cancerstats export       # regenera report/generado a partir de la última corrida
+cd report && latexmk informe.tex
+uv run cancerstats serve        # interfaz interactiva en http://127.0.0.1:8000
+\end{lstlisting}
+
+La corrida de este informe es la \res{corrida-id}, generada el \res{corrida-fecha} en
+\res{corrida-duracion} segundos a partir del commit \res{corrida-commit} con la configuración de
+huella \res{corrida-huella} y la semilla \res{corrida-semilla}. Las bibliotecas principales son
+\var{statsmodels} \parencite{seabold2010} para el modelo y el diagnóstico y \var{scikit-learn}
+\parencite{pedregosa2011} para el modelo predictivo; la \cref{tab:entorno} recoge sus versiones.
+
+\input{generado/tablas/entorno}
+
+\section{Sintaxis de SPSS}
+
+La sintaxis siguiente, generada automáticamente a partir de la corrida, aplica sobre
+\var{practica.sav} las mismas decisiones de depuración, construye las mismas variables (región,
+transformaciones, centrado e interacciones) y estima el modelo final con el procedimiento
+\var{REGRESSION}, pidiendo los diagnósticos de la orientación: Durbin-Watson, gráficos de residuos,
+tolerancia y FIV, índices de condición y medidas de influencia. Sus coeficientes y errores típicos
+clásicos coinciden con los de la \cref{tab:spss-coeficientes}.
+
+\lstinputlisting[language={},caption={Sintaxis de SPSS que reproduce el modelo final.},label={lst:spss}]{../spss/modelo_final.sps}

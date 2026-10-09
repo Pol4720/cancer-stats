@@ -1,0 +1,184 @@
+\chapter{Construcción del modelo}\label{cap:construccion}
+
+\begin{entregable}{(a): pasos seguidos para construir el modelo}
+Partiendo de \res{n-candidatas} explicativas candidatas y la región censal: (1) se eliminan una a
+una las variables con colinealidad severa; (2) se diagnostica la estructura del error del modelo
+máximo para elegir cómo hacer inferencia; (3) se seleccionan los efectos principales por
+eliminación hacia atrás con contrastes robustos; (4) se reincorporan las confusoras de las
+exposiciones de interés; (5) se contrastan interacciones respetando el principio jerárquico; y
+(6) se comparan los modelos anidados resultantes. Cada paso es una opción de la configuración y
+queda registrado en la corrida.
+\end{entregable}
+
+\section{Especificación de partida}
+
+El modelo de partida incluye todas las explicativas que pueden serlo (\cref{cap:datos}), con las
+transformaciones logarítmicas de la población, la renta y los ensayos clínicos, y la región como
+variable cualitativa con el Sur de referencia. La incidencia se incluye: la mortalidad es, en
+buena medida, incidencia por letalidad, y omitirla haría que los coeficientes mezclaran ambas
+cosas. Con ella, el resto de coeficientes se interpreta a igual número de diagnósticos por
+habitante; el \cref{cap:modelo-final} compara ambos modelos (\cref{tab:incidencia}).
+
+Las explicativas continuas se \emph{centran} en su media. El centrado no cambia el ajuste ni las
+pendientes de un modelo sin interacciones, pero hace interpretable la constante (mortalidad
+esperada de un condado medio del Sur) y, sobre todo, da sentido a los efectos principales cuando
+hay interacciones: cada uno es el efecto de su variable en la región de referencia y con las demás
+en su media, y desaparece la colinealidad no esencial entre una variable y su producto.
+
+\section{Colinealidad}\label{sec:colinealidad}
+
+Cuando una explicativa es casi combinación lineal de las demás, su coeficiente se estima con una
+varianza enorme y se vuelve inestable. Se mide con el factor de inflación de la varianza
+\[
+\mathrm{FIV}_j=\frac{1}{1-R_j^2},
+\]
+donde $R_j^2$ es el coeficiente de determinación de la regresión de $X_j$ sobre las demás
+explicativas: la varianza de $\hat\beta_j$ es $\mathrm{FIV}_j$ veces la que tendría con
+explicativas incorreladas. Su inversa es la \emph{tolerancia} que imprime SPSS. Complementa al
+FIV el número de condición de Belsley \parencite{belsley1980}, que detecta dependencias que
+implican a varias variables a la vez.
+
+El FIV máximo del modelo de partida es \res{fiv-max-antes} y el número de condición
+\res{ncond-antes}. Se eliminó en cada paso la variable de mayor FIV, recalculando todos los FIV,
+hasta que ninguno superó 10 (\cref{tab:poda}): salen \res{podadas}. Las cuatro son redundantes
+con otra que permanece: el seguro público incluye al sólo público y el privado es casi su
+complementario; la población casada y la proporción de hogares de matrimonios miden casi lo mismo;
+y la renta mediana está fuertemente correlacionada, en sentido inverso, con la pobreza
+($|r|>0{,}85$ en los cuatro casos). Así, la dimensión de la renta sigue representada en el
+modelo máximo por la pobreza.
+Tras la poda el FIV máximo es \res{fiv-max-despues} y el número de condición \res{ncond-despues}.
+
+\input{generado/tablas/poda}
+
+\figura{fiv}{Factor de inflación de la varianza de cada explicativa antes y después de la poda
+(escala logarítmica); la línea vertical marca el umbral de 10.}
+
+\section{Estructura del error y estrategia de inferencia}\label{sec:estructura-error}
+
+Antes de seleccionar variables hay que decidir cómo se calculan los errores típicos, porque de
+ellos dependen todos los contrastes de la selección. El modelo máximo
+($R^2=\res{r2-inicial}$) presenta dos violaciones claras de las hipótesis clásicas:
+
+\begin{itemize}
+  \item \textbf{Heterocedasticidad ligada a la población.} Una tasa calculada con pocas muertes es
+  muy ruidosa: si las muertes de un condado de $n$ habitantes se comportan como un proceso de
+  Poisson, la varianza de su tasa es proporcional a $1/n$. La varianza de los residuos en el
+  decil de condados más pequeños (\res{var-decil1}) es \res{razon-var-deciles} veces la del decil
+  más grande (\res{var-decil10}); el contraste de Breusch-Pagan frente a $1/n$ lo confirma
+  ($\mathrm{LM}=\res{bp-pob-antes}$, \res{bp-pob-antes-p}). Se estimó la función de varianza
+  \[
+  \sigma^2(n)=a+\frac{b}{n},\qquad \hat a=\res{vf-a},\quad \hat b=\res{vf-b}\cdot10^{6}\ \text{(\res{vf-b-p})},
+  \]
+  por mínimos cuadrados ponderados factibles iterados. Su lectura es sustantiva: en un condado de
+  \num{10000} habitantes el \res{frac-muestreo-10000}\,\% de la varianza residual es ruido de
+  muestreo de la propia tasa; en uno de un millón, el \res{frac-muestreo-1000000}\,\%.
+  \item \textbf{Dependencia dentro de cada estado.} Los condados de un mismo estado comparten
+  registro de cáncer, sistema sanitario y políticas. La correlación intraclase de los residuos por
+  estado es \res{icc-antes} ($F=\res{icc-antes-f}$, \res{icc-antes-p}): los errores no son
+  independientes.
+\end{itemize}
+
+\figura{varianza}{Varianza residual media por decil de población. Izquierda: modelo inicial y
+función de varianza ajustada $a+b/n$. Derecha: modelo final, residuos MCO frente a residuos
+ponderados por la función de varianza (MCPF).}
+
+Ninguna de las dos violaciones sesga los coeficientes MCO, pero ambas invalidan sus errores
+típicos clásicos, $\hat\sigma^2(X^{\top}X)^{-1}$. Hay dos remedios:
+\begin{enumerate}
+  \item \textbf{Mantener MCO y corregir la varianza.} El estimador «sándwich»
+  \[
+  \widehat{\Var}(\hat{\boldsymbol\beta})=(X^{\top}X)^{-1}
+  \Bigl(\sum_{g=1}^{G}X_g^{\top}\hat{\mathbf e}_g\hat{\mathbf e}_g^{\top}X_g\Bigr)(X^{\top}X)^{-1}
+  \]
+  agrupa los residuos por estado ($G$ conglomerados), de modo que es válido con
+  heterocedasticidad de cualquier forma y con correlación arbitraria dentro de cada estado
+  \parencite{white1980,cameron2015}. Con $G=\res{n-estados-final}$ estados, los contrastes usan la
+  $t$ de Student con $G-1=\res{gl-inferencia}$ grados de libertad, como recomiendan
+  \textcite{cameron2015} para un número moderado de conglomerados.
+  \item \textbf{Ponderar} por $1/\hat\sigma^2(n)$ (MCPF), más eficiente si la función de varianza es
+  correcta.
+\end{enumerate}
+
+\begin{idea}[Decisión.]
+La orientación pide un modelo MCO, de modo que el estimador principal es MCO con errores típicos
+robustos por conglomerados de estado. Los errores típicos clásicos se presentan como salida tipo
+SPSS (\cref{sec:salida-spss}) y los HC3 \parencite{mackinnon1985} como referencia; la estimación
+ponderada por la función de varianza es una especificación de sensibilidad
+(\cref{cap:sensibilidad}). Todos los contrastes de la selección usan la covarianza por
+conglomerados.
+\end{idea}
+
+\section{Selección de variables}
+
+Se aplicó la eliminación hacia atrás: partiendo del modelo máximo (\res{k-maximo} términos,
+$n=\res{n-maximo}$ condados con todas las variables), en cada paso se retira el término con mayor
+$p$ en el contraste de Wald robusto mientras ese $p$ supere $\alpha=0{,}05$. La región, con tres
+indicadoras, se contrasta como un único término (un $F$ con tres grados de libertad). En
+\res{n-pasos-seleccion} pasos salen, por este orden, \res{eliminadas} (\cref{tab:seleccion}).
+
+\input{generado/tablas/seleccion}
+
+Para comprobar que el resultado no es un artefacto del método se repitió la selección hacia
+delante y por pasos: las tres estrategias coinciden en \res{n-comunes-estrategias} términos
+(\res{comunes-estrategias}). En cambio, la misma eliminación hacia atrás con errores típicos
+\emph{clásicos} retiene \res{n-ingenua} términos, \res{n-ingenua-extra} más
+(\res{ingenua-extra}): al ignorar la dependencia por estado y la heterocedasticidad subestima los
+errores típicos y declara significativas variables que no lo son.
+
+\section{Confusión}
+
+La selección por significación puede descartar una variable que, sin ser significativa, cambia el
+coeficiente de un factor de interés: una \emph{confusora}. Se aplicó el criterio del cambio en la
+estimación \parencite{maldonado1993} a las exposiciones socioeconómicas que motivan el estudio
+(educación, pobreza y renta): se reincorpora la variable eliminada cuya inclusión cambia más de un
+10\,\% el coeficiente de alguna exposición retenida, y se repite hasta que ninguna lo hace. Se
+reincorpora \res{confusoras}: su ausencia cambia un \res{confusion-bach25}\,\% el coeficiente de
+\res{confusion-bach25-en}. Las dos variables describen la misma distribución educativa (la
+proporción con bachillerato y la proporción con título universitario), y estimar el efecto del
+título universitario sin controlar por el bachillerato mezclaría ambos escalones educativos.
+
+\section{Interacciones}
+
+Se contrastaron \res{n-interacciones-candidatas} interacciones con fundamento sustantivo: si los
+efectos de la incidencia, la educación, la cobertura sólo pública, el desempleo o la pobreza
+difieren entre regiones, y si el efecto de la incidencia depende del nivel educativo. Sólo se
+contrasta una interacción si sus efectos principales están en el modelo (principio jerárquico), y
+en cada ronda los $p$ de todas las candidatas se corrigen por Holm para controlar la tasa de error
+de familia. Entran \res{n-interacciones}: \res{interacciones}
+(\cref{tab:interacciones}). La primera tiene $F=\res{int-grado25xregion-f}$
+(\res{int-grado25xregion-p}; corregido, \res{int-grado25xregion-padj}); la segunda,
+$F=\res{int-desempleoxregion-f}$ (\res{int-desempleoxregion-p}; corregido,
+\res{int-desempleoxregion-padj}).
+
+\input{generado/tablas/interacciones}
+
+\section{Comparación de modelos anidados}\label{sec:comparacion}
+
+La \cref{tab:comparacion} compara, sobre la misma muestra de \res{n-maximo} condados, el modelo
+con sólo la región, el máximo tras la poda, el seleccionado y el final con interacciones. Cada fila
+se contrasta con la anterior con el $F$ parcial clásico y con el Wald robusto.
+
+\input{generado/tablas/comparacion}
+
+Tres lecturas:
+\begin{itemize}
+  \item Las explicativas aportan muchísimo frente a la región sola ($\bar R^2$ pasa de
+  \res{cmp-nulo-r2aj} a \res{cmp-maximo-r2aj}).
+  \item Los \res{cmp-seleccionado-gl} parámetros que retira la selección no son significativos uno a
+  uno, pero conjuntamente el Wald robusto da \res{cmp-seleccionado-p-rob}: aportan, en bloque, una
+  mejora pequeña del ajuste ($\bar R^2$ de \res{cmp-seleccionado-r2aj} frente a
+  \res{cmp-maximo-r2aj}). El BIC, que penaliza más la complejidad, prefiere el modelo seleccionado
+  (\res{cmp-seleccionado-bic} frente a \res{cmp-maximo-bic}); el AIC prefiere el máximo. Se opta por
+  el modelo parsimonioso para interpretar, y el modelo máximo se reestima como especificación de
+  sensibilidad (\cref{cap:sensibilidad}) para comprobar que las conclusiones no dependen de esta
+  elección.
+  \item Las interacciones mejoran el ajuste de forma significativa con ambos contrastes
+  (Wald robusto \res{cmp-final-p-rob}) y el modelo final tiene el menor AIC de los cuatro.
+\end{itemize}
+
+\begin{idea}[Muestra de estimación.]
+La selección y la comparación se hacen sobre los \res{n-maximo} condados con todas las candidatas,
+para que todos los modelos sean comparables. Una vez fijados los términos, el modelo final se
+reestima con todos los condados completos en \emph{sus} variables, \res{n-final}: excluir
+condados por variables que el modelo no usa sólo restaría precisión.
+\end{idea}
