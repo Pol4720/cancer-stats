@@ -1,0 +1,63 @@
+name: GitHub Pages
+
+# Publica la interfaz en modo estático (datos de la última corrida versionada) en la raíz,
+# la presentación en /presentacion/ y el informe en /informe.pdf.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  construir:
+    name: Construir el sitio
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --frozen
+      - name: Datos y presentación de la última corrida
+        run: uv run cancerstats web-data && uv run cancerstats presentation
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Compilación de la interfaz
+        working-directory: web
+        run: npm ci && npm run build
+      - name: Ensamblado del sitio
+        run: |
+          mkdir -p site/presentacion
+          cp -r web/dist/. site/
+          cp presentation/index.html site/presentacion/index.html
+          cp report/dist/informe.pdf site/informe.pdf
+          touch site/.nojekyll
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  publicar:
+    name: Publicar
+    needs: construir
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - id: despliegue
+        uses: actions/deploy-pages@v4
