@@ -1,6 +1,23 @@
 # Datos
 
-## `raw/CANCER.csv` — datos originales
+## `raw/practica.sav` — fuente oficial
+
+Fichero SPSS entregado por el profesor junto con la orientación
+(`raw/orientacion-Multiple_Linear_Regression_Challenge.docx`). Es el que lee el pipeline por
+defecto (`data.path` en `config/default.yaml`; el CSV es `data.reference_path`).
+
+| Propiedad | Valor |
+|---|---|
+| Huella SHA-256 | `1924e0da423a7408347eefb5373e4592bf7e3d4fcdedc52a05fb05df45e00a9f` |
+| Tamaño | 951 372 bytes |
+| Codificación | UTF-8 |
+| Filas × columnas | 3047 × 35 |
+
+Cada corrida comprueba que coincide **celda a celda** con `raw/CANCER.csv` (sólo le falta la
+columna vacía sin nombre del CSV) y registra su huella en el manifiesto; una prueba de
+integración lo verifica.
+
+## `raw/CANCER.csv` — conjunto público equivalente
 
 Conjunto *Cancer Death Rates* publicado en Kaggle
 (<https://www.kaggle.com/datasets/gurtegsawhney/cancer-death-rates-data>), derivado del
@@ -15,8 +32,8 @@ equivalente) de EE. UU.: **3047 condados de los 50 estados y el Distrito de Colu
 | Finales de línea | CR (`\r`), formato del Mac OS clásico |
 | Filas × columnas | 3047 × 36 (incluida una columna vacía sin nombre) |
 
-El fichero se versiona **byte a byte** (ver `.gitattributes`): el pipeline comprueba su
-huella en cada corrida y la registra en el manifiesto, de modo que cualquier alteración
+Los ficheros se versionan **byte a byte** (ver `.gitattributes`): el pipeline comprueba la
+huella del que lee en cada corrida y la registra en el manifiesto, de modo que cualquier alteración
 queda a la vista.
 
 Fuentes de las variables, según la descripción original:
