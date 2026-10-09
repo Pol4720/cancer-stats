@@ -355,6 +355,16 @@ _VARS: tuple[Variable, ...] = (
         "b",
         "Geografía",
     ),
+    Variable(
+        "Notificadomuerte",
+        "Casos menos muertes",
+        "Variable añadida en el fichero oficial de SPSS; la validación demuestra que es "
+        "exactamente avgAnnCount − avgDeathsPerYear (casos anuales menos muertes anuales).",
+        "casos/año",
+        "conteo",
+        "derivada",
+        "Carga de cáncer",
+    ),
     # --- Variables derivadas en la depuración -------------------------------------------
     Variable(
         "PctNativeMulti",

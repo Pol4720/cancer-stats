@@ -1,4 +1,8 @@
-"""Ingesta del fichero original.
+"""Ingesta de los datos.
+
+La fuente oficial es el fichero de SPSS que entregó el profesor (``practica.sav``). El CSV
+de Kaggle del que procede se conserva como referencia de procedencia: el módulo
+:mod:`cancerstats.provenance` comprueba celda a celda que ambos contienen los mismos datos.
 
 El CSV de Kaggle llega con dos particularidades que una lectura ingenua no detecta:
 
@@ -72,6 +76,7 @@ class IngestReport:
     line_ending: str
     n_rows: int
     n_columns_raw: int
+    format: str = "csv"
     empty_columns: list[str] = field(default_factory=list)
     non_ascii_examples: list[str] = field(default_factory=list)
     missing_expected: list[str] = field(default_factory=list)
@@ -122,12 +127,23 @@ def decode(data: bytes, encoding: str = "auto") -> tuple[str, str]:
     return text, enc
 
 
-def read_raw(path: Path, encoding: str = "auto") -> tuple[pd.DataFrame, IngestReport]:
-    """Lee el CSV original y devuelve los datos junto con el informe de ingesta.
+def _finish(df: pd.DataFrame, report: IngestReport) -> tuple[pd.DataFrame, IngestReport]:
+    """Comprueba las columnas esperadas, las ordena y añade el identificador del condado.
 
-    Las columnas completamente vacías y sin nombre (artefacto de exportación) se eliminan
-    aquí, porque no contienen información; quedan registradas en el informe.
+    Las columnas no documentadas (como ``Notificadomuerte`` en el fichero del profesor) se
+    conservan al final para que la validación pueda examinarlas.
     """
+    report.missing_expected = [c for c in EXPECTED_COLUMNS if c not in df.columns]
+    report.unexpected_columns = [c for c in df.columns if c not in EXPECTED_COLUMNS]
+    if report.missing_expected:
+        raise ValueError(f"Faltan columnas esperadas: {report.missing_expected}")
+    df = df[[*EXPECTED_COLUMNS, *report.unexpected_columns]].copy()
+    df.insert(0, "county_id", df["Geography"] + ", " + df["state"])
+    return df, report
+
+
+def read_csv_source(path: Path, encoding: str = "auto") -> tuple[pd.DataFrame, IngestReport]:
+    """Lee el CSV de Kaggle (Mac Roman, finales CR, Geography partida en dos columnas)."""
     data = path.read_bytes()
     text, enc = decode(data, encoding)
     df = pd.read_csv(io.StringIO(text), dtype=dict.fromkeys(TEXT_COLUMNS, "string"))
@@ -143,7 +159,6 @@ def read_raw(path: Path, encoding: str = "auto") -> tuple[pd.DataFrame, IngestRe
         line.rsplit(",", 2)[-2].strip() + ", " + line.rsplit(",", 1)[-1].strip()
         for line in non_ascii
     ][:5]
-
     report = IngestReport(
         path=str(path),
         sha256=sha256_bytes(data),
@@ -152,13 +167,53 @@ def read_raw(path: Path, encoding: str = "auto") -> tuple[pd.DataFrame, IngestRe
         line_ending=detect_line_ending(data),
         n_rows=len(df),
         n_columns_raw=len(df.columns) + len(empty),
+        format="csv",
         empty_columns=empty,
         non_ascii_examples=examples,
-        missing_expected=[c for c in EXPECTED_COLUMNS if c not in df.columns],
-        unexpected_columns=[c for c in df.columns if c not in EXPECTED_COLUMNS],
     )
-    if report.missing_expected:
-        raise ValueError(f"Faltan columnas esperadas: {report.missing_expected}")
-    df = df[list(EXPECTED_COLUMNS)]
-    df.insert(0, "county_id", df["Geography"] + ", " + df["state"])
-    return df, report
+    return _finish(df, report)
+
+
+def read_sav_source(path: Path) -> tuple[pd.DataFrame, IngestReport]:
+    """Lee el fichero de SPSS oficial.
+
+    ``Geography`` llega como una sola columna «Condado, Estado»; se separa por la última
+    coma (ningún nombre de estado contiene comas). Los valores perdidos del sistema de SPSS
+    se leen como ausentes.
+    """
+    import pyreadstat
+
+    data = path.read_bytes()
+    df, meta = pyreadstat.read_sav(str(path), apply_value_formats=False)
+    for col in ("Geography", "binnedInc"):
+        df[col] = df[col].astype("string").str.strip()
+    parts = df["Geography"].str.rsplit(",", n=1, expand=True)
+    df["Geography"] = parts[0].str.strip()
+    df["state"] = parts[1].str.strip()
+    non_ascii = [
+        g
+        for g in (parts[0] + ", " + parts[1].str.strip()).tolist()
+        if any(ord(ch) > 127 for ch in g)
+    ][:5]
+    report = IngestReport(
+        path=str(path),
+        sha256=sha256_bytes(data),
+        n_bytes=len(data),
+        encoding=str(meta.file_encoding or "utf-8").lower(),
+        line_ending="—",
+        n_rows=len(df),
+        n_columns_raw=int(meta.number_columns or df.shape[1]),
+        format="spss",
+        non_ascii_examples=non_ascii,
+    )
+    return _finish(df, report)
+
+
+def read_raw(path: Path, encoding: str = "auto") -> tuple[pd.DataFrame, IngestReport]:
+    """Lee la fuente de datos según su extensión (``.sav`` o ``.csv``)."""
+    suffix = path.suffix.lower()
+    if suffix == ".sav":
+        return read_sav_source(path)
+    if suffix in (".csv", ".txt"):
+        return read_csv_source(path, encoding)
+    raise ValueError(f"No se reconoce el formato de «{path.name}»: se admiten .sav y .csv.")
