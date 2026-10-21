@@ -8,7 +8,7 @@ Juan Tejada): *Multiple Linear Regression Challenge*. Un modelo de regresión li
 la tasa de mortalidad por cáncer (`TARGET_deathRate`) de 3047 condados, que va desde los datos en
 bruto (`practica.sav`) hasta la inferencia robusta. Todo es reproducible.
 
-**Autores:** Lic. Richard Alejandro Matos Arderí, Lic. Abel Ponce González y Lic. Lidier Robayna.
+**Autores:** Lic. Richard Alejandro Matos Arderí, Lic. Abel Ponce González y Lic. Lidier Robayna Carballo.
 
 | | |
 |---|---|

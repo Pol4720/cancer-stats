@@ -108,7 +108,7 @@ export function Shell() {
             Corrida <code>{runId}</code>
             {index.latest === runId ? " (última)" : ""}
           </span>
-          <span className="muted small">Lic. Richard Alejandro Matos Arderí · Lic. Abel Ponce González · Lic. Lidier Robayna</span>
+          <span className="muted small">Lic. Richard Alejandro Matos Arderí · Lic. Abel Ponce González · Lic. Lidier Robayna Carballo</span>
         </div>
       </nav>
       <div className="main">

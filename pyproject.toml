@@ -11,7 +11,7 @@ license = "MIT"
 authors = [
   { name = "Richard Alejandro Matos Arderí" },
   { name = "Abel Ponce González" },
-  { name = "Lidier Robayna" },
+  { name = "Lidier Robayna Carballo" },
 ]
 requires-python = ">=3.11"
 classifiers = [
