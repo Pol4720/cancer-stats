@@ -62,6 +62,7 @@ REGION_ALIAS = {"Sur": "sur", "Noreste": "noreste", "Medio Oeste": "medio-oeste"
 MODEL_ALIAS = {
     "baseline": "referencia",
     "ols_effects": "mco-efectos",
+    "ols_effects_outliers": "mco-indicadoras",
     "ols_full": "mco-completo",
     "ridge": "ridge",
     "lasso": "lasso",
@@ -508,6 +509,8 @@ def macros(res: Results) -> dict[str, str]:
         m["mayor-residuo-y"] = num(big["y"], 1)
         m["mayor-residuo-ajuste"] = num(big["fitted"], 1)
 
+    m.update(_indicator_macros(eff))
+
     specs = {sp["id"]: sp for sp in eff["sensitivity"]}
     m["n-especificaciones"] = integer(len(specs))
     main_terms = [c["term"] for c in fin["coef"] if c["term"] != "const"]
@@ -602,6 +605,74 @@ def macros(res: Results) -> dict[str, str]:
     env = man["environment"]
     for k in ("python", "numpy", "pandas", "scipy", "statsmodels", "scikit-learn", "matplotlib"):
         m[f"version-{k.replace('-', '')}"] = tex_escape(env.get(k, "?"))
+    return m
+
+
+IND_ALIAS = {"top": "ind5", "bonferroni": "indbonf", "cook4n": "indcook"}
+
+
+def _indicator_macros(eff: Results) -> dict[str, str]:
+    """Cifras de los modelos con variables indicadoras de atípicos (cambio en la media)."""
+    m: dict[str, str] = {}
+    oi = eff.get("outlier_indicators")
+    if not oi:
+        return m
+    m["ind-top-k"] = integer(oi["top"])
+    bonf = oi["bonferroni"]
+    m["bonf-critico"] = num(bonf["critico"], 2)
+    m["bonf-gl"] = integer(bonf["gl"])
+    m["bonf-n"] = integer(len(bonf["outliers"]))
+    m["bonf-condados"] = join_es([tex_escape(o["county_id"]) for o in bonf["outliers"]])
+    if bonf["outliers"]:
+        m["bonf-mayor"] = tex_escape(bonf["outliers"][0]["county_id"])
+        m["bonf-mayor-r"] = num(bonf["outliers"][0]["stud_resid"], 2)
+    for mod in oi["models"]:
+        a = IND_ALIAS[mod["id"]]
+        m[f"{a}-q"] = integer(mod["q"])
+        m[f"{a}-r2"] = num(mod["r2"], 3)
+        m[f"{a}-r2aj"] = num(mod["r2_adj"], 3)
+        m[f"{a}-sigma"] = num(mod["sigma"], 2)
+        m[f"{a}-aic"] = num(mod["aic"], 1)
+        m[f"{a}-bic"] = num(mod["bic"], 1)
+        m[f"{a}-f"] = num(mod["F"], 2)
+        m[f"{a}-gl"] = rf"({integer(mod['gl'][0])};\,{integer(mod['gl'][1])})"
+        m[f"{a}-p"] = pvalue(mod["p"])
+        m[f"{a}-f-rob"] = num(mod.get("F_robusto"), 1)
+        m[f"{a}-p-rob"] = pvalue(mod.get("p_robusto"))
+        m[f"{a}-p-cal"] = pvalue(mod.get("p_calibrado"))
+        m[f"{a}-nbonf"] = integer(mod["n_bonferroni"])
+        m[f"{a}-nsig"] = integer(mod["n_significativas"])
+        m[f"{a}-maxcambio"] = num(mod["max_cambio_se"], 2)
+        m[f"{a}-ncambian"] = integer(len(mod["cambian"]))
+        m[f"{a}-cambian"] = (
+            join_es([tex_escape(term_label(t)).lower() for t in mod["cambian"]]) or "ninguno"
+        )
+        v = mod["veredicto"]
+        m[f"{a}-veredicto"] = "sí" if v["vale_la_pena"] else "no"
+        if mod["id"] == "top":
+            m["final-sigma"] = num(mod["sigma_final"], 2)
+            m["final-aic"] = num(mod["aic_final"], 1)
+            m["final-bic"] = num(mod["bic_final"], 1)
+            for k, ind in enumerate(mod["indicators"], start=1):
+                m[f"ind5-condado{k}"] = tex_escape(ind["county_id"])
+                m[f"ind5-delta{k}"] = num(ind["delta"], 1)
+            m["ind5-atipicos"] = join_es(
+                [tex_escape(i["county_id"]) for i in mod["indicators"] if i["atipico"]]
+            )
+    cal = oi.get("calibration")
+    if cal:
+        m["cal-reps"] = integer(cal["reps"])
+        for law, key in (("normal", "normal"), ("bootstrap", "boot")):
+            c = cal[law]
+            m[f"cal-{key}-k"] = num(c["k_media"], 0)
+            m[f"cal-{key}-k-ic"] = ci(c["k_lower"], c["k_upper"], 0)
+            m[f"cal-{key}-f"] = num(c["F_media"], 2)
+            m[f"cal-{key}-f-ic"] = ci(c["F_lower"], c["F_upper"], 2)
+            m[f"cal-{key}-ftop"] = num(c["F_top_media"], 2)
+            m[f"cal-{key}-ftop-ic"] = ci(c["F_top_lower"], c["F_top_upper"], 2)
+            m[f"cal-{key}-pk"] = pvalue(c["p_k"])
+            m[f"cal-{key}-pf"] = pvalue(c["p_F"])
+            m[f"cal-{key}-pftop"] = pvalue(c["p_F_top"])
     return m
 
 
@@ -1305,6 +1376,131 @@ def t_influence(res: Results) -> str:
     )
 
 
+def _indicator_models(res: Results) -> list[dict[str, Any]]:
+    oi = res["effects"].get("outlier_indicators") or {}
+    return list(oi.get("models", []))
+
+
+def t_indicator_models(res: Results) -> str:
+    models = _indicator_models(res)
+    if not models:
+        return "% Sin modelos con indicadoras de atípicos.\n"
+    f0 = models[0]
+    rows = [
+        rf"Final (sin indicadoras) & --- & {num(f0['r2_adj_final'], 3)} & "
+        rf"{num(f0['sigma_final'], 2)} & {num(f0['aic_final'], 0)} & {num(f0['bic_final'], 0)} & "
+        r"--- & --- & --- & --- & --- \\"
+    ]
+    for mod in models:
+        rows.append(
+            rf"{tex_escape(mod['label'].replace('Final + indicadoras de los ', '+ '))} & "
+            rf"{integer(mod['q'])} & {num(mod['r2_adj'], 3)} & {num(mod['sigma'], 2)} & "
+            rf"{num(mod['aic'], 0)} & {num(mod['bic'], 0)} & {num(mod['F'], 2)} & "
+            rf"{pcell(mod['p'])} & {pcell(mod.get('p_calibrado'))} & "
+            rf"{num(mod['max_cambio_se'], 2)} & {integer(len(mod['cambian']))} \\"
+        )
+    return _table(
+        "indicadoras",
+        "Modelos con variables indicadoras de atípicos frente al modelo final (misma muestra)",
+        r"X r r r r r r r r r r",
+        r"Modelo & $q$ & $\bar R^2$ & $\hat\sigma$ & AIC & BIC & $F$ & $p$ & $p$ cal. & "
+        r"$\max|\Delta\beta|$ & Camb.",
+        rows,
+        env="tabularx",
+        size=r"\footnotesize\setlength{\tabcolsep}{3.5pt}",
+        note=r"$q$: número de indicadoras. $F$ y $p$: contraste parcial clásico de "
+        r"$H_0\colon\delta_1=\dots=\delta_q=0$, que equivale a comparar el ajuste con y sin esos "
+        r"condados. $p$ cal.: valor $p$ calibrado por bootstrap de los residuos, que tiene en "
+        r"cuenta que los condados se eligieron por su distancia de Cook (los atípicos de "
+        r"Bonferroni se contrastan uno a uno). $\max|\Delta\beta|$: mayor cambio de un "
+        r"coeficiente del modelo final, en errores típicos. Camb.: coeficientes que cambian de "
+        r"signo o de significación al 5\,\%.",
+    )
+
+
+def t_indicator_counties(res: Results) -> str:
+    top = next((m for m in _indicator_models(res) if m["id"] == "top"), None)
+    if top is None:
+        return "% Sin modelo con indicadoras de los condados más influyentes.\n"
+    rows = []
+    for ind in top["indicators"]:
+        rows.append(
+            rf"{tex_escape(ind['county_id'])} & {integer(ind['poblacion'])} & "
+            rf"{num(ind['y'], 1)} & {num(ind['cook'], 4)} & {num(ind['delta'], 1)} & "
+            rf"{num(ind['t'], 2)} & {pcell(ind['p'])} & {pcell(ind['p_bonferroni'])} \\"
+        )
+    return _table(
+        "indicadoras-condados",
+        f"Indicadoras de los {top['q']} condados más influyentes: estimación y contraste",
+        r"X r r r r r r r",
+        r"Condado & Población & $y$ & Cook & $\hat\delta$ & $t$ & $p$ & $p$ Bonf.",
+        rows,
+        env="tabularx",
+        size=r"\footnotesize",
+        note=r"$\hat\delta_i=y_i-\hat y_{(i)}$: error de predicción del condado cuando no "
+        r"interviene en el ajuste. Su $t$ es el residuo estudentizado externamente; el $p$ de "
+        r"Bonferroni lo multiplica por $n$ porque se examinan todos los condados.",
+    )
+
+
+def t_bonferroni(res: Results) -> str:
+    oi = res["effects"].get("outlier_indicators") or {}
+    bonf = oi.get("bonferroni")
+    if not bonf or not bonf["outliers"]:
+        return "% Ningún atípico según el contraste de Bonferroni.\n"
+    rows = [
+        rf"{tex_escape(o['county_id'])} & {tex_escape(o['region'])} & {num(o['y'], 1)} & "
+        rf"{num(o['stud_resid'], 2)} & {pcell(o['p_bonferroni'])} & {num(o['cook'], 4)} \\"
+        for o in bonf["outliers"]
+    ]
+    return _table(
+        "bonferroni",
+        "Atípicos según el contraste de Bonferroni sobre los residuos estudentizados",
+        r"X l r r r r",
+        r"Condado & Región & $y$ & $r^*$ & $p$ Bonf. & Cook",
+        rows,
+        env="tabularx",
+        size=r"\footnotesize",
+        note=rf"Valor crítico $|r^*|>{num(bonf['critico'], 2)}$ (cuantil "
+        rf"$1-\alpha/(2n)$ de la $t$ con {integer(bonf['gl'])} g.\,l.).",
+    )
+
+
+def t_indicator_changes(res: Results) -> str:
+    models = {m["id"]: m for m in _indicator_models(res)}
+    shown = [models[k] for k in ("top", "cook4n") if k in models]
+    if not shown:
+        return "% Sin modelos con indicadoras de atípicos.\n"
+    base = {c["term"]: c for c in shown[0]["changes"]}
+    rows = []
+    for term, c in base.items():
+        cells = [num(c["coef_final"], 3) + ("" if c["p_final"] < 0.05 else r"$^{\dagger}$")]
+        for mod in shown:
+            ch = next(x for x in mod["changes"] if x["term"] == term)
+            mark = "" if ch["p"] < 0.05 else r"$^{\dagger}$"
+            flip = r"\,$^{\ast}$" if ch["cambia_conclusion"] else ""
+            cells.append(
+                f"{num(ch['coef'], 3)}{mark} & {num(ch['cambio_se'], 2, signed=True)}{flip}"
+            )
+        rows.append(rf"{tex_escape(term_label(term))} & " + " & ".join(cells) + r" \\")
+    head = " & ".join(
+        rf"\multicolumn{{2}}{{c}}{{+ {integer(mod['q'])} indicadoras}}" for mod in shown
+    )
+    rules = "".join(rf"\cmidrule(lr){{{3 + 2 * k}-{4 + 2 * k}}}" for k in range(len(shown)))
+    sub = " & ".join(r"Coef. & $\Delta$/EE" for _ in shown)
+    return _long(
+        "indicadoras-cambios",
+        "Coeficientes del modelo final y de los modelos con indicadoras de atípicos",
+        "X r " + "r r " * len(shown),
+        rf"Término & Final & {head} \\ {rules} & & {sub}",
+        rows,
+        note=r"$\Delta$/EE: cambio respecto al modelo final en errores típicos del modelo final "
+        r"(por conglomerados). $^{\dagger}$: no significativo al 5\,\%. $^{\ast}$: el "
+        r"coeficiente cambia de significación o de signo.",
+        size=r"\footnotesize",
+    )
+
+
 def t_sensitivity(res: Results) -> str:
     specs = res["effects"]["sensitivity"]
     coef = [
@@ -1475,6 +1671,10 @@ TABLES: dict[str, Callable[[Results], str]] = {
     "efectos": t_effects,
     "diagnostico": t_diagnostics,
     "influyentes": t_influence,
+    "indicadoras": t_indicator_models,
+    "indicadoras-condados": t_indicator_counties,
+    "indicadoras-cambios": t_indicator_changes,
+    "bonferroni": t_bonferroni,
     "sensibilidad": t_sensitivity,
     "incidencia": t_incidence,
     "prediccion": t_cv,

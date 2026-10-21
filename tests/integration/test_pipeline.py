@@ -27,8 +27,9 @@ pytestmark = pytest.mark.slow
 FAST = [
     "missing.n_imputations=3",
     "effects.bootstrap_reps=0",
+    "effects.outlier_simulations=49",
     "inference.bootstrap_reps=200",
-    "predictive.models=[baseline, ols_effects, ridge, lasso]",
+    "predictive.models=[baseline, ols_effects, ols_effects_outliers, ridge, lasso]",
     "predictive.cv_folds=3",
     "predictive.n_jobs=1",
 ]
@@ -114,6 +115,21 @@ def test_nested_comparison_has_robust_tests(outcome) -> None:  # type: ignore[no
         assert r["F_robusto"] > 0
     ids = [s["id"] for s in outcome[1]["effects"]["sensitivity"]]
     assert "maximo" in ids
+
+
+def test_outlier_indicators_cover_the_flagged_counties(outcome) -> None:  # type: ignore[no-untyped-def]
+    eff = outcome[1]["effects"]
+    oi = eff["outlier_indicators"]
+    models = {m["id"]: m for m in oi["models"]}
+    assert models["top"]["q"] == 5
+    assert models["cook4n"]["q"] == eff["diagnostics"]["influence"]["n_cook"]
+    # Las indicadoras de los Cook > 4/n reproducen el reajuste sin esos condados.
+    dropped = next(s for s in eff["sensitivity"] if s["id"] == "no_influential")
+    for term, value in dropped["coef"].items():
+        assert models["cook4n"]["coef"][term] == pytest.approx(value, rel=1e-6, abs=1e-8)
+    assert oi["calibration"]["k_obs"] == models["cook4n"]["q"]
+    assert "indicadoras" in [s["id"] for s in eff["sensitivity"]]
+    assert "ols_effects_outliers" in [r["model"] for r in outcome[1]["predictive"]["cv"]]
 
 
 def test_robust_and_classic_share_estimates(outcome) -> None:  # type: ignore[no-untyped-def]

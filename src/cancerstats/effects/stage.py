@@ -20,7 +20,7 @@ from cancerstats import collinearity
 from cancerstats.cleaning import response_column
 from cancerstats.config import AnalysisConfig
 from cancerstats.dictionary import VARIABLES, label
-from cancerstats.effects import interpret, sensitivity
+from cancerstats.effects import indicators, interpret, sensitivity
 from cancerstats.effects.design import REGION, Design, build_design, term_name
 from cancerstats.effects.diagnostics import diagnose, residual_check_before
 from cancerstats.effects.fit import (
@@ -297,6 +297,20 @@ def run_effects(
         fdesign, final_terms, wf, eff.covariance, alpha, config.inference.multiple_testing, seed
     )
     residual_table: pd.DataFrame = diag.pop("table")  # type: ignore[assignment]
+
+    # 8b. Indicadoras de atípicos (modelo de cambio en la media) --------------------------
+    say("Indicadoras de atípicos: condados más críticos, Bonferroni y Cook > 4/n")
+    outlier_ind = _outlier_indicators(
+        fdesign,
+        final_terms,
+        wf,
+        eff.covariance,
+        eff.outlier_indicators,
+        eff.outlier_simulations,
+        alpha,
+        seed,
+        residual_table,
+    )
     # Varianza de los residuos por decil de población en la escala original (MCO) y tras
     # ponderar por la función de varianza estimada (MCPF, especificación de sensibilidad).
     pop_bins = pd.qcut(fdesign.population, 10, labels=False, duplicates="drop")
@@ -398,6 +412,22 @@ def run_effects(
         sensitivity.mixed_model(fdesign, final_terms),
         sensitivity.huber(fdesign, final_terms, w_or_one),
     ]
+    ind_models: list[Record] = outlier_ind["models"]  # type: ignore[assignment]
+    top_model = next((m for m in ind_models if m["id"] == "top"), None)
+    if top_model is not None:
+        specs.append(
+            sensitivity._table(
+                "indicadoras",
+                str(top_model["label"]),
+                pd.Series(top_model["coef"]),
+                pd.Series(top_model["se"]),
+                pd.Series(top_model["lower"]),
+                pd.Series(top_model["upper"]),
+                pd.Series(top_model["pvalues"]),
+                fdesign.n,
+                "Una indicadora por condado: sus coeficientes son los del ajuste sin ellos.",
+            )
+        )
     flagged = diag["influence"]["flagged_ids"]  # type: ignore[index]
     if eff.influence_sensitivity and flagged:
         specs.append(
@@ -478,6 +508,7 @@ def run_effects(
             "equation": _equation(coef),
         },
         "diagnostics": diag,
+        "outlier_indicators": outlier_ind,
         "residuals": _records(residual_table.round(5)),
         "effects": effects,
         "numeric_interactions": num_inter,
@@ -487,6 +518,88 @@ def run_effects(
         "bootstrap": boot,
         "boxcox": boxcox_profile(fdesign, final_terms, alpha),
     }
+
+
+def _outlier_indicators(
+    design: Design,
+    terms: list[str],
+    weights: np.ndarray | None,
+    cov: str,
+    top: int,
+    sims: int,
+    alpha: float,
+    seed: int,
+    table: pd.DataFrame,
+) -> Record:
+    """Modelos con variables indicadoras de atípicos y la decisión de excluirlos o no.
+
+    Tres conjuntos de condados: los ``top`` de mayor distancia de Cook (el modelo propuesto),
+    los atípicos del contraste de Bonferroni y todos los que superan Cook > 4/n. Como los tres
+    se eligen con los propios residuos, el F conjunto de los dos elegidos por Cook se calibra
+    por simulación.
+    """
+    cook = table["cook"].to_numpy(dtype=float)
+    stud = table["stud_resid"].to_numpy(dtype=float)
+    p = len(design.columns_for(terms))
+    order = np.argsort(-cook)
+    bonf = indicators.bonferroni_outliers(design, stud, p, alpha, cook)
+    flagged = np.flatnonzero(cook > 4 / design.n).tolist()
+    calib = (
+        indicators.calibrate_cook_blocks(design, terms, weights, top, sims, seed)
+        if sims > 0
+        else None
+    )
+    models: list[Record] = []
+    if top > 0:
+        m = indicators.mean_shift_model(
+            design,
+            terms,
+            order[:top].tolist(),
+            weights,
+            cov,
+            alpha,
+            "top",
+            f"Final + indicadoras de los {top} condados más influyentes",
+            f"Los {top} de mayor distancia de Cook",
+            cook,
+        )
+        m["p_calibrado"] = calib["bootstrap"]["p_F_top"] if calib else None  # type: ignore[index]
+        m["veredicto"] = indicators.verdict(m, alpha, m["p_calibrado"])  # type: ignore[arg-type]
+        models.append(m)
+    rows: list[int] = bonf.pop("rows")  # type: ignore[assignment]
+    if rows:
+        m = indicators.mean_shift_model(
+            design,
+            terms,
+            rows,
+            weights,
+            cov,
+            alpha,
+            "bonferroni",
+            f"Final + indicadoras de los {len(rows)} atípicos de Bonferroni",
+            f"|r*| > {bonf['critico']:.2f} (Bonferroni al {alpha:.0%})".replace(".", ","),
+            cook,
+        )
+        m["p_calibrado"] = None
+        m["veredicto"] = indicators.verdict(m, alpha)
+        models.append(m)
+    if flagged:
+        m = indicators.mean_shift_model(
+            design,
+            terms,
+            flagged,
+            weights,
+            cov,
+            alpha,
+            "cook4n",
+            f"Final + indicadoras de los {len(flagged)} condados con Cook > 4/n",
+            "Distancia de Cook mayor que 4/n",
+            cook,
+        )
+        m["p_calibrado"] = calib["bootstrap"]["p_F"] if calib else None  # type: ignore[index]
+        m["veredicto"] = indicators.verdict(m, alpha, m["p_calibrado"])  # type: ignore[arg-type]
+        models.append(m)
+    return {"top": top, "models": models, "bonferroni": bonf, "calibration": calib}
 
 
 def _variance_examples(vf) -> list[Record]:  # type: ignore[no-untyped-def]

@@ -81,6 +81,7 @@ DEFAULT_INTERACTIONS: list[list[str]] = [
 PredictiveModelName = Literal[
     "baseline",
     "ols_effects",
+    "ols_effects_outliers",
     "ols_full",
     "ridge",
     "lasso",
@@ -441,6 +442,24 @@ class EffectsConfig(_Section):
         True,
         title="Reajustar sin observaciones influyentes",
     )
+    outlier_indicators: int = Field(
+        5,
+        title="Condados críticos con variable indicadora",
+        description="Se propone un modelo con una indicadora por cada uno de los condados de "
+        "mayor distancia de Cook (modelo de cambio en la media): el coeficiente de cada una "
+        "contrasta si el condado es atípico y su F conjunto si conviene excluirlos del ajuste.",
+        ge=0,
+        le=50,
+    )
+    outlier_simulations: int = Field(
+        999,
+        title="Simulaciones para calibrar el F de las indicadoras",
+        description="Los condados con Cook > 4/n se eligen con los propios residuos, así que el "
+        "F de sus indicadoras no sigue una F: su distribución nula se obtiene repitiendo la "
+        "elección y el contraste sobre residuos simulados (normales y bootstrap).",
+        ge=0,
+        le=10000,
+    )
 
     @field_validator("interactions")
     @classmethod
@@ -480,6 +499,7 @@ class PredictiveConfig(_Section):
         default_factory=lambda: [  # type: ignore[arg-type]
             "baseline",
             "ols_effects",
+            "ols_effects_outliers",
             "ols_full",
             "ridge",
             "lasso",

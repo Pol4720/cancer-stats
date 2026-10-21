@@ -194,7 +194,7 @@ def without_rows(
     res = fit(design, terms, weights, cov, rows=mask)
     return _from_res(
         "no_influential",
-        f"Sin los {len(drop_ids)} condados influyentes (Cook > 4/n)",
+        f"Sin los {len(drop_ids)} condados con Cook > 4/n (= sus indicadoras)",
         res,
         "Si los coeficientes apenas cambian, ningún condado concreto dirige la conclusión.",
     )

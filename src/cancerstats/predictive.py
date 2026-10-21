@@ -22,7 +22,7 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from sklearn.base import BaseEstimator, TransformerMixin, clone
+from sklearn.base import BaseEstimator, RegressorMixin, TransformerMixin, clone
 from sklearn.compose import ColumnTransformer
 from sklearn.dummy import DummyRegressor
 from sklearn.ensemble import HistGradientBoostingRegressor, RandomForestRegressor
@@ -43,6 +43,7 @@ Logger = Callable[[str], None]
 MODEL_LABELS: dict[str, str] = {
     "baseline": "Referencia (media)",
     "ols_effects": "MCO con la especificación del modelo de efectos",
+    "ols_effects_outliers": "MCO de efectos con indicadoras de los condados más influyentes",
     "ols_full": "MCO con todas las variables",
     "ridge": "Ridge",
     "lasso": "Lasso",
@@ -95,6 +96,36 @@ class EffectsSpec(BaseEstimator, TransformerMixin):
         return np.column_stack(list(cols.values()))
 
 
+class IndicatorOLS(BaseEstimator, RegressorMixin):
+    """MCO con una indicadora para cada uno de los ``k`` condados de mayor distancia de Cook.
+
+    La indicadora de un condado vale 1 sólo en él, así que el resto de coeficientes son los del
+    ajuste sin esos condados y, para un condado nuevo (todas las indicadoras a 0), la
+    predicción es la de ese ajuste. Los condados se eligen con la distancia de Cook del ajuste
+    MCO sobre los datos de entrenamiento del pliegue.
+    """
+
+    def __init__(self, k: int = 5) -> None:
+        self.k = k
+
+    def fit(self, X: np.ndarray, y: np.ndarray) -> IndicatorOLS:
+        Z = np.column_stack([np.ones(len(y)), np.asarray(X, dtype=float)])
+        U, sv, _ = np.linalg.svd(Z, full_matrices=False)
+        U = U[:, sv > sv[0] * 1e-10]
+        n, p = U.shape
+        e = y - U @ (U.T @ y)
+        h = (U**2).sum(axis=1)
+        cook = e**2 * h / (p * float(e @ e) / (n - p) * (1 - h) ** 2)
+        keep = np.ones(n, dtype=bool)
+        keep[np.argsort(-cook)[: self.k]] = False
+        self.indicated_ = np.flatnonzero(~keep)
+        self.ols_ = LinearRegression().fit(np.asarray(X)[keep], np.asarray(y)[keep])
+        return self
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        return self.ols_.predict(X)
+
+
 def _preprocessor(numeric: list[str], categorical: list[str], scale: bool) -> ColumnTransformer:
     num_steps: list[tuple[str, Any]] = [
         ("impute", SimpleImputer(strategy="median", add_indicator=True))
@@ -118,6 +149,7 @@ def build_models(
     reference: str,
     seed: int,
     n_jobs: int,
+    outlier_k: int = 5,
 ) -> dict[str, Any]:
     """Construye los estimadores (cada uno con su propio preprocesado)."""
     alphas = np.logspace(-3, 3, 40)
@@ -131,6 +163,13 @@ def build_models(
                 [
                     ("spec", EffectsSpec(effects_numeric, effects_terms, reference)),
                     ("ols", LinearRegression()),
+                ]
+            )
+        elif name == "ols_effects_outliers":
+            models[name] = Pipeline(
+                [
+                    ("spec", EffectsSpec(effects_numeric, effects_terms, reference)),
+                    ("ols", IndicatorOLS(max(outlier_k, 1))),
                 ]
             )
         elif name == "ols_full":
@@ -375,6 +414,7 @@ def run_predictive(
         config.variables.region_reference,
         seed,
         pc.n_jobs,
+        config.effects.outlier_indicators,
     )
 
     say(f"Validación cruzada aleatoria de {pc.cv_folds} pliegues")
@@ -393,6 +433,7 @@ def run_predictive(
     complexity = [
         "baseline",
         "ols_effects",
+        "ols_effects_outliers",
         "lasso",
         "elasticnet",
         "ridge",

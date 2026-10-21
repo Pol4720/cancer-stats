@@ -160,7 +160,7 @@ def syntax(res: Results, data_file: str = "practica.sav") -> str:
         "  /SCATTERPLOT=(*ZRESID, *ZPRED) (*SRESID, *ZPRED)",
         "  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)",
         "  /CASEWISE PLOT(ZRESID) OUTLIERS(3)",
-        "  /SAVE PRED ZRESID SRESID COOK LEVER SDBETA.",
+        "  /SAVE PRED ZRESID SRESID SDRESID COOK LEVER SDBETA.",
         "",
         "* Contraste de Breusch-Pagan (versión de Koenker) a mano: regresión de los",
         "* residuos al cuadrado sobre las explicativas; LM = n·R².",
@@ -169,4 +169,79 @@ def syntax(res: Results, data_file: str = "practica.sav") -> str:
         _wrap(predictors) + ".",
         "",
     ]
+    out += _indicator_blocks(res, predictors)
     return "\n".join(out) + "\n"
+
+
+def _quote(text: str) -> str:
+    return "'" + text.replace("'", "''") + "'"
+
+
+def _indicator_blocks(res: Results, predictors: list[str]) -> list[str]:
+    """Modelos con variables indicadoras de atípicos (modelo de cambio en la media).
+
+    Cada bloque añade las indicadoras en un segundo paso de REGRESSION: con /STATISTICS
+    CHANGE, SPSS da el F parcial del bloque (cambio en R²) y el t de cada indicadora.
+    """
+    eff = res["effects"]
+    oi = eff.get("outlier_indicators")
+    if not oi or not oi["models"]:
+        return []
+    n = eff["final"]["n"]
+    out = [
+        "* " + "=" * 74 + ".",
+        "* Variables indicadoras de atípicos (modelo de cambio en la media).",
+        "* La indicadora de un condado vale 1 sólo en él: su coeficiente es y - ŷ(i), el error",
+        "* de predicción del condado cuando no interviene en el ajuste; su t es el residuo",
+        "* estudentizado externamente (SDR_1). El resto de coeficientes son los del ajuste sin",
+        "* esos condados. El «Cambio en F» del segundo paso contrasta el bloque completo:",
+        "* si conviene excluirlos del ajuste.",
+        "* " + "=" * 74 + ".",
+        "",
+        "* Contraste de atípicos de Bonferroni: |SDR_1| mayor que el valor crítico.",
+        f"COMPUTE atipico_bonf = (ABS(SDR_1) > {oi['bonferroni']['critico']:.4f}).",
+        "FREQUENCIES atipico_bonf.",
+        "",
+    ]
+    for mod in oi["models"]:
+        prefix = {"top": "AT", "bonferroni": "AB", "cook4n": "IC"}[mod["id"]]
+        names = [f"{prefix}{k + 1}" for k in range(mod["q"])]
+        out.append(f"* {mod['label']}.")
+        if mod["id"] == "cook4n":
+            out += [
+                f"* Se eligen con la distancia de Cook guardada (COO_1 > 4/n = 4/{n}); se esperan",
+                f"* {mod['q']} condados, cada uno con su indicadora (IC1 ... IC{mod['q']}).",
+                f"COMPUTE cook_alto = (COO_1 > 4 / {n}).",
+                "FREQUENCIES cook_alto.",
+                "DO IF (cook_alto = 1).",
+                "+  COMPUTE #k = #k + 1.",
+                "+  COMPUTE orden_cook = #k.",
+                "END IF.",
+                f"VECTOR IC({mod['q']}).",
+                f"LOOP #i = 1 TO {mod['q']}.",
+                "+  COMPUTE IC(#i) = 0.",
+                "+  IF (orden_cook = #i) IC(#i) = 1.",
+                "END LOOP.",
+                "EXECUTE.",
+            ]
+            block = f"IC1 TO IC{mod['q']}"
+        else:
+            for name, ind in zip(names, mod["indicators"], strict=True):
+                out.append(
+                    f"COMPUTE {name} = (RTRIM(Geography) = {_quote(str(ind['county_id']))})."
+                )
+            out.append("EXECUTE.")
+            block = " ".join(names)
+        out += [
+            "REGRESSION",
+            "  /MISSING LISTWISE",
+            "  /STATISTICS COEFF OUTS CI(95) R ANOVA CHANGE",
+            "  /NOORIGIN",
+            "  /DEPENDENT TARGET_deathRate",
+            "  /METHOD=ENTER",
+            _wrap(predictors),
+            "  /METHOD=ENTER " + block + ".",
+            f"* Esperado: cambio en F = {mod['F']:.3f} con ({mod['gl'][0]}; {mod['gl'][1]}) g.l.",
+            "",
+        ]
+    return out

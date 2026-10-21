@@ -104,6 +104,8 @@ effects:
   interaction_correction: holm
   bootstrap_reps: 999
   influence_sensitivity: true
+  outlier_indicators: 5
+  outlier_simulations: 999
 predictive:
   enabled: true
   test_size: 0.2
@@ -113,6 +115,7 @@ predictive:
   models:
     - baseline
     - ols_effects
+    - ols_effects_outliers
     - ols_full
     - ridge
     - lasso
