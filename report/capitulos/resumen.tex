@@ -28,7 +28,11 @@ adultos con título universitario, con un gradiente educativo que es menor en el
 conclusiones se mantienen en las \res{n-especificaciones} especificaciones del análisis de
 sensibilidad y en el bootstrap por conglomerados (ponderación por la función
 de varianza, efectos fijos de estado, modelo mixto, regresión robusta, exclusión de observaciones
-influyentes e imputación múltiple, entre otras). Como complemento, un modelo
+influyentes e imputación múltiple, entre otras). Los atípicos se tratan con variables indicadoras:
+el modelo con las de los \res{ind-top-k} condados más influyentes ajusta mejor pero no cambia
+ninguna conclusión, y el $F$ de las indicadoras de los \res{indcook-q} condados con distancia de
+Cook mayor que $4/n$, calibrado por simulación porque se eligen con los propios residuos, no
+justifica excluirlos. Como complemento, un modelo
 predictivo (\res{modelo-elegido}) alcanza un RMSE de \res{test-rmse-elegido} en una partición de
 prueba no usada para ajustar ni elegir.
 

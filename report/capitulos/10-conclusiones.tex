@@ -26,6 +26,13 @@ errores típicos robustos por conglomerados, y las conclusiones se mantienen en 
 \res{n-especificaciones} especificaciones del análisis de sensibilidad y en el bootstrap por
 conglomerados.
 
+Los atípicos se trataron con variables indicadoras (modelo de cambio en la media). El modelo
+propuesto con las indicadoras de los \res{ind-top-k} condados más influyentes mejora el ajuste
+($\bar R^2=\res{ind5-r2aj}$) sin cambiar ninguna conclusión, y excluir los \res{indcook-q} condados
+con distancia de Cook mayor que $4/n$ no está justificado: su bloque de indicadoras no es atípico
+una vez calibrado el contraste y el BIC prefiere el modelo final. Los condados atípicos son
+reales y se mantienen.
+
 \section{Limitaciones}
 
 \begin{itemize}

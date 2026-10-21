@@ -15,7 +15,7 @@ bruto (`practica.sav`) hasta la inferencia robusta. Todo es reproducible.
 | Interfaz interactiva | <https://pol4720.github.io/cancer-stats/> |
 | Presentación | <https://pol4720.github.io/cancer-stats/presentacion/> |
 | Informe (PDF) | [`report/dist/informe.pdf`](report/dist/informe.pdf) · [en Pages](https://pol4720.github.io/cancer-stats/informe.pdf) |
-| Sintaxis SPSS del modelo final | [`spss/modelo_final.sps`](spss/modelo_final.sps) |
+| Sintaxis SPSS del modelo final y de los modelos con indicadoras de atípicos | [`spss/modelo_final.sps`](spss/modelo_final.sps) |
 
 ## Resultado
 
@@ -28,9 +28,18 @@ interacciones con la región censal.
 - La inferencia usa errores típicos robustos por conglomerados de estado (48 estados), porque la
   varianza depende del tamaño del condado y los condados de un mismo estado se parecen.
 
-Las conclusiones se mantienen bajo 10 especificaciones de sensibilidad y un bootstrap por
+Las conclusiones se mantienen bajo 11 especificaciones de sensibilidad y un bootstrap por
 conglomerados. Como modelo predictivo se eligió ridge, con un RMSE de 17,36 en la partición de
 prueba.
+
+**Atípicos con variables indicadoras.** Se propone, ajusta y compara un modelo alternativo: el
+final con una indicadora para cada uno de los 5 condados más influyentes (mayor distancia de
+Cook), que equivale a estimarlo sin ellos. Mejora el ajuste (R² ajustado 0,570 frente a 0,555),
+pero ningún coeficiente cambia más de 0,46 errores típicos, así que **no compensa** sustituir el
+modelo final; queda como especificación de sensibilidad y como candidato predictivo. Para los 185
+condados con Cook > 4/n, el F conjunto de sus indicadoras se calibra por simulación (se eligen
+con los propios residuos, así que el F nominal no vale): no son atípicos como grupo (p calibrado
+0,18) y el BIC prefiere el modelo final, de modo que tampoco compensa excluirlos.
 
 ## Entregables de la orientación
 
@@ -41,7 +50,7 @@ prueba.
 | (c) | Código | Este repositorio (`src/cancerstats`) · informe, apéndice A |
 | (d) | Diagnóstico: linealidad, independencia, homocedasticidad, normalidad, multicolinealidad | Informe, capítulo 7 · interfaz, «Diagnóstico» |
 | (e) | Interpretación | Informe, apartado 6.3 · interfaz, «Interpretación» |
-| (f) | Atípicos, valores perdidos y variables categóricas | Informe, capítulos 2 y 3 |
+| (f) | Atípicos, valores perdidos y variables categóricas | Informe, capítulos 2, 3 y 7 (variables indicadoras de atípicos) · interfaz, «Diagnóstico → Influencia» |
 
 ## Uso
 
@@ -108,8 +117,9 @@ adaptado al móvil.
 - **Datos:** `practica.sav` (orientación oficial). Se comprobó que coincide celda a celda con el
   conjunto público de Kaggle; véase `data/README.md`.
 - **Pruebas:** pruebas unitarias y de integración. Entre ellas, una reestimación independiente del
-  modelo final con `statsmodels` y una prueba de que la sintaxis SPSS marca exactamente los 206
-  centinelas.
+  modelo final con `statsmodels`, una prueba de que la sintaxis SPSS marca exactamente los 206
+  centinelas y pruebas de las equivalencias del modelo con indicadoras de atípicos (el t de cada
+  indicadora es el residuo estudentizado y sus coeficientes, los del ajuste sin esos condados).
 - **CI:** estilo (ruff), tipos (mypy), pruebas, pipeline completo, interfaz (ESLint, Vitest,
   Playwright en escritorio y móvil) e informe LaTeX sin advertencias.
 

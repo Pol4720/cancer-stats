@@ -1,0 +1,16 @@
+\begin{table}[htbp]
+\centering
+\footnotesize\setlength{\tabcolsep}{3.5pt}
+\caption{Modelos con variables indicadoras de atípicos frente al modelo final (misma muestra)}\label{tab:indicadoras}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X r r r r r r r r r r}
+\toprule
+Modelo & $q$ & $\bar R^2$ & $\hat\sigma$ & AIC & BIC & $F$ & $p$ & $p$ cal. & $\max|\Delta\beta|$ & Camb. \\
+\midrule
+Final (sin indicadoras) & --- & \num{0.555} & \num{18.50} & \num{24653} & \num{24772} & --- & --- & --- & --- & --- \\
++ 5 condados más influyentes & \num{5} & \num{0.570} & \num{18.19} & \num{24561} & \num{24709} & \num{20.73} & $<\num{0.001}$ & \num{0.307} & \num{0.46} & \num{0} \\
++ 6 atípicos de Bonferroni & \num{6} & \num{0.581} & \num{17.95} & \num{24487} & \num{24642} & \num{30.42} & $<\num{0.001}$ & --- & \num{0.67} & \num{0} \\
++ 185 condados con Cook > 4/n & \num{185} & \num{0.713} & \num{14.87} & \num{23588} & \num{24808} & \num{9.37} & $<\num{0.001}$ & \num{0.178} & \num{1.48} & \num{3} \\
+\bottomrule
+\end{tabularx}
+\par\smallskip{\footnotesize\raggedright $q$: número de indicadoras. $F$ y $p$: contraste parcial clásico de $H_0\colon\delta_1=\dots=\delta_q=0$, que equivale a comparar el ajuste con y sin esos condados. $p$ cal.: valor $p$ calibrado por bootstrap de los residuos, que tiene en cuenta que los condados se eligieron por su distancia de Cook (los atípicos de Bonferroni se contrastan uno a uno). $\max|\Delta\beta|$: mayor cambio de un coeficiente del modelo final, en errores típicos. Camb.: coeficientes que cambian de signo o de significación al 5\,\%.\par}
+\end{table}

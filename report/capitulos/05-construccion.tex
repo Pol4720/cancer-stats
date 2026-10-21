@@ -176,6 +176,16 @@ Tres lecturas:
   (Wald robusto \res{cmp-final-p-rob}) y el modelo final tiene el menor AIC de los cuatro.
 \end{itemize}
 
+\paragraph{Un modelo alternativo propuesto: indicadoras de los condados más influyentes.} A la
+comparación se añade el modelo final con una variable indicadora para cada uno de los
+\res{ind-top-k} condados de mayor distancia de Cook, que equivale a estimarlo sin ellos. Sobre la
+muestra del modelo final, $\bar R^2$ pasa de \res{r2aj-final} a \res{ind5-r2aj} y el BIC de
+\res{final-bic} a \res{ind5-bic}, pero ningún coeficiente cambia más de \res{ind5-maxcambio}
+errores típicos. La \cref{sec:indicadoras} lo compara también con las indicadoras de los atípicos
+de Bonferroni y de los \res{indcook-q} condados con Cook $>4/n$ (\cref{tab:indicadoras}) y
+concluye que no compensa sustituir el modelo final; se mantiene como especificación de
+sensibilidad.
+
 \begin{idea}[Muestra de estimación.]
 La selección y la comparación se hacen sobre los \res{n-maximo} condados con todas las candidatas,
 para que todos los modelos sean comparables. Una vez fijados los términos, el modelo final se

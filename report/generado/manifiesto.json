@@ -1,6 +1,6 @@
 {
-  "run_id": "20261009-095405-f8341612",
-  "macros": 752,
+  "run_id": "20261021-132942-a4b9e3fe",
+  "macros": 858,
   "tables": [
     "variables",
     "excluidas",
@@ -25,6 +25,10 @@
     "efectos",
     "diagnostico",
     "influyentes",
+    "indicadoras",
+    "indicadoras-condados",
+    "indicadoras-cambios",
+    "bonferroni",
     "sensibilidad",
     "incidencia",
     "prediccion",

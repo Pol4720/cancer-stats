@@ -127,7 +127,108 @@ y los DFBETAS de cada coeficiente:
 
 \input{generado/tablas/influyentes}
 
-Ningún condado domina el ajuste. Aun así, se reestimó el modelo sin los \res{n-cook} condados con
-$D_i>4/n$ y con regresión robusta de Huber, que pondera a la baja \res{n-huber} condados con
-residuos grandes en lugar de eliminarlos (\cref{cap:sensibilidad}): las conclusiones no cambian.
-Los atípicos detectados son condados reales, por lo que se mantienen en el modelo.
+Ningún condado domina el ajuste por sí solo, pero que \res{n-cook} superen el umbral orientativo
+no basta para decidir qué hacer con ellos. La herramienta del curso para esa decisión son las
+variables indicadoras de atípicos (\cref{sec:indicadoras}). Además, la regresión robusta de Huber
+pondera a la baja \res{n-huber} condados con residuos grandes en lugar de eliminarlos
+(\cref{cap:sensibilidad}).
+
+\section{Variables indicadoras de atípicos}\label{sec:indicadoras}
+
+Para un conjunto $S$ de $q$ condados sospechosos se añade al modelo una variable indicadora por
+condado, $D_{ij}=1$ si $i$ es el $j$-ésimo condado de $S$ y $0$ en otro caso:
+\[
+y_i=\mathbf{x}_i^{\top}\boldsymbol\beta+\sum_{j\in S}\delta_j D_{ij}+\varepsilon_i .
+\]
+Es el \emph{modelo de cambio en la media} \parencite{cook1982}, y tiene tres propiedades que lo
+convierten en la forma correcta de tratar los atípicos:
+\begin{itemize}
+  \item cada $D_j$ vale 1 en un único condado, que queda ajustado exactamente: los demás
+  coeficientes $\hat{\boldsymbol\beta}$ son \emph{los mismos} que se obtendrían excluyendo esos
+  condados. Añadir la indicadora equivale, por tanto, a excluir el condado, pero dentro de un
+  modelo que permite contrastarlo;
+  \item $\hat\delta_j=y_j-\hat y_{(j)}$ es el error de predicción del condado cuando no interviene
+  en el ajuste, y su estadístico $t$ es su residuo estudentizado externamente $r_j^{*}$. El
+  contraste $H_0\colon\delta_j=0$ dice si el condado es atípico respecto al modelo; como se busca el
+  mayor de $n$ residuos, se corrige por Bonferroni (valor crítico $t_{1-\alpha/(2n)}$);
+  \item el $F$ parcial del bloque, $H_0\colon\delta_1=\dots=\delta_q=0$, compara el ajuste con y
+  sin esos condados y contrasta si, en conjunto, conviene excluirlos.
+\end{itemize}
+
+Se ajustaron tres modelos con indicadoras sobre la misma muestra que el modelo final
+(\cref{tab:indicadoras}): las de los \res{ind-top-k} condados más influyentes (mayor distancia de
+Cook), el \emph{modelo propuesto}; las de los \res{bonf-n} atípicos que detecta el contraste de
+Bonferroni; y las de los \res{indcook-q} condados con $D_i>4/n$.
+
+\input{generado/tablas/indicadoras}
+
+\paragraph{Una advertencia sobre el $F$ nominal.} Los tres conjuntos se eligen \emph{con los
+propios residuos}: Cook crece con $r_i^2$, y los atípicos de Bonferroni son, por definición, los
+mayores. Contrastar después sus indicadoras con la $F$ de Snedecor es circular: aunque el modelo
+fuera correcto, los residuos elegidos por ser grandes darían un $F$ muy por encima de 1. Para
+obtener la distribución nula correcta se repitió el procedimiento completo (calcular Cook, elegir
+los condados igual que con los datos y calcular el $F$ de sus indicadoras) sobre \res{cal-reps}
+respuestas simuladas sin ningún atípico añadido, con errores normales y con un bootstrap de los
+residuos, que conserva sus colas pesadas:
+\begin{itemize}
+  \item con errores normales, el umbral $4/n$ señala por puro azar \res{cal-normal-k} condados
+  \res{cal-normal-k-ic}, y su $F$ vale \res{cal-normal-f} \res{cal-normal-f-ic}, no 1. Lo observado
+  (\res{indcook-q} condados, $F=\res{indcook-f}$) supera esa referencia (\res{cal-normal-pf}),
+  lo que sólo confirma que los residuos tienen colas más pesadas que la normal (\cref{tab:normalidad});
+  \item frente a la propia distribución de los residuos (bootstrap), el $F$ de los \res{indcook-q}
+  condados ya no es anómalo (\res{cal-boot-f} \res{cal-boot-f-ic}; calibrado,
+  \res{indcook-p-cal}), y tampoco el de los \res{ind-top-k} más influyentes (calibrado,
+  \res{ind5-p-cal}): son la cola esperable de los errores, no un grupo de condados distinto que
+  contamine el ajuste.
+\end{itemize}
+El contraste de Bonferroni de cada indicadora sí es válido, porque ya tiene en cuenta que se
+examinan los $n$ condados.
+
+\subsection{El modelo propuesto: indicadoras de los condados más influyentes}
+
+\input{generado/tablas/indicadoras-condados}
+
+El \cref{tab:indicadoras-condados} muestra las \res{ind-top-k} indicadoras. Sólo
+\res{ind5-nbonf} superan el contraste de Bonferroni (\res{ind5-atipicos}); el resto son condados
+influyentes, por su apalancamiento, pero no atípicos. Atípico e influyente no son lo mismo: el
+condado con el mayor residuo, \res{bonf-mayor} ($r^{*}=\res{bonf-mayor-r}$), no está entre los
+\res{ind-top-k} de mayor Cook porque su apalancamiento es bajo (\cref{tab:bonferroni}).
+
+\input{generado/tablas/bonferroni}
+
+Con las indicadoras el ajuste mejora: $\bar R^2$ pasa de \res{r2aj-final} a \res{ind5-r2aj},
+$\hat\sigma$ de \res{final-sigma} a \res{ind5-sigma}, y bajan el AIC (\res{final-aic} frente a
+\res{ind5-aic}) y el BIC (\res{final-bic} frente a \res{ind5-bic}); el $F$ nominal del bloque es
+\res{ind5-f} (\res{ind5-p}). Pero la mejora es mecánica: cada indicadora ajusta exactamente su
+condado y no explica nada sobre la mortalidad del resto. Lo que importa es si las conclusiones
+cambian, y no lo hacen: ningún coeficiente se mueve más de \res{ind5-maxcambio} errores típicos ni cambia de signo o
+de significación (\cref{tab:indicadoras-cambios}).
+
+\begin{idea}[¿Compensa el modelo con indicadoras de los \res{ind-top-k} más influyentes?]
+\textbf{No como modelo final.} Los condados son reales, su exclusión no cambia ninguna conclusión y
+el $F$ calibrado no los distingue de la cola de los residuos; mantenerlos con indicadoras sólo
+maquillaría el $R^2$ y, además, un modelo con indicadoras no sirve para predecir condados nuevos.
+Se conserva como especificación de sensibilidad (\cref{cap:sensibilidad}) y como candidato en la
+comparación predictiva (\cref{cap:prediccion}).
+\end{idea}
+
+\subsection{Los condados con distancia de Cook mayor que \texorpdfstring{$4/n$}{4/n}}
+
+Añadir sus \res{indcook-q} indicadoras eleva el $R^2$ a \res{indcook-r2} y reduce $\hat\sigma$ a
+\res{indcook-sigma}, pero el BIC empeora (\res{indcook-bic} frente a \res{final-bic}): penaliza
+\res{indcook-q} parámetros que sólo reproducen un condado cada uno. Sólo \res{indcook-nbonf} de las
+\res{indcook-q} indicadoras superan el contraste de Bonferroni. Los coeficientes cambian más que
+con el modelo propuesto (hasta \res{indcook-maxcambio} errores típicos), y \res{indcook-ncambian}
+cambian de significación (\res{indcook-cambian}). Ese cambio no es una razón para excluirlos, sino
+un artefacto de la exclusión: al quitar el \res{indcook-pct}\,\% de la muestra elegido por tener residuos
+grandes, $\hat\sigma$ se subestima y los errores típicos se encogen.
+
+\input{generado/tablas/indicadoras-cambios}
+
+\begin{idea}[¿Compensa excluir del ajuste los \res{indcook-q} condados con Cook $>4/n$?]
+\textbf{No.} El bloque no es atípico respecto a la distribución de los residuos (calibrado,
+\res{indcook-p-cal}), el BIC prefiere el modelo sin indicadoras y la mayoría de los condados no son
+atípicos uno a uno. Excluirlos sesgaría a la baja la varianza del error y daría una precisión
+ficticia. Los atípicos detectados son condados reales, por lo que se mantienen en el modelo, con
+la inferencia robusta como protección.
+\end{idea}

@@ -1,6 +1,6 @@
 * ==========================================================================.
 * Reproducción en SPSS del modelo final MCO (proyecto cancer-stats).
-* Generado automáticamente a partir de la corrida 20261009-095405-f8341612.
+* Generado automáticamente a partir de la corrida 20261021-132942-a4b9e3fe.
 * Los coeficientes y errores típicos clásicos deben coincidir con la tabla
 * «salida tipo SPSS» del informe. Ejecutar con el fichero oficial en la
 * misma carpeta que esta sintaxis.
@@ -89,7 +89,7 @@ REGRESSION
   /SCATTERPLOT=(*ZRESID, *ZPRED) (*SRESID, *ZPRED)
   /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
   /CASEWISE PLOT(ZRESID) OUTLIERS(3)
-  /SAVE PRED ZRESID SRESID COOK LEVER SDBETA.
+  /SAVE PRED ZRESID SRESID SDRESID COOK LEVER SDBETA.
 
 * Contraste de Breusch-Pagan (versión de Koenker) a mano: regresión de los
 * residuos al cuadrado sobre las explicativas; LM = n·R².
@@ -101,4 +101,92 @@ REGRESSION /DEPENDENT res2 /METHOD=ENTER
     c_PctBachDeg25_Over_x_NE c_PctBachDeg25_Over_x_MO
     c_PctBachDeg25_Over_x_OE c_PctUnemployed16_Over_x_NE
     c_PctUnemployed16_Over_x_MO c_PctUnemployed16_Over_x_OE.
+
+* ==========================================================================.
+* Variables indicadoras de atípicos (modelo de cambio en la media).
+* La indicadora de un condado vale 1 sólo en él: su coeficiente es y - ŷ(i), el error
+* de predicción del condado cuando no interviene en el ajuste; su t es el residuo
+* estudentizado externamente (SDR_1). El resto de coeficientes son los del ajuste sin
+* esos condados. El «Cambio en F» del segundo paso contrasta el bloque completo:
+* si conviene excluirlos del ajuste.
+* ==========================================================================.
+
+* Contraste de atípicos de Bonferroni: |SDR_1| mayor que el valor crítico.
+COMPUTE atipico_bonf = (ABS(SDR_1) > 4.3007).
+FREQUENCIES atipico_bonf.
+
+* Final + indicadoras de los 5 condados más influyentes.
+COMPUTE AT1 = (RTRIM(Geography) = 'Williamsburg city, Virginia').
+COMPUTE AT2 = (RTRIM(Geography) = 'De Baca County, New Mexico').
+COMPUTE AT3 = (RTRIM(Geography) = 'Crowley County, Colorado').
+COMPUTE AT4 = (RTRIM(Geography) = 'Nome Census Area, Alaska').
+COMPUTE AT5 = (RTRIM(Geography) = 'Wibaux County, Montana').
+EXECUTE.
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA CHANGE
+  /NOORIGIN
+  /DEPENDENT TARGET_deathRate
+  /METHOD=ENTER
+    c_incidenceRate c_MedianAge c_AvgHouseholdSize c_PctHS18_24
+    c_PctBachDeg25_Over c_PctUnemployed16_Over c_PctPublicCoverageAlone
+    c_PctOtherRace c_BirthRate c_PctHS25_Over reg_NE reg_MO reg_OE
+    c_PctBachDeg25_Over_x_NE c_PctBachDeg25_Over_x_MO
+    c_PctBachDeg25_Over_x_OE c_PctUnemployed16_Over_x_NE
+    c_PctUnemployed16_Over_x_MO c_PctUnemployed16_Over_x_OE
+  /METHOD=ENTER AT1 AT2 AT3 AT4 AT5.
+* Esperado: cambio en F = 20.732 con (5; 2815) g.l.
+
+* Final + indicadoras de los 6 atípicos de Bonferroni.
+COMPUTE AB1 = (RTRIM(Geography) = 'Madison County, Mississippi').
+COMPUTE AB2 = (RTRIM(Geography) = 'Williamsburg city, Virginia').
+COMPUTE AB3 = (RTRIM(Geography) = 'De Baca County, New Mexico').
+COMPUTE AB4 = (RTRIM(Geography) = 'Baker County, Georgia').
+COMPUTE AB5 = (RTRIM(Geography) = 'Echols County, Georgia').
+COMPUTE AB6 = (RTRIM(Geography) = 'North Slope Borough, Alaska').
+EXECUTE.
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA CHANGE
+  /NOORIGIN
+  /DEPENDENT TARGET_deathRate
+  /METHOD=ENTER
+    c_incidenceRate c_MedianAge c_AvgHouseholdSize c_PctHS18_24
+    c_PctBachDeg25_Over c_PctUnemployed16_Over c_PctPublicCoverageAlone
+    c_PctOtherRace c_BirthRate c_PctHS25_Over reg_NE reg_MO reg_OE
+    c_PctBachDeg25_Over_x_NE c_PctBachDeg25_Over_x_MO
+    c_PctBachDeg25_Over_x_OE c_PctUnemployed16_Over_x_NE
+    c_PctUnemployed16_Over_x_MO c_PctUnemployed16_Over_x_OE
+  /METHOD=ENTER AB1 AB2 AB3 AB4 AB5 AB6.
+* Esperado: cambio en F = 30.415 con (6; 2814) g.l.
+
+* Final + indicadoras de los 185 condados con Cook > 4/n.
+* Se eligen con la distancia de Cook guardada (COO_1 > 4/n = 4/2840); se esperan
+* 185 condados, cada uno con su indicadora (IC1 ... IC185).
+COMPUTE cook_alto = (COO_1 > 4 / 2840).
+FREQUENCIES cook_alto.
+DO IF (cook_alto = 1).
++  COMPUTE #k = #k + 1.
++  COMPUTE orden_cook = #k.
+END IF.
+VECTOR IC(185).
+LOOP #i = 1 TO 185.
++  COMPUTE IC(#i) = 0.
++  IF (orden_cook = #i) IC(#i) = 1.
+END LOOP.
+EXECUTE.
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA CHANGE
+  /NOORIGIN
+  /DEPENDENT TARGET_deathRate
+  /METHOD=ENTER
+    c_incidenceRate c_MedianAge c_AvgHouseholdSize c_PctHS18_24
+    c_PctBachDeg25_Over c_PctUnemployed16_Over c_PctPublicCoverageAlone
+    c_PctOtherRace c_BirthRate c_PctHS25_Over reg_NE reg_MO reg_OE
+    c_PctBachDeg25_Over_x_NE c_PctBachDeg25_Over_x_MO
+    c_PctBachDeg25_Over_x_OE c_PctUnemployed16_Over_x_NE
+    c_PctUnemployed16_Over_x_MO c_PctUnemployed16_Over_x_OE
+  /METHOD=ENTER IC1 TO IC185.
+* Esperado: cambio en F = 9.367 con (185; 2635) g.l.
 

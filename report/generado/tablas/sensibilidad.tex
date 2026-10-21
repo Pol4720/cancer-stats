@@ -14,7 +14,8 @@ Modelo máximo: todas las candidatas tras la poda & \num{2699} & \num{0.182} & \
 Efectos fijos de estado (MCO + cluster) & \num{2840} & \num{0.188} & \num{-0.581} & \num{0.915} & \num{-1.015} & \num{-10.647} & \num{0.154} \\
 Modelo mixto (intercepto aleatorio por estado) & \num{2840} & \num{0.188} & \num{-0.595} & \num{0.856} & \num{-1.118} & \num{-10.680} & \num{0.163} \\
 Regresión robusta de Huber (M-estimador) & \num{2840} & \num{0.188} & \num{-0.875} & \num{0.777} & \num{-1.192} & \num{-14.634} & \num{0.252} \\
-Sin los 185 condados influyentes (Cook > 4/n) & \num{2655} & \num{0.175} & \num{-0.927} & \num{0.783} & \num{-1.283} & \num{-14.998} & \num{0.256} \\
+Final + indicadoras de los 5 condados más influyentes & \num{2840} & \num{0.192} & \num{-0.856} & \num{0.850} & \num{-1.079} & \num{-14.381} & \num{0.258} \\
+Sin los 185 condados con Cook > 4/n (= sus indicadoras) & \num{2655} & \num{0.175} & \num{-0.927} & \num{0.783} & \num{-1.283} & \num{-14.998} & \num{0.256} \\
 Imputación múltiple (20 conjuntos, todos los condados) & \num{3047} & \num{0.188} & \num{-0.761} & \num{0.814} & \num{-1.090} & \num{-12.870} & \num{0.261} \\
 Bootstrap por conglomerados (\num{999}) & --- & \num{0.187} & \num{-0.784} & \num{0.893} & \num{-1.102} & \num{-12.456} & \num{0.234} \\
 \bottomrule

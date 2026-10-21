@@ -19,8 +19,13 @@ que las conclusiones no dependen de ellas, el modelo final se reestimó bajo
   intraestatal en lugar de corregirla en los errores típicos.
   \item[Regresión robusta de Huber.] M-estimador que pondera a la baja los residuos grandes
   \parencite{huber1964}: resistente a los atípicos en la respuesta.
-  \item[Sin observaciones influyentes.] Reajuste sin los condados con distancia de Cook mayor que
-  $4/n$ (\res{n-sin-influyentes} condados restantes).
+  \item[Indicadoras de los condados más influyentes.] El modelo propuesto en la
+  \cref{sec:indicadoras}: una indicadora para cada uno de los \res{ind-top-k} condados de mayor
+  distancia de Cook, lo que equivale a estimar los coeficientes sin ellos.
+  \item[Sin los condados con Cook $>4/n$.] Reajuste sin los \res{indcook-q} condados con distancia
+  de Cook mayor que $4/n$ (\res{n-sin-influyentes} condados restantes), idéntico al modelo con sus
+  \res{indcook-q} indicadoras. Es una especificación extrema: la \cref{sec:indicadoras} muestra que
+  no está justificada.
   \item[Imputación múltiple.] Los \res{n-imputacion} condados, con los ausentes imputados en
   \res{m-imputaciones} conjuntos y los resultados combinados por las reglas de Rubin (\cref{cap:ausentes}).
   \item[Bootstrap por conglomerados.] \res{boot-reps} remuestreos de estados completos con
@@ -37,7 +42,10 @@ resaltada y el bootstrap por conglomerados aparece al final.}
 Los resultados son estables. En todas las especificaciones los coeficientes conservan el signo y
 un orden de magnitud similar; por ejemplo, el del título universitario (en el Sur) varía entre
 \res{rango-grado25}, el de la cobertura sólo pública entre \res{rango-solopublico} y el de la
-incidencia entre \res{rango-incidencia}. Las mayores diferencias aparecen con los efectos fijos de
+incidencia entre \res{rango-incidencia}. Las indicadoras de los \res{ind-top-k} condados más
+influyentes apenas mueven los coeficientes; excluir los \res{indcook-q} condados con Cook $>4/n$
+los mueve algo más, como cabe esperar al recortar la cola de los residuos, pero ninguna de las
+seis explicativas de la tabla cambia de signo. Las mayores diferencias aparecen con los efectos fijos de
 estado y el modelo mixto en la edad mediana y el tamaño del hogar: parte de su asociación con la
 mortalidad se produce entre estados, no dentro de ellos. El bootstrap por conglomerados da
 intervalos muy parecidos a los paramétricos (por ejemplo, \res{boot-grado25} para el título

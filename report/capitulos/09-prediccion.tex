@@ -3,7 +3,7 @@
 El modelo de efectos se construyó para interpretar. Si el objetivo es predecir la mortalidad de
 condados nuevos, el criterio cambia: lo que importa es el error fuera de la muestra, y pueden
 convenir modelos con más variables, regularizados o no lineales \parencite{hastie2009}. Este
-capítulo compara ocho modelos con un protocolo que evita estimaciones optimistas del error.
+capítulo compara nueve modelos con un protocolo que evita estimaciones optimistas del error.
 
 \section{Protocolo}
 
@@ -23,7 +23,10 @@ capítulo compara ocho modelos con un protocolo que evita estimaciones optimista
 \end{enumerate}
 
 Los modelos comparados son: la media del entrenamiento (referencia), MCO con la especificación
-del modelo de efectos, MCO con todas las candidatas, ridge, lasso y red elástica (que pueden usar
+del modelo de efectos, el mismo MCO con indicadoras de los \res{ind-top-k} condados más influyentes
+de cada pliegue (el modelo propuesto en la \cref{sec:indicadoras}; para un condado nuevo, todas sus
+indicadoras valen 0, de modo que predice con los coeficientes estimados sin esos condados), MCO con
+todas las candidatas, ridge, lasso y red elástica (que pueden usar
 también indicadoras de estado), un bosque aleatorio y una potenciación del gradiente sobre
 histogramas.
 
@@ -56,8 +59,17 @@ especificación del modelo de efectos se seleccionó con todos los condados, de 
 prueba es ligeramente optimista; el resto de modelos se ajustó sólo con el entrenamiento.
 
 Cuando hay que predecir estados no vistos (validación agrupada), el error aumenta para todos los
-modelos y el mejor pasa a ser el \res{modelo-mejor-gcv} (RMSE \res{gcv-rmse-mco-efectos}): las
-indicadoras de estado no sirven para estados nuevos, y un modelo parsimonioso generaliza mejor.
+modelos y el mejor pasa a ser el \res{modelo-mejor-gcv} (RMSE \res{gcv-rmse-mejor}), seguido
+muy de cerca por el MCO de efectos sin indicadoras (\res{gcv-rmse-mco-efectos}): las indicadoras
+de estado no sirven para estados nuevos, y un modelo parsimonioso generaliza mejor.
+
+El modelo propuesto con indicadoras de los \res{ind-top-k} condados más influyentes predice
+prácticamente igual que el MCO de efectos sin ellas: RMSE \res{cv-rmse-mco-indicadoras} frente a
+\res{cv-rmse-mco-efectos} en validación cruzada aleatoria, \res{gcv-rmse-mco-indicadoras} frente a
+\res{gcv-rmse-mco-efectos} en la agrupada por estado y \res{test-rmse-mco-indicadoras} frente a
+\res{test-rmse-mco-efectos} en prueba. Son diferencias de centésimas, muy por debajo de la
+variabilidad entre pliegues (desviación típica \res{cv-rmse-mco-efectos-dt}): estimar sin esos
+condados no mejora la predicción, otra razón para no adoptarlo como modelo final.
 
 \section{Importancia de las variables}
 

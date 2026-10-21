@@ -1,0 +1,17 @@
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{Indicadoras de los 5 condados más influyentes: estimación y contraste}\label{tab:indicadoras-condados}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X r r r r r r r}
+\toprule
+Condado & Población & $y$ & Cook & $\hat\delta$ & $t$ & $p$ & $p$ Bonf. \\
+\midrule
+Williamsburg city, Virginia & \num{15052} & \num{162.1} & \num{0.0977} & \num{-113.9} & \num{-6.10} & $<\num{0.001}$ & $<\num{0.001}$ \\
+De Baca County, New Mexico & \num{1828} & \num{243.6} & \num{0.0716} & \num{89.9} & \num{4.79} & $<\num{0.001}$ & \num{0.005} \\
+Crowley County, Colorado & \num{5562} & \num{110.7} & \num{0.0407} & \num{-55.5} & \num{-2.92} & \num{0.004} & \num{1.000} \\
+Nome Census Area, Alaska & \num{9846} & \num{277.6} & \num{0.0246} & \num{75.1} & \num{4.07} & $<\num{0.001}$ & \num{0.138} \\
+Wibaux County, Montana & \num{1130} & \num{214.4} & \num{0.0232} & \num{76.7} & \num{4.16} & $<\num{0.001}$ & \num{0.093} \\
+\bottomrule
+\end{tabularx}
+\par\smallskip{\footnotesize\raggedright $\hat\delta_i=y_i-\hat y_{(i)}$: error de predicción del condado cuando no interviene en el ajuste. Su $t$ es el residuo estudentizado externamente; el $p$ de Bonferroni lo multiplica por $n$ porque se examinan todos los condados.\par}
+\end{table}
