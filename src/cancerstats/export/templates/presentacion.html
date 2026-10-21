@@ -261,6 +261,13 @@ const SLIDES = [
       const ok = d.p == null || d.p >= 0.05;
       return `<span class="reveal" style="--d:${i + 2};font-weight:700">${d.name}</span><span class="reveal muted" style="--d:${i + 2}">${d.test}: ${d.p == null ? num(d.value, 2) : pv(d.p)}</span><span class="status reveal" style="--d:${i + 2};color:${ok ? "var(--good)" : "var(--serious)"}">${ok ? "✓" : "⚠"} ${d.action}</span>`;
     }).join("")}</div></div>`,
+  ...(D.indicators ? [() => `<div class="inner"><div class="eyebrow reveal">Atípicos · variables indicadoras</div>
+    <h2 class="reveal" style="--d:1">${D.indicators.models.some((m) => m.exclude) ? "Algún grupo de atípicos cambia las conclusiones." : "Excluir atípicos no compensa."}</h2>
+    <div class="grid g3" style="margin-top:1em">${D.indicators.models.map((m, i) => `<div class="tile reveal" style="--d:${i + 2}"><div class="label">${esc(m.title)} · ${m.q} indicadoras</div>
+      <div class="mid">${num(m.max_change, 2)}<span class="unit"> EE</span></div><div class="unit">mayor cambio de un coeficiente</div>
+      <p class="muted" style="margin:.6em 0 0">R² aj. ${num(D.indicators.r2_adj_final, 3)} → ${num(m.r2_adj, 3)} · ${m.n_bonf} atípicos de Bonferroni${m.p_cal == null ? "" : ` · F calibrado ${pv(m.p_cal)}`}</p>
+      <div class="status" style="margin-top:.5em;color:${m.exclude ? "var(--serious)" : "var(--good)"}">${m.exclude ? "⚠ Excluir" : "✓ Mantener"}${m.changes ? ` · ${m.changes} coef. cambian de significación` : ""}</div></div>`).join("")}</div>
+    <p class="lead wide reveal" style="--d:5;margin-top:1em">Una indicadora por condado equivale a excluirlo. Se excluiría un grupo sólo si es atípico y cambia alguna conclusión.</p></div>`] : []),
   () => `<div class="inner"><div class="eyebrow reveal">Sensibilidad</div>
     <h2 class="reveal" style="--d:1">La conclusión no depende de las decisiones.</h2>
     <div class="reveal" style="--d:2">${forest(D.sensitivity.rows, { rowH: 34, left: 470, fmt: 3, fit: true })}</div>

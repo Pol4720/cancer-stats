@@ -219,6 +219,7 @@ def slide_data(res: dict[str, Any]) -> dict[str, Any]:
             },
         ],
         "sensitivity": {"term": label(key), "rows": sens},
+        "indicators": _indicators(eff),
         "prediction": {
             "chosen": pred.get("chosen_label"),
             "cv": [
@@ -240,6 +241,34 @@ def slide_data(res: dict[str, Any]) -> dict[str, Any]:
                 (r["r2"] for r in pred.get("test", []) if r["model"] == pred.get("chosen")), None
             ),
         },
+    }
+
+
+def _indicators(eff: dict[str, Any]) -> dict[str, Any] | None:
+    """Modelos con variables indicadoras de atípicos, resumidos para una diapositiva."""
+    oi = eff.get("outlier_indicators")
+    if not oi or not oi["models"]:
+        return None
+    titles = {
+        "top": f"Los {oi['top']} más influyentes",
+        "bonferroni": "Atípicos de Bonferroni",
+        "cook4n": "Cook > 4/n",
+    }
+    return {
+        "r2_adj_final": oi["models"][0]["r2_adj_final"],
+        "models": [
+            {
+                "title": titles[m["id"]],
+                "q": m["q"],
+                "r2_adj": m["r2_adj"],
+                "max_change": m["max_cambio_se"],
+                "p_cal": m.get("p_calibrado"),
+                "n_bonf": m["n_bonferroni"],
+                "changes": len(m["cambian"]),
+                "exclude": m["veredicto"]["vale_la_pena"],
+            }
+            for m in oi["models"]
+        ],
     }
 
 

@@ -562,6 +562,7 @@ def macros(res: Results) -> dict[str, str]:
         if pred["group_cv"]:
             gbest = min(pred["group_cv"], key=lambda r: r["rmse_mean"])
             m["modelo-mejor-gcv"] = _model_name(gbest["label"])
+            m["gcv-rmse-mejor"] = num(gbest["rmse_mean"], 2)
         for row in pred["test"]:
             a = MODEL_ALIAS[row["model"]]
             m[f"test-rmse-{a}"] = num(row["rmse"], 2)
@@ -611,6 +612,19 @@ def macros(res: Results) -> dict[str, str]:
 IND_ALIAS = {"top": "ind5", "bonferroni": "indbonf", "cook4n": "indcook"}
 
 
+def _county(cid: str) -> str:
+    """«Condado (Estado)»: los nombres con coma serían ambiguos dentro de una enumeración."""
+    name, _, state = cid.rpartition(", ")
+    return tex_escape(f"{name} ({state})" if name else cid)
+
+
+def _term_in_text(term: str) -> str:
+    """Término en minúscula dentro de una frase, conservando los nombres de región."""
+    if term.startswith("region["):
+        return f"región {tex_escape(term[7:-1])}"
+    return tex_escape(term_label(term)).lower()
+
+
 def _indicator_macros(eff: Results) -> dict[str, str]:
     """Cifras de los modelos con variables indicadoras de atípicos (cambio en la media)."""
     m: dict[str, str] = {}
@@ -622,13 +636,14 @@ def _indicator_macros(eff: Results) -> dict[str, str]:
     m["bonf-critico"] = num(bonf["critico"], 2)
     m["bonf-gl"] = integer(bonf["gl"])
     m["bonf-n"] = integer(len(bonf["outliers"]))
-    m["bonf-condados"] = join_es([tex_escape(o["county_id"]) for o in bonf["outliers"]])
+    m["bonf-condados"] = join_es([_county(o["county_id"]) for o in bonf["outliers"]])
     if bonf["outliers"]:
         m["bonf-mayor"] = tex_escape(bonf["outliers"][0]["county_id"])
         m["bonf-mayor-r"] = num(bonf["outliers"][0]["stud_resid"], 2)
     for mod in oi["models"]:
         a = IND_ALIAS[mod["id"]]
         m[f"{a}-q"] = integer(mod["q"])
+        m[f"{a}-pct"] = num(100 * mod["q"] / mod["n"], 1)
         m[f"{a}-r2"] = num(mod["r2"], 3)
         m[f"{a}-r2aj"] = num(mod["r2_adj"], 3)
         m[f"{a}-sigma"] = num(mod["sigma"], 2)
@@ -644,9 +659,7 @@ def _indicator_macros(eff: Results) -> dict[str, str]:
         m[f"{a}-nsig"] = integer(mod["n_significativas"])
         m[f"{a}-maxcambio"] = num(mod["max_cambio_se"], 2)
         m[f"{a}-ncambian"] = integer(len(mod["cambian"]))
-        m[f"{a}-cambian"] = (
-            join_es([tex_escape(term_label(t)).lower() for t in mod["cambian"]]) or "ninguno"
-        )
+        m[f"{a}-cambian"] = join_es([_term_in_text(t) for t in mod["cambian"]]) or "ninguno"
         v = mod["veredicto"]
         m[f"{a}-veredicto"] = "sí" if v["vale_la_pena"] else "no"
         if mod["id"] == "top":
@@ -657,7 +670,7 @@ def _indicator_macros(eff: Results) -> dict[str, str]:
                 m[f"ind5-condado{k}"] = tex_escape(ind["county_id"])
                 m[f"ind5-delta{k}"] = num(ind["delta"], 1)
             m["ind5-atipicos"] = join_es(
-                [tex_escape(i["county_id"]) for i in mod["indicators"] if i["atipico"]]
+                [_county(i["county_id"]) for i in mod["indicators"] if i["atipico"]]
             )
     cal = oi.get("calibration")
     if cal:
