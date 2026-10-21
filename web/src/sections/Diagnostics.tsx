@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Plot } from "../charts/Plot";
+import { OutlierIndicators } from "../components/OutlierIndicators";
 import { Card, DataTable, Explain, Section, Segmented, StatusTag } from "../components/ui";
 import { int, num, pval, termLabel } from "../lib/format";
 import { lowess } from "../lib/stats";
@@ -61,7 +62,7 @@ export default function Diagnostics() {
             <li><strong>Heterocedasticidad y dependencia por estado</strong>: errores típicos robustos por conglomerados (inferencia válida sin suponer varianza constante ni independencia dentro del estado).</li>
             <li><strong>Colas algo pesadas</strong>: con n ≈ 2 800 los estimadores MCO son aproximadamente normales (TCL); además, el bootstrap por conglomerados no supone normalidad y da intervalos muy parecidos.</li>
             <li><strong>Curvatura leve</strong>: transformaciones logarítmicas previas; el RESET global no detecta mala especificación grave.</li>
-            <li><strong>Influencia</strong>: se reestima sin los condados influyentes (sensibilidad) y con regresión robusta de Huber.</li>
+            <li><strong>Influencia</strong>: variables indicadoras de los condados más influyentes, contraste de atípicos de Bonferroni y F del bloque de indicadoras (calibrado) para decidir si compensa excluirlos; además, regresión robusta de Huber.</li>
           </ul>
         </Explain>
       </Card>
@@ -308,6 +309,7 @@ export default function Diagnostics() {
       )}
 
       {tab === "influencia" && (
+        <>
         <div className="grid grid-2">
           <Card title="Apalancamiento frente a residuo estudentizado" sub={`El tamaño del punto es la distancia de Cook. Umbrales: h > ${num(inf.thresholds.leverage, 4)}, |r*| > ${num(inf.thresholds.studentized, 1)}.`}>
             <Plot
@@ -361,6 +363,8 @@ export default function Diagnostics() {
             />
           </Card>
         </div>
+        <OutlierIndicators />
+        </>
       )}
     </Section>
   );

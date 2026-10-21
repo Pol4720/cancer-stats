@@ -52,3 +52,15 @@ test("el menú lateral se abre en móvil", async ({ page, isMobile }) => {
   await page.getByRole("link", { name: /Diagnóstico/ }).click();
   await expect(page).toHaveURL(/#\/diagnostico/);
 });
+
+test("la pestaña de influencia muestra las variables indicadoras de atípicos sin desbordar", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/#/diagnostico");
+  await page.getByRole("group", { name: "Hipótesis" }).getByRole("button", { name: "Influencia" }).click();
+  await expect(page.getByText("Variables indicadoras de atípicos: ¿conviene excluirlos del ajuste?")).toBeVisible();
+  await expect(page.getByText("Calibración del F de las indicadoras elegidas por Cook")).toBeVisible();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+  expect(errors).toEqual([]);
+});

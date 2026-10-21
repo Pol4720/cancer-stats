@@ -1,4 +1,5 @@
 import { Plot } from "../charts/Plot";
+import { IndicatorComparison } from "../components/OutlierIndicators";
 import { Card, DataTable, Explain, Section, Stat } from "../components/ui";
 import { int, num, pval, termLabel } from "../lib/format";
 import { useApp } from "../lib/store";
@@ -211,6 +212,22 @@ export default function Building() {
           ]}
         />
       </Card>
+
+      {e.outlier_indicators && (
+        <Card
+          title="Paso 7 · Modelo propuesto con indicadoras de atípicos"
+          sub={`El modelo final frente al mismo modelo con una indicadora por cada uno de los ${int(e.outlier_indicators.top)} condados más influyentes, por los atípicos de Bonferroni y por los de Cook > 4/n (n = ${int(e.final.n)}).`}
+        >
+          <IndicatorComparison name="comparacion-indicadoras" />
+          <Explain title="¿Compensa el modelo con indicadoras?">
+            <p>
+              Una indicadora por condado equivale a excluirlo del ajuste. El modelo con las de los {int(e.outlier_indicators.top)} más influyentes
+              ajusta mejor (menor AIC y BIC), pero no cambia ninguna conclusión del modelo final; el detalle, con la calibración del F y el cambio de cada
+              coeficiente, está en «Diagnóstico → Influencia».
+            </p>
+          </Explain>
+        </Card>
+      )}
     </Section>
   );
 }

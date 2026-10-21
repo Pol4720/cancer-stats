@@ -28,7 +28,7 @@ export default function Prediction() {
     <Section
       eyebrow="10 · Predicción"
       title="Un modelo para predecir, evaluado con honestidad"
-      lead="El modelo de efectos busca interpretar; el predictivo, acertar en condados nuevos. Se comparan ocho modelos con validación cruzada anidada en entrenamiento y el elegido se evalúa una sola vez en la partición de prueba."
+      lead={`El modelo de efectos busca interpretar; el predictivo, acertar en condados nuevos. Se comparan ${p.cv.length} modelos (entre ellos el MCO de efectos con indicadoras de los condados más influyentes) con validación cruzada anidada en entrenamiento y el elegido se evalúa una sola vez en la partición de prueba.`}
     >
       <div className="grid grid-4">
         <Stat label="Modelo elegido" value={<span style={{ fontSize: "1.3rem" }}>{p.chosen_label}</span>} note={`regla: ${rule}`} />

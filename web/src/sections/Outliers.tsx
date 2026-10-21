@@ -15,7 +15,7 @@ export default function Outliers() {
     <Section
       eyebrow="5 · Atípicos"
       title="Valores atípicos: detectar no es eliminar"
-      lead="Se buscan atípicos en cada variable (Tukey y z robusto) y en el espacio conjunto (distancia de Mahalanobis robusta, MCD). Un atípico verificado como real se conserva; su influencia sobre el modelo se evalúa después."
+      lead="Se buscan atípicos en cada variable (Tukey y z robusto) y en el espacio conjunto (distancia de Mahalanobis robusta, MCD). Un atípico verificado como real se conserva; en el modelo, su influencia se mide con Cook y se contrasta con variables indicadoras (Diagnóstico → Influencia)."
     >
       <div className="grid grid-4">
         <Stat label="Atípicos de Tukey en la respuesta" value={int(resp?.n_tukey)} note={`vallas ${num(resp?.valla_inferior, 1)} y ${num(resp?.valla_superior, 1)}`} />
